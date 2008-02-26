@@ -1,4 +1,4 @@
-#summary Project status
+#summary The status of the project
+#labels Featured
 
-= Introduction =
 Hello good evening and welcome.  We're not quite ready for you yet.  Would you care to take a seat?
