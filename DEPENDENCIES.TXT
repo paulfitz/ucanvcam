@@ -1,0 +1,259 @@
+
+============================================================================
+==
+== Basic list of dependencies
+
+Core libraries:
+  gd
+  freetype
+  SDL
+  YARP
+
+Merged components:
+
+  effects from effectv
+    effectv/
+
+  some windows registry code from cmake 
+    common/registry.cpp
+
+  linux loopback example
+    linux_loopback.cpp
+
+Optional windows parts:
+
+  vdub driver, from virtualdub
+    modules/vdub
+
+  activex shell, based on an example from rep movsd via the mad hatter
+    activex/
+    
+Optional library dependency on windows:
+
+  directx includes, baseclasses.
+
+
+============================================================================
+==
+== Requirements for redistribution:
+
+This project uses the YARP library under the GPL.
+
+
+This project uses the ACE library (via YARP) under its license terms:
+  http://www.cs.wustl.edu/~schmidt/ACE-copying.html
+
+
+This project uses the freetype library under the GPL version 2
+(BSD license also available).
+
+
+
+This project uses the SDL library under the LGPL license.
+
+
+
+This project uses the wxWidgets library under the wxWindows license
+(essentially the LGPL license with an extra right).
+
+
+
+This project incorporates files from EffecTV v0.3.11, released under
+the GPL 2.  See individual source files in the "effectv/" directory
+of this project's source code for copyright statements.
+
+
+
+
+This project uses a modified version of SystemTools.cxx from the 
+CMake project.  Here is the original copyright statement of that
+source file:
+
+/*=========================================================================
+
+  Program:   KWSys - Kitware System Library
+  Module:    $RCSfile: SystemTools.cxx,v $
+
+  Copyright (c) Kitware, Inc., Insight Consortium.  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+/*
+
+CMake was initially developed by Kitware with the following sponsorship:
+
+ * National Library of Medicine at the National Institutes of Health
+   as part of the Insight Segmentation and Registration Toolkit (ITK).
+
+ * US National Labs (Los Alamos, Livermore, Sandia) ASC Parallel 
+   Visualization Initiative.
+
+ * National Alliance for Medical Image Computing (NAMIC) is funded by the
+   National Institutes of Health through the NIH Roadmap for Medical Research,
+   Grant U54 EB005149.
+
+ * Kitware, Inc.
+
+The CMake copyright is as follows:
+
+Copyright (c) 2002 Kitware, Inc., Insight Consortium
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ * The names of Kitware, Inc., the Insight Consortium, or the names of
+   any consortium members, or of any contributors, may not be used to
+   endorse or promote products derived from this software without
+   specific prior written permission.
+
+ * Modified source versions must be plainly marked as such, and must
+   not be misrepresented as being the original software.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS ``AS IS''
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+See also the CMake web site: http://www.cmake.org for more information.
+  */
+
+
+
+
+
+
+
+This project uses gd, under the following licence terms:
+
+
+Portions copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 by Cold Spring Harbor Laboratory. Funded under Grant P41-RR02188 by the National Institutes of Health.
+
+Portions copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 by Boutell.Com, Inc.
+
+Portions relating to GD2 format copyright 1999, 2000, 2001, 2002, 2003, 2004 Philip Warner.
+
+Portions relating to PNG copyright 1999, 2000, 2001, 2002, 2003, 2004 Greg Roelofs.
+
+Portions relating to gdttf.c copyright 1999, 2000, 2001, 2002, 2003, 2004 John Ellson (ellson@graphviz.org).
+
+Portions relating to gdft.c copyright 2001, 2002, 2003, 2004 John Ellson (ellson@graphviz.org).
+
+Portions relating to JPEG and to color quantization copyright 2000, 2001, 2002, 2003, 2004, Doug Becker and copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Thomas G. Lane. This software is based in part on the work of the Independent JPEG Group. See the file README-JPEG.TXT for more information.
+
+Portions relating to GIF compression copyright 1989 by Jef Poskanzer and David Rowley, with modifications for thread safety by Thomas Boutell.
+
+Portions relating to GIF decompression copyright 1990, 1991, 1993 by David Koblas, with modifications for thread safety by Thomas Boutell.
+
+Portions relating to WBMP copyright 2000, 2001, 2002, 2003, 2004 Maurice Szmurlo and Johan Van den Brande.
+
+Portions relating to GIF animations copyright 2004 Jaakko Hyvätti (jaakko.hyvatti@iki.fi)
+
+Permission has been granted to copy, distribute and modify gd in any context without fee, including a commercial application, provided that this notice is present in user-accessible supporting documentation.
+
+This does not affect your ownership of the derived work itself, and the intent is to assure proper credit for the authors of gd, not to interfere with your productive use of gd. If you have questions, ask. "Derived works" includes all programs that utilize the library. Credit must be given in user-accessible documentation.
+
+This software is provided "AS IS." The copyright holders disclaim all warranties, either express or implied, including but not limited to implied warranties of merchantability and fitness for a particular purpose, with respect to this code and accompanying documentation.
+
+Although their code does not appear in the current release, the authors also wish to thank Hutchison Avenue Software Corporation for their prior contributions. 
+
+
+
+This project optionally uses Microsoft DirectShow on the windows
+system; the source code can be downloaded directly from the vendor, or
+is also packaged in the project "drdivx" under the GPL license.
+
+  svn co https://drdivx.svn.sourceforge.net/svnroot/drdivx/DrDivX/trunk drdivx
+
+
+The sybig.ttf font is from the larabie font collection in the "ttf-larabie-uncommon"
+package on debian.
+  Fonts Homepage: http://www.larabiefonts.com/
+  Author: Ray Larabie <rlarabie@hotmail.com>
+Here's the copyright statement:
+
+copyright:
+-------------------------------
+Larabie Fonts End-user license agreement software product from Larabie Fonts
+---------------------------------------------------
+
+SOFTWARE PRODUCT LICENSE
+
+The SOFTWARE PRODUCT is protected by copyright laws and international copyright
+treaties, as well as other intellectual property laws and treaties. The
+SOFTWARE PRODUCT is licensed, not sold.
+
+1. GRANT OF LICENSE. This document grants you the following rights:
+
+- Installation and Use. You may install and use an unlimited number of copies
+  of the SOFTWARE PRODUCT.  You may copy and distribute unlimited copies of the
+  SOFTWARE PRODUCT as you receive them, in any medium, provided that you
+  publish on each copy an appropriate copyright notice. Keep intact all the
+  notices that refer to this License. And give any other  recipients of the
+  fonts a copy of this License along with the fonts.
+
+2. DESCRIPTION OF OTHER RIGHTS AND LIMITATIONS. 
+
+- You may modify your copy or copies of the fonts or any portion of it,
+  provided that you also meet all of these rules:
+
+	a) Do not alter in any way alphamumerics(eq. a-z, 1-9) contained in the
+	font. An exception is converting between formats, here is allowed the
+	nominal distortion that occurs during conversion from second order to
+	third order quadratic curves (TrueType to Postscript) and vice versa.
+
+	b) Extra characters may be added, here it is allowed to use curves from
+	alphanumerics in fonts under same license.
+
+	c) It is allowed to modify and remove analpahbetics (punctuation,
+	special characters, ligatures and symbols).
+
+	d) The original font name must remain but can be augmented. (ie.  Blue
+	Highway Cyrillic, Blue Highway ANSI, Blue Highway Fudge)
+
+	e) Character mapping may be altered.
+
+	f) If the kerning information is damaged or discarded please state that
+	in the user notes or documentation.
+
+	g) All modifications must be released under this license.
+
+LIMITED WARRANTY
+NO WARRANTIES. Larabie Fonts expressly disclaims any warranty for the SOFTWARE
+PRODUCT. The SOFTWARE PRODUCT and any related documentation is provided "as is"
+without warranty of any kind, either express or implied, including, without
+limitation, the implied warranties or merchantability, fitness for a particular
+purpose, or noninfringement. The entire risk arising out of use or performance
+of the SOFTWARE PRODUCT remains with you.
+
+NO LIABILITY FOR CONSEQUENTIAL DAMAGES. In no event shall Larabie Fonts be
+liable for any damages whatsoever (including, without limitation, damages for
+loss of business profits, business interruption, loss of business information,
+or any other pecuniary loss) arising out of the use of or inability to use this
+product, even if Larabie Fonts has been advised of the possibility of such
+damages.
+
+3. MISCELLANEOUS
+
+Should you have any questions concerning this document, or if you desire to
+contact Larabie Fonts for any reason, please contact rlarabie@hotmail.com , or
+write: Ray Larabie, 61 Wesley Ave. Mississauga, ON Canada L5H 2M8
