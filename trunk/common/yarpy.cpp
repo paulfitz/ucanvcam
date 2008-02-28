@@ -40,7 +40,7 @@ void screen_setcaption(const char *str) {
 static YarpEffect *ye = NULL;
 static ImageOf<PixelBgra> src, dest;
 
-void yarpy_init(Image& in) {
+void yarpy_old_init(Image& in) {
   static bool first = true;
   if (first) {
     bool cp = false;
@@ -62,14 +62,14 @@ void yarpy_init(Image& in) {
       sharedbuffer_init();
 
       //ye = effects.search("NervousTV");
-      //ye = YarpEffects::get().search("TickerTV");
+      ye = YarpEffects::get().search("TickerTV");
       //ye = YarpEffects::get().search("EngageTV");
 
 #ifdef WIN32
 #else
       //      ye = YarpEffects::get().search("ParamTV");
 #endif
-      ye = YarpEffects::get().search("BrokenTV");
+      //ye = YarpEffects::get().search("BrokenTV");
 
       if (ye!=NULL) {
 	ye->start();
@@ -77,6 +77,65 @@ void yarpy_init(Image& in) {
 
   }
   first = false;
+}
+
+void yarpy_init() {
+  static bool first = true;
+  if (first) {
+    
+    //ye = effects.search("NervousTV");
+    ye = YarpEffects::get().search("TickerTV");
+    //ye = YarpEffects::get().search("EngageTV");
+    
+#ifdef WIN32
+#else
+    //      ye = YarpEffects::get().search("ParamTV");
+#endif
+    //ye = YarpEffects::get().search("BrokenTV");
+  }
+  first = false;
+}
+
+
+void yarpy_start(Image& in) {
+  static bool first = true;
+  if (first) {
+    bool cp = false;
+    if (in.getPixelCode()!=src.getPixelCode()) {
+      src.copy(in);
+      cp = true;
+    }
+      video_width = in.width();
+      video_height = in.height();
+      video_area = video_width*video_height;
+    
+      screen_width = in.width();
+      screen_height = in.height();
+    
+      screen->pixels = RAW(cp?src:in);
+      //screen_init(video_width,video_height,1);
+      image_init();
+      //palette_init();
+      sharedbuffer_init();
+
+#ifdef WIN32
+#else
+      //      ye = YarpEffects::get().search("ParamTV");
+#endif
+      //ye = YarpEffects::get().search("BrokenTV");
+
+      if (ye!=NULL) {
+	ye->start();
+      }
+
+  }
+  first = false;
+}
+
+
+void yarpy_init(Image& in) {
+  yarpy_init();
+  yarpy_start(in);
 }
 
 

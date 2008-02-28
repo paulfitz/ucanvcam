@@ -14,17 +14,25 @@
 
 #include "location.h"
 
+#include <string>
+
 using namespace yarp::os;
 using namespace yarp::sig;
+
+using namespace std;
 
 class YarpyTickerEffect : public YarpEffect {
 private:
   gdImageStruct access;
   ImageOf<PixelBgra> idest;
+  Property options;
+  string txt;
 public:
   YarpyTickerEffect() {
     access.sx = 0;
     access.sy = 0;
+    options.put("text", "Welcome to ucanvcam!");
+    reconfigure(options);
   }
 
   //virtual void draw(ImageOf<PixelRgba>& src2, ImageOf<PixelRgba>& dest2);
@@ -34,6 +42,18 @@ public:
 
   std::string getName() {
     return "TickerTV";
+  }
+
+  virtual bool reconfigure(yarp::os::Searchable& config) {
+    options.fromString(config.toString());
+    if (options.check("text")) {
+      txt = options.check("text",Value("huh?")).toString().c_str();
+    }
+    return true;
+  }
+
+  virtual Property getConfiguration() {
+    return options;
   }
 };
 
@@ -92,7 +112,6 @@ yarp::sig::Image *YarpyTickerEffect::pdraw(yarp::sig::Image& src,
   int pt = 24;
   int xx = src.width()-(int)(offset+0.5);
   int yy = src.height()-10;
-  char *txt = "Happy VALENTINE's day!";
 
   for (int i=-1; i<=1; i++) {
     for (int j=-1; j<=1; j++) {
@@ -100,14 +119,14 @@ yarp::sig::Image *YarpyTickerEffect::pdraw(yarp::sig::Image& src,
       if (i!=0&&j!=0) {
 	gdImageStringFT(im, &brect[0], 
 			gdTrueColorAlpha(10, 10, 10, 0),
-			fnt, pt, 0, xx+i, yy+j, txt);
+			fnt, pt, 0, xx+i, yy+j, (char*)txt.c_str());
       }
     }
   }
 
   gdImageStringFT(im, &brect[0], 
 		  gdTrueColorAlpha(255, colr, 0, 0),
-		  fnt, pt, 0, xx, yy, txt);
+		  fnt, pt, 0, xx, yy, (char*)txt.c_str());
 
   // we've gone off the left; wrap
   if (brect[2]<0) {
