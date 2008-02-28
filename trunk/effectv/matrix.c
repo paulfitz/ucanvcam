@@ -67,24 +67,6 @@ effect *matrixRegister(void)
 {
 	effect *entry;
 	
-	sharedbuffer_reset();
-	mapW = video_width / FONT_W;
-	mapH = video_height / FONT_H;
-	cmap = (unsigned char *)sharedbuffer_alloc(mapW * mapH);
-	vmap = (unsigned char *)sharedbuffer_alloc(mapW * mapH);
-	img = (unsigned char *)sharedbuffer_alloc(mapW * mapH);
-	if(cmap == NULL || vmap == NULL || img == NULL) {
-		return NULL;
-	}
-
-	blips = (Blip *)sharedbuffer_alloc(mapW * sizeof(Blip));
-	if(blips == NULL) {
-		return NULL;
-	}
-
-	setPattern();
-	setPalette();
-
 	entry = (effect *)malloc(sizeof(effect));
 	if(entry == NULL) {
 		return NULL;
@@ -101,6 +83,26 @@ effect *matrixRegister(void)
 
 static int start(void)
 {
+  // move begins
+	sharedbuffer_reset();
+	mapW = video_width / FONT_W;
+	mapH = video_height / FONT_H;
+	cmap = (unsigned char *)sharedbuffer_alloc(mapW * mapH);
+	vmap = (unsigned char *)sharedbuffer_alloc(mapW * mapH);
+	img = (unsigned char *)sharedbuffer_alloc(mapW * mapH);
+	if(cmap == NULL || vmap == NULL || img == NULL) {
+		return 1;
+	}
+
+	blips = (Blip *)sharedbuffer_alloc(mapW * sizeof(Blip));
+	if(blips == NULL) {
+		return 1;
+	}
+
+	setPattern();
+	setPalette();
+	// move ends
+
 	memset(cmap, CHARNUM - 1, mapW * mapH * sizeof(unsigned char));
 	memset(vmap, 0, mapW * mapH * sizeof(unsigned char));
 	memset(blips, 0, mapW * sizeof(Blip));

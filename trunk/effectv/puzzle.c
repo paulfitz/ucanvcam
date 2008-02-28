@@ -54,35 +54,6 @@ static void autoSolve(void);
 effect *puzzleRegister(void)
 {
 	effect *entry;
-	int x, y;
-
-	blockSize = BLOCKSIZE;
-	if(video_width < 320) {
-		blockSize = video_width / 4;
-	}
-	if(video_height < 240) {
-		if((video_height / 3) < blockSize) {
-			blockSize = video_height / 3;
-		}
-	}
-	blockW = video_width / blockSize;
-	blockH = video_height / blockSize;
-	blockNum = blockW * blockH;
-
-	blocks = (Block *)malloc(blockNum * sizeof(Block));
-	if(blocks == NULL) {
-		return NULL;
-	}
-
-	for(y=0; y<blockH; y++) {
-		for(x=0; x<blockW; x++) {
-			blocks[y * blockW + x].destOffset
-				= (y * video_width + x) * blockSize;
-		}
-	}
-
-	marginW = video_width - blockW * blockSize;
-	marginH = video_height - blockH * blockSize;
 
 	entry = (effect *)malloc(sizeof(effect));
 	if(entry == NULL) {
@@ -101,6 +72,39 @@ effect *puzzleRegister(void)
 static int start(void)
 {
 	int i, a, b, c;
+
+	// move begins
+	int x, y;
+
+	blockSize = BLOCKSIZE;
+	if(video_width < 320) {
+		blockSize = video_width / 4;
+	}
+	if(video_height < 240) {
+		if((video_height / 3) < blockSize) {
+			blockSize = video_height / 3;
+		}
+	}
+	blockW = video_width / blockSize;
+	blockH = video_height / blockSize;
+	blockNum = blockW * blockH;
+
+	if (blocks!=NULL) { free(blocks); blocks = NULL; }
+	blocks = (Block *)malloc(blockNum * sizeof(Block));
+	if(blocks == NULL) {
+		return 1;
+	}
+
+	for(y=0; y<blockH; y++) {
+		for(x=0; x<blockW; x++) {
+			blocks[y * blockW + x].destOffset
+				= (y * video_width + x) * blockSize;
+		}
+	}
+
+	marginW = video_width - blockW * blockSize;
+	marginH = video_height - blockH * blockSize;
+	// move ends
 
 	for(i=0; i<blockNum; i++) {
 		blocks[i].position = i;

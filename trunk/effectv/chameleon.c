@@ -36,12 +36,6 @@ effect *chameleonRegister(void)
 {
 	effect *entry;
 	
-	sharedbuffer_reset();
-	sum = (unsigned int *)sharedbuffer_alloc(video_area * sizeof(unsigned int));
-	bgimage = (RGB32 *)sharedbuffer_alloc(video_area * PIXEL_SIZE);
-	if(sum == NULL || bgimage == NULL)
-		return NULL;
-
 	entry = (effect *)malloc(sizeof(effect));
 
 	if(entry == NULL) {
@@ -59,6 +53,14 @@ effect *chameleonRegister(void)
 
 static int start(void)
 {
+	sharedbuffer_reset();
+	sum = (unsigned int *)sharedbuffer_alloc(video_area * sizeof(unsigned int));
+	bgimage = (RGB32 *)sharedbuffer_alloc(video_area * PIXEL_SIZE);
+	if(sum == NULL || bgimage == NULL)
+		return 1;
+	// move ends
+
+
 	timebuffer = (unsigned char *)malloc(video_area * PLANES);
 	if(timebuffer == NULL)
 		return -1;

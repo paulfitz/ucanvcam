@@ -1,4 +1,7 @@
 
+#ifndef YEFFECTS_INC
+#define YEFFECTS_INC
+
 #include <yarp/sig/Image.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/dev/DeviceDriver.h>
@@ -105,6 +108,8 @@ YarpEffect *ypaulfitzRegister();
 YarpEffect *ytickerRegister();
 
 YarpEffect *yparamRegister();
+
+#endif
 
 
 

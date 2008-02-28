@@ -47,11 +47,6 @@ effect *pupRegister(void)
 {
 	effect *entry;
 
-	sharedbuffer_reset();
-	buffer = (RGB32 *)sharedbuffer_alloc(video_area * PIXEL_SIZE);
-	if(buffer == NULL)
-		return NULL;
-
 	entry = (effect *)malloc(sizeof(effect));
 	if(entry == NULL)
 		return NULL;
@@ -67,6 +62,14 @@ effect *pupRegister(void)
 
 static int start(void)
 {
+  // move begines
+	sharedbuffer_reset();
+	buffer = (RGB32 *)sharedbuffer_alloc(video_area * PIXEL_SIZE);
+	if(buffer == NULL)
+		return 1;
+	// move ends
+
+
 	bgIsSet = 0;
 	state = 1;
 

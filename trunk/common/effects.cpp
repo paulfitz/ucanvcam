@@ -51,17 +51,19 @@ static effectRegisterFunc *effects_register_list[] =
 	diffRegister,
 	scrollRegister,
 	warholRegister,
-	matrixRegister,
-	pupRegister,
-	chameleonRegister,
-	opRegister,
-	nervousHalfRegister,
-	slofastRegister,
-	displayWallRegister,
+	// DROP until register and init are separated -
+	// image size can change
+	//matrixRegister,
+	//pupRegister,
+	//chameleonRegister,
+	//opRegister,
+	//nervousHalfRegister,
+	//slofastRegister,
+	////displayWallRegister,
 	//bluescreenRegister,
-	colstreakRegister,
-	timeDistortionRegister,
-	edgeBlurRegister,
+	//colstreakRegister,
+	//timeDistortionRegister,
+	//edgeBlurRegister,
 };
 
 static effect **effectsList;
