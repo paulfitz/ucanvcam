@@ -1,17 +1,19 @@
 PROJECT(ucanvcam)
 
-# GUI not ready
-SET (USE_GUI FALSE)
+# do we want a standalone program or a plugin of some kind?
+SET (STANDALONE TRUE CACHE BOOL "standalone")
 
-IF (USE_GUI)
+# new GUI not ready
+SET (USE_NEW_GUI FALSE CACHE BOOL "work with new gui (not available yet!)")
+
+IF (USE_NEW_GUI)
   FIND_PACKAGE(wxWidgets REQUIRED)
   INCLUDE_DIRECTORIES(${wxWidgets_INCLUDE_DIRS})
   ADD_DEFINITIONS(${wxWidgets_DEFINITIONS})
   LINK_LIBRARIES(${wxWidgets_LIBRARIES})
-ENDIF (USE_GUI)
+  INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/wrapper/gui)
+ENDIF (USE_NEW_GUI)
 
-# do we want a standalone program or a plugin of some kind?
-SET (STANDALONE TRUE CACHE BOOL "standalone")
 
 FIND_PACKAGE(YARP REQUIRED)
 
@@ -59,11 +61,11 @@ ENDIF (MINGW)
 
 IF (STANDALONE)
   IF (UNIX)
-    IF (USE_GUI)
-      ADD_EXECUTABLE(${TARGET_NAME} wrapper/gui/gui.cpp ${common_sources})
-    ELSE (USE_GUI)
+    IF (USE_NEW_GUI)
+      ADD_EXECUTABLE(${TARGET_NAME} wrapper/gui/gui.cpp wrapper/linux/VcamLinuxStandalone.cpp ${common_sources})
+    ELSE (USE_NEW_GUI)
       ADD_EXECUTABLE(${TARGET_NAME} wrapper/linux/standalone_linux.cpp ${common_sources})
-    ENDIF (USE_GUI)
+    ENDIF (USE_NEW_GUI)
   ELSE (UNIX)
     ADD_EXECUTABLE(${TARGET_NAME} wrapper/win32/standalone_windows.cpp ${common_sources})
   ENDIF (UNIX)

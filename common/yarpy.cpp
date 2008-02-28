@@ -63,13 +63,13 @@ void yarpy_init(Image& in) {
 
       //ye = effects.search("NervousTV");
       //ye = YarpEffects::get().search("TickerTV");
-      ye = YarpEffects::get().search("EngageTV");
+      //ye = YarpEffects::get().search("EngageTV");
 
 #ifdef WIN32
 #else
       //      ye = YarpEffects::get().search("ParamTV");
 #endif
-      //ye = YarpEffects::get().search("BrokenTV");
+      ye = YarpEffects::get().search("BrokenTV");
 
       if (ye!=NULL) {
 	ye->start();
@@ -136,4 +136,33 @@ bool yarpy_stop() {
 
   return true;
 }
+
+
+
+YarpEffect *yarpy_get_effect() {
+  return ye;
+}
+
+YarpEffect *yarpy_take_effect() {
+  if (ye!=NULL) {
+    ye->stop();
+  }
+  YarpEffect *tmp = ye;
+  ye = NULL;
+  return tmp;
+}
+
+bool yarpy_set_effect(YarpEffect *next) {
+  if (ye!=NULL) {
+    ye->stop();
+    //delete ye;
+    ye = NULL;
+  }
+  ye = next;
+  if (ye!=NULL) {
+    ye->start();
+  }
+}
+
+
 
