@@ -11,6 +11,7 @@ class Effect {
 private:
 public:
   Effect() {
+    yarpy_init();
   }
 
   virtual ~Effect() {
@@ -43,6 +44,21 @@ public:
   bool apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
 	     yarp::sig::ImageOf<yarp::sig::PixelBgr>& out) {
     return yarpy_apply(in,out);
+  }
+
+  yarp::os::Property getConfiguration() {
+    YarpEffect *e = yarpy_get_effect();
+    if (e!=NULL) {
+      return e->getConfiguration();
+    }
+    return yarp::os::Property();
+  }
+
+  void setConfiguration(yarp::os::Property& prop) {
+    YarpEffect *e = yarpy_get_effect();
+    if (e!=NULL) {
+      e->reconfigure(prop);
+    }
   }
 
 private:

@@ -4,6 +4,7 @@
 
 #include <yarp/sig/Image.h>
 #include <yarp/os/Bottle.h>
+#include <yarp/os/Property.h>
 #include <yarp/dev/DeviceDriver.h>
 
 #include <string>
@@ -17,6 +18,14 @@ public:
 
   virtual bool close() {
     return true;
+  }
+
+  virtual bool reconfigure(yarp::os::Searchable& config) {
+    return true;
+  }
+
+  virtual yarp::os::Property getConfiguration() {
+    return yarp::os::Property();
   }
 
   virtual bool draw(yarp::sig::ImageOf<yarp::sig::PixelRgb>& src,

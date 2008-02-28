@@ -95,7 +95,7 @@ public:
 
         if (vcam.isImage()) {
             prev = now;
-            printf("paint %06d\n",ct);
+            //printf("paint %06d\n",ct);
             ct++;
 
             ImageOf<PixelRgb> img;
@@ -119,10 +119,6 @@ public:
         Time::delay(0.02);
 
         wxGetApp().ProcessIdle();
-    }
-
-    void OnChoice(wxCommandEvent& e) {
-        printf("got a choice\n");
     }
 };
 
@@ -163,6 +159,11 @@ public:
         printf("got a choice (frame): %s\n", choice.c_str());
         mutex.wait();
         effect.setEffect(choice.c_str());
+        if (m_textCtrl!=NULL) {
+            m_textCtrl->Clear();
+            m_textCtrl->AppendText(wxString(effect.getConfiguration().toString().c_str(),
+                                            wxConvUTF8));
+        }
         mutex.post();
     }
 
@@ -222,10 +223,13 @@ bool MyFrame::OnInit() {
         new wxChoice(this,wxID_ANY,
                      wxDefaultPosition,
                      wxDefaultSize,
-                       nchoices, 
-                       choices);
+                     nchoices, 
+                     choices);
     delete[] choices;
     choices = NULL;
+    if (effectList!=NULL) {
+        effectList->SetStringSelection("TickerTV");
+    }
     //effectList->SetEditable(false);
 
     m_textCtrl = new wxTextCtrl(this, -1, wxEmptyString,
@@ -236,7 +240,7 @@ bool MyFrame::OnInit() {
     //create two buttons that are horizontally unstretchable, 
     // with an all-around border with a width of 10 and implicit top alignment
     button_sizer->Add(
-                      new wxButton( this, wxID_OK, _T("&Translate") ),
+                      new wxButton( this, wxID_OK, _T("&Configure") ),
                       wxSizerFlags(0).Align(wxALIGN_RIGHT).Border(wxALL, 10));       
     
     button_sizer->Add(
@@ -247,9 +251,9 @@ bool MyFrame::OnInit() {
         wxSizerFlags(0).Align(wxALIGN_LEFT).Border(wxLEFT|wxRIGHT|wxTOP, 10);
     wxSizerFlags flags = 
         wxSizerFlags(0).Align(wxALIGN_CENTER).Border(wxALL, 10);
-    topsizer->Add(view);
-    topsizer->Add(effectList);
-    topsizer->Add(new wxStaticText(this,-1,_T("ticker text")),tflags);
+    topsizer->Add(view,flags);
+    topsizer->Add(effectList,flags);
+    topsizer->Add(new wxStaticText(this,-1,_T("configuration")),tflags);
     topsizer->Add(m_textCtrl, flags);
 
     topsizer->Add(button_sizer,wxSizerFlags(0).Align(wxALIGN_RIGHT));
@@ -259,32 +263,28 @@ bool MyFrame::OnInit() {
 
     if (m_textCtrl!=NULL) {
         m_textCtrl->Clear();
-        m_textCtrl->AppendText(wxString("nothing to see here yet!",wxConvUTF8));
+        m_textCtrl->AppendText(wxString(effect.getConfiguration().toString().c_str(),
+                                        wxConvUTF8));
     }
 
     return true;
 }
 
 void MyFrame::OnOK(wxCommandEvent& ev) {
-    //printf("Time to translate...\n");
-    /*
-      Quacker q;
-      std::string str;
-      std::string vocab;
-      if (m_textCtrl!=NULL) {
-      str = m_textCtrl->GetValue().mb_str();
-      }
-      if (m_vocabCtrl!=NULL) {
-      vocab = m_vocabCtrl->GetValue().mb_str();
-      }
-      q.setWordList(vocab);
-      std::string result = q.encode(str);
-      //printf("result %s\n", result.c_str());
-      if (m_codeCtrl!=NULL) {
-      m_codeCtrl->Clear();
-      m_codeCtrl->AppendText(wxString(result.c_str(),wxConvUTF8));
-      }
-    */
+    std::string str;
+    std::string vocab;
+    if (m_textCtrl!=NULL) {
+        str = m_textCtrl->GetValue().mb_str();
+        printf("Configuring with %s\n", str.c_str());
+        mutex.wait();
+        Property p;
+        p.fromString(str.c_str());
+        effect.setConfiguration(p);
+        m_textCtrl->Clear();
+        m_textCtrl->AppendText(wxString(effect.getConfiguration().toString().c_str(),
+                                        wxConvUTF8));
+        mutex.post();
+    }
 }
 
 MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
