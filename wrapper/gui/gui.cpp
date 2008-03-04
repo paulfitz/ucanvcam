@@ -11,6 +11,7 @@
 #include <wx/wxprec.h>
 #include <wx/dcbuffer.h>
 #include <wx/image.h>
+#include <wx/cmdline.h>
 
 #include <yarp/os/Time.h>
 #include <yarp/os/Semaphore.h>
@@ -20,6 +21,8 @@
 #include "Effect.h"
 
 #include <string>
+
+#include "location.h"
 
 using namespace std;
 
@@ -31,12 +34,58 @@ extern Vcam& getVcam();
 
 class MyApp: public wxApp
 {
+private:
+    bool silent;
 public:
     MyApp() {
+        silent = false;
     }
 
     virtual bool OnInit();
+
+    virtual void OnInitCmdLine(wxCmdLineParser& parser);
+    virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
 };
+
+static const wxCmdLineEntryDesc g_cmdLineDesc [] = {
+    { wxCMD_LINE_SWITCH, wxT("h"), wxT("help"), wxT("displays help on the command line parameters"),
+      wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+    //    { wxCMD_LINE_SWITCH, wxT("t"), wxT("test"), wxT("test switch"),
+    //      wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_MANDATORY  },
+    { wxCMD_LINE_SWITCH, wxT("s"), wxT("silent"), wxT("disables the GUI") },
+    { wxCMD_LINE_OPTION, wxT("r"), wxT("res"), wxT("set resource location"),
+      wxCMD_LINE_VAL_STRING, 0  },
+    { wxCMD_LINE_NONE },
+};
+
+
+void MyApp::OnInitCmdLine(wxCmdLineParser& parser) {
+    parser.SetDesc (g_cmdLineDesc);
+    // must refuse '/' as parameter starter or cannot use "/path" style paths
+    parser.SetSwitchChars (wxT("--"));
+}
+ 
+bool MyApp::OnCmdLineParsed(wxCmdLineParser& parser) {
+    silent = parser.Found(wxT("s"));
+
+    wxString location;
+    if (parser.Found(wxT("r"),&location)) {
+        printf("*** setting location to [%s]\n", location.c_str());
+        setResourceLocation(location);
+    }
+    
+    // to get at your unnamed parameters use
+    wxArrayString files;
+    for (int i = 0; i < parser.GetParamCount(); i++) {
+        files.Add(parser.GetParam(i));
+    }
+    
+    // and other command line parameters
+    
+    // then do what you need with them.
+    
+    return true;
+}
 
 IMPLEMENT_APP(MyApp);
 
@@ -180,11 +229,20 @@ bool MyApp::OnInit()
 {
     MyFrame *frame = new MyFrame( _T("ucanvcam"), wxPoint(50,50), wxSize(450,340) );
     
-    frame->OnInit();
-    
-    frame->Show(TRUE);
-    SetTopWindow(frame);
-    return TRUE;
+    if (!wxApp::OnInit()) {
+        return false;
+    }
+
+    if (!silent) {
+        if (!frame->OnInit()) {
+            return false;
+        }
+        frame->Show(TRUE);
+        SetTopWindow(frame);
+        return TRUE;
+    } else {
+        return false;
+    }
 };
 
 
@@ -316,7 +374,15 @@ void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-    wxMessageBox(_T("Welcome to ucanvcam! GUI does not exist yet"),
+    wxMessageBox(_T("Welcome to ucanvcam!\n\
+Main author: Paul Fitzpatrick (paulfitz@alum.mit.edu\n\
+Built using gd, freetype, yarp, ace, effectv, wxwidgets, cmake.\n\
+For licensing details, see DEPENDENCIES.TXT in:\n\
+  http://code.google.com/p/ucanvcam/source/browse/trunk/\n\
+\n\
+Includes sybig.ttf font from the Larabie font collection."),
                  _T("About ucanvcam"), wxOK | wxICON_INFORMATION, this);
 }
+
+
 

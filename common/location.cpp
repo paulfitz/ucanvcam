@@ -12,9 +12,11 @@ static string g_location = SWEETCAM_RESOURCE_PATH;
 static bool g_located = false;
 
 std::string getResourceLocation() {
+  //printf("Checking for resource location\n");
   if (!g_located) {
     std::string result = getRegistry(KEY_ROOT);
     if (result!="") {
+      printf("Registry reports resource location %s\n", result.c_str());
       g_location = result;
     }
   }
@@ -23,3 +25,6 @@ std::string getResourceLocation() {
 
 
 
+void setResourceLocation(std::string location) {
+  putRegistry(KEY_ROOT,location.c_str());
+}

@@ -7,7 +7,7 @@
 
 using namespace yarp::sig;
 
-class VcamDummy {
+class VcamDummy : public Vcam {
 private:
   ImageOf<PixelRgb> img;
   int ct;
