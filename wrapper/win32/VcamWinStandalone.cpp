@@ -20,10 +20,17 @@ private:
   PolyDriver source;
   IFrameGrabberImage *grabber;
   ImageOf<PixelRgb> cache, proc;
+  Bottle sources;
 public:
   VcamWinStandalone() {
+    open("test_grabber");
+  }
+
+  bool open(const char *name) {
+    grabber = NULL;
+    source.close();
     Property pSource;
-    pSource.put("device","vdub");
+    pSource.put("device",name);
     //pSource.put("v4l",1);
     //pSource.put("v4ldevice","/dev/video0");
     //pSource.put("v4ldevice","/dev/video2");
@@ -31,6 +38,7 @@ public:
     pSource.put("height",240);
     pSource.put("w",320);
     pSource.put("h",240);
+    pSource.put("mode","ball");
     //pSource.put("source","/scratch/camera/dcim/135canon/mvi_3549.avi");
     bool ok = source.open(pSource);
     if (!ok) {
@@ -40,7 +48,7 @@ public:
         pSource.put("mode","ball");
         source.open(pSource);
     }
-    source.view(grabber);
+    source.view(grabber);    return true;
   }
 
   virtual bool isImage() {
@@ -62,6 +70,22 @@ public:
     if (!result) return false;
     yarpy_apply(cache,img);
   }
+
+  virtual yarp::os::Bottle getSources() {
+    sources.clear();
+    sources.addString("test_grabber");
+    sources.addString("vdub");
+    return sources;
+  }
+
+  virtual void setSource(const char *name) {
+    if (sources.size()<1) {
+      getSources();
+    }
+    printf("Should switch source to %s\n", name);
+    open(name);
+  }
+
 };
 
 

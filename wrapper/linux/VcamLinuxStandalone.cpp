@@ -52,6 +52,7 @@ public:
         source.open(pSource);
     }
     source.view(grabber);
+    return true;
   }
 
   virtual bool isImage() {
