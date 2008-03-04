@@ -21,6 +21,10 @@ public:
     return true;
   }
 
+  virtual bool close() {
+    return true;
+  }
+
   virtual yarp::sig::Image *getImage() {
     if (img.width()==0) {
       img.resize(320,240);
@@ -36,10 +40,8 @@ public:
   }
 };
 
-static VcamDummy my_vcam;
-
-Vcam& getVcam() {
-    return my_vcam;
+Vcam *getVcam() {
+  return new VcamDummy;
 }
 
 

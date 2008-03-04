@@ -23,10 +23,10 @@ private:
 public:
   VcamWinStandalone() {
     Property pSource;
-    pSource.put("device","ffmpeg_grabber");
-    pSource.put("v4l",1);
+    pSource.put("device","vdub");
+    //pSource.put("v4l",1);
     //pSource.put("v4ldevice","/dev/video0");
-    pSource.put("v4ldevice","/dev/video2");
+    //pSource.put("v4ldevice","/dev/video2");
     pSource.put("width",320);
     pSource.put("height",240);
     pSource.put("w",320);
@@ -66,10 +66,8 @@ public:
 
 
 
-static VcamWinStandalone my_vcam;
-
-Vcam& getVcam() {
-    return my_vcam;
+Vcam *getVcam() {
+  return new VcamWinStandalone;
 }
 
 

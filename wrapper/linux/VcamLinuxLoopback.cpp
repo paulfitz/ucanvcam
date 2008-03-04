@@ -143,10 +143,8 @@ public:
 
 
 
-static VcamLinuxLoopback my_vcam;
-
-Vcam& getVcam() {
-    return my_vcam;
+Vcam *getVcam() {
+  return new VcamLinuxLoopback;
 }
 
 
