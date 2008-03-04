@@ -30,7 +30,33 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-extern Vcam& getVcam();
+extern Vcam *getVcam();
+
+static Vcam *myVcam = NULL;
+static bool no_vcam = false;
+
+static Semaphore mutex(1);
+
+Vcam& theVcam() {
+    if (myVcam==NULL) {
+        myVcam = getVcam();
+        if (myVcam==NULL) {
+            printf("failed to allocate vcam\n");
+            exit(1);
+        }
+    }
+    return *myVcam;
+}
+
+void removeVcam() {
+    mutex.wait();
+    if (myVcam!=NULL) {
+        delete myVcam;
+        myVcam = NULL;
+    }
+    no_vcam = true;
+    mutex.post();
+}
 
 class MyApp: public wxApp
 {
@@ -89,8 +115,6 @@ bool MyApp::OnCmdLineParsed(wxCmdLineParser& parser) {
 
 IMPLEMENT_APP(MyApp);
 
-static Semaphore mutex(1);
-
 
 class MyView : public wxWindow {
     DECLARE_CLASS(MyView)
@@ -105,7 +129,7 @@ public:
            const wxPoint& pos = wxDefaultPosition, 
            const wxSize& size = wxDefaultSize, 
            long style = 0, const wxString& name = wxPanelNameStr) :
-        wxWindow(parent,id,pos,size,style,name), vcam(getVcam()) {
+        wxWindow(parent,id,pos,size,style,name), vcam(theVcam()) {
         printf("Making MyView\n");
         screen.setQuantum(1);
         screen.resize(320,240);
@@ -138,11 +162,19 @@ public:
     }
 
     void OnPaint(wxPaintEvent &e) {
+
         double now = Time::now();
         static double prev = now;
         static int ct = 0;
 
-        if (vcam.isImage()) {
+        bool is_image = false;
+        mutex.wait();
+        if (!no_vcam) {
+            is_image = vcam.isImage();
+        }
+        mutex.post();
+
+        if (is_image) {
             prev = now;
             //printf("paint %06d\n",ct);
             ct++;
@@ -150,7 +182,9 @@ public:
             ImageOf<PixelRgb> img;
             img.setQuantum(1);
             mutex.wait();
-            vcam.getImage(img);
+            if (!no_vcam) {
+                vcam.getImage(img);
+            }
             mutex.post();
 
             // paint the screen
@@ -167,7 +201,13 @@ public:
         // limit activity - is there a better way?
         Time::delay(0.02);
 
-        wxGetApp().ProcessIdle();
+        mutex.wait();
+        if (!no_vcam) {
+            wxGetApp().ProcessIdle();
+        }
+        mutex.post();
+
+        wxPaintDC dc(this);
     }
 };
 
@@ -200,6 +240,14 @@ public:
 
     void OnQuit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
+
+    void OnExit(wxCloseEvent& event) {
+        printf("Removing vcam\n");
+        removeVcam();
+        printf("Removing frame\n");
+        Destroy();
+        printf("Exiting\n");
+    }
 
     void OnOK(wxCommandEvent& event);
 
@@ -255,6 +303,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_BUTTON(wxID_OK, MyFrame::OnOK)
     EVT_BUTTON(ID_Quit, MyFrame::OnQuit)
     EVT_CHOICE(-1,MyFrame::OnChoice)
+    EVT_CLOSE(MyFrame::OnExit)
 END_EVENT_TABLE()
 
 

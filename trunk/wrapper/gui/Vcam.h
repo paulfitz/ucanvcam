@@ -8,6 +8,8 @@
 
 class Vcam {
 public:
+  virtual ~Vcam() {}
+
   virtual bool isImage() = 0;
 
   virtual yarp::sig::Image *getImage() = 0;
@@ -20,6 +22,8 @@ public:
     }
     return false;
   }
+  
+  //virtual bool close() {}
 };
 
 #endif
