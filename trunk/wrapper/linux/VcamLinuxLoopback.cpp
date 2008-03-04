@@ -47,9 +47,7 @@ private:
   IFrameGrabberImage *grabber;
 
   
-  char *start_capture(int dev, int width, int height);
   int start_pipe (int dev, int width, int height);
-  char *next_capture (int dev, char *map, int width, int height);
   int put_image(int dev, char *image, int width, int height);
 
 public:
@@ -170,46 +168,6 @@ Vcam& getVcam() {
  */
 
 
-char *VcamLinuxLoopback::start_capture (int dev, int width, int height)
-{
-        struct video_capability vid_caps;
-	struct video_window vid_win;
-	struct video_mbuf vid_buf;
-	char *map;
-	int fmt = vformat;
-
-	if (ioctl (dev, VIDIOCGCAP, &vid_caps) == -1) {
-		printf ("ioctl (VIDIOCGCAP)\nError[%s]\n",strerror(errno));
-		return (NULL);
-	}
-	if (vid_caps.type & VID_TYPE_MONOCHROME) fmt=VIDEO_PALETTE_GREY;
-	if (ioctl (dev, VIDIOCGMBUF, &vid_buf) == -1) {
-		fprintf(stderr, "no mmap falling back on read\n");
-		if (ioctl (dev, VIDIOCGWIN, &vid_win)== -1) {
-			printf ("ioctl VIDIOCGWIN\nError[%s]\n",strerror(errno));
-			return (NULL);
-		}
-		vid_win.width=width;
-		vid_win.height=height;
-		if (ioctl (dev, VIDIOCSWIN, &vid_win)== -1) {
-			printf ("ioctl VIDIOCSWIN\nError[%s]\n",strerror(errno));
-			return (NULL);
-		}
-		readImage=1;
-		map=(char*)malloc(width*height*3);
-		return (map);
-	}
-	/* If we are going to capture greyscale we need room to blow the image up */
-	if (fmt==VIDEO_PALETTE_GREY)
-		map=(char*)mmap(0, vid_buf.size*3, PROT_READ|PROT_WRITE, MAP_SHARED, dev, 0);
-	else
-		map=(char*)mmap(0, vid_buf.size, PROT_READ|PROT_WRITE, MAP_SHARED, dev, 0);
-	
-	if ((unsigned char *)-1 == (unsigned char *)map)
-		return (NULL);
-	return map;
-}
-
 int VcamLinuxLoopback::start_pipe (int dev, int width, int height)
 {
         struct video_capability vid_caps;
@@ -241,60 +199,6 @@ int VcamLinuxLoopback::start_pipe (int dev, int width, int height)
 		return (1);
 	}
 	return 0;
-}
-
-char *VcamLinuxLoopback::next_capture (int dev, char *map, int width, 
-				       int height)
-{
-	int i;
-	char *grey, *rgb;
-	struct video_mmap vid_mmap;
-	int fmt = vformat;
-
-    	sigset_t    set, old;
-
-	if (readImage) {
-		if (fmt==VIDEO_PALETTE_GREY) {
-			if (read(dev, map, width*height) != width*height)
-				return NULL;
-		} else {
-			if (read(dev, map, width*height*3) != width*height*3)
-				return NULL;
-		}
-	} else {
-		vid_mmap.format=fmt;
-		vid_mmap.frame=0;
-		vid_mmap.width=width;
-		vid_mmap.height=height;
-    
-        	sigemptyset (&set);	     //BTTV hates signals during IOCTL
-	        sigaddset (&set, SIGCHLD);   //block SIGCHLD & SIGALRM
-       		sigaddset (&set, SIGALRM);   //for the time of ioctls
-        	sigprocmask (SIG_BLOCK, &set, &old);
-                    
-		if (ioctl(dev, VIDIOCMCAPTURE, &vid_mmap) == -1) {
-	        	sigprocmask (SIG_UNBLOCK, &old, NULL);
-			return (NULL);
-		}
-		if (ioctl(dev, VIDIOCSYNC, &vid_mmap) == -1) {
-	        	sigprocmask (SIG_UNBLOCK, &old, NULL);
-			return (NULL);
-		}
-		
-        	sigprocmask (SIG_UNBLOCK, &old, NULL); //undo the signal blocking
-	}
-	/* Blow up a grey */
-	if (fmt==VIDEO_PALETTE_GREY) {
-		i=width*height;
-		grey=map+i-1;
-		rgb=map+i*3;
-		for (; i>=0; i--, grey--) {
-			*(rgb--)=*grey;
-			*(rgb--)=*grey;
-			*(rgb--)=*grey;
-		}
-	}
-	return map;
 }
 
 int VcamLinuxLoopback::put_image(int dev, char *image, int width, int height)
