@@ -29,6 +29,8 @@ using namespace std;
 using namespace yarp::os;
 using namespace yarp::sig;
 
+#define ID_CHOICE_SOURCE 1
+#define ID_CHOICE_EFFECT 2
 
 extern Vcam *getVcam();
 
@@ -233,6 +235,7 @@ private:
     wxBoxSizer *topsizer;
     wxTextCtrl* m_textCtrl;
     Effect effect;
+    Bottle sources;
  
 public:
 
@@ -251,15 +254,25 @@ public:
 
     void OnOK(wxCommandEvent& event);
 
-    void OnChoice(wxCommandEvent& e) {
+    void OnChoiceEffect(wxCommandEvent& e) {
         string choice = e.GetString().c_str();
-        printf("got a choice (frame): %s\n", choice.c_str());
+        printf("got a choice of effect: %s\n", choice.c_str());
         mutex.wait();
         effect.setEffect(choice.c_str());
         if (m_textCtrl!=NULL) {
             m_textCtrl->Clear();
             m_textCtrl->AppendText(wxString(effect.getConfiguration().toString().c_str(),
                                             wxConvUTF8));
+        }
+        mutex.post();
+    }
+
+    void OnChoiceSource(wxCommandEvent& e) {
+        string choice = e.GetString().c_str();
+        printf("got a choice of source: %s\n", choice.c_str());
+        mutex.wait();
+        if (!no_vcam) {
+            theVcam().setSource(choice.c_str());
         }
         mutex.post();
     }
@@ -302,20 +315,25 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID_About, MyFrame::OnAbout)
     EVT_BUTTON(wxID_OK, MyFrame::OnOK)
     EVT_BUTTON(ID_Quit, MyFrame::OnQuit)
-    EVT_CHOICE(-1,MyFrame::OnChoice)
+    EVT_CHOICE(ID_CHOICE_EFFECT,MyFrame::OnChoiceEffect)
+    EVT_CHOICE(ID_CHOICE_SOURCE,MyFrame::OnChoiceSource)
     EVT_CLOSE(MyFrame::OnExit)
 END_EVENT_TABLE()
 
 
 bool MyFrame::OnInit() {
     Bottle lst = effect.getEffects();
+    sources = theVcam().getSources();
     printf("Effects are %s\n", lst.toString().c_str());
+    printf("Sources are %s\n", sources.toString().c_str());
 
 
     topsizer = new wxBoxSizer( wxVERTICAL );
 
     MyView *view = new MyView(this, -1, 
                               wxDefaultPosition, wxSize(320,240));
+
+
 
     int nchoices = lst.size();
     wxString *choices = new wxString[nchoices];
@@ -327,7 +345,7 @@ bool MyFrame::OnInit() {
         choices[i] = lst.get(i).asString().c_str();
     }
     wxChoice* effectList = 
-        new wxChoice(this,wxID_ANY,
+        new wxChoice(this,ID_CHOICE_EFFECT,
                      wxDefaultPosition,
                      wxDefaultSize,
                      nchoices, 
@@ -337,7 +355,40 @@ bool MyFrame::OnInit() {
     if (effectList!=NULL) {
         effectList->SetStringSelection("TickerTV");
     }
-    //effectList->SetEditable(false);
+
+
+
+    int nsrcchoices = sources.size();
+    wxChoice* sourceList = NULL;
+
+    if (nsrcchoices>=1) {
+        wxString *srcchoices = new wxString[nsrcchoices];
+        if (srcchoices==NULL) {
+            printf("memory allocation failure\n");
+            exit(1);
+        }
+        for (int i=0; i<nsrcchoices; i++) {
+            srcchoices[i] = sources.get(i).asString().c_str();
+        }
+        sourceList = 
+            new wxChoice(this,ID_CHOICE_SOURCE,
+                         wxDefaultPosition,
+                         wxDefaultSize,
+                         nsrcchoices, 
+                         srcchoices);
+        delete[] srcchoices;
+        srcchoices = NULL;
+        if (sourceList!=NULL) {
+            ConstString guess = theVcam().guessSource();
+            if (guess!="") {
+                sourceList->SetStringSelection(guess.c_str());
+            }
+        }
+    }
+
+
+
+
 
     m_textCtrl = new wxTextCtrl(this, -1, wxEmptyString,
                                 wxDefaultPosition, wxSize(320,30));
@@ -359,6 +410,9 @@ bool MyFrame::OnInit() {
     wxSizerFlags flags = 
         wxSizerFlags(0).Align(wxALIGN_CENTER).Border(wxALL, 10);
     topsizer->Add(view,flags);
+    if (sourceList!=NULL) {
+        topsizer->Add(sourceList,flags);
+    }
     topsizer->Add(effectList,flags);
     topsizer->Add(new wxStaticText(this,-1,_T("configuration")),tflags);
     topsizer->Add(m_textCtrl, flags);
