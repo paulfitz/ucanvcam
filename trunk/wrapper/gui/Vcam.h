@@ -3,6 +3,7 @@
 #define VCAM_INC
 
 #include <yarp/sig/Image.h>
+#include <yarp/os/Bottle.h>
 
 #include "Effect.h"
 
@@ -24,6 +25,18 @@ public:
   }
   
   //virtual bool close() {}
+
+  virtual yarp::os::Bottle getSources() {
+    return yarp::os::Bottle();
+  }
+
+  virtual void setSource(const char *name) {
+    printf("Cannot switch source to %s or anything else\n", name);
+  }
+
+  virtual yarp::os::ConstString guessSource() {
+    return "";
+  }
 };
 
 #endif
