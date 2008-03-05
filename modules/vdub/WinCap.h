@@ -8,6 +8,8 @@
 #include <yarp/sig/all.h>
 #include <yarp/dev/all.h>
 
+#include "../ISourceLister.h"
+
 using namespace nsVDCapture;
 
 //extern HWND ghApp;
@@ -16,8 +18,8 @@ using namespace nsVDCapture;
 //#define xprintf(a) printf(a); if (FOUT!=NULL) {fprintf(FOUT,a); fflush(FOUT);}
 //#define xprintf2(a1,a2) printf(a1,a2); if (FOUT!=NULL) {fprintf(FOUT,a1,a2); fflush(FOUT);}
 
-#define xprintf(a) printf(a);
-#define xprintf2(a1,a2) printf(a1,a2);
+#define xprintf(a) printf(a); fflush(stdout);
+#define xprintf2(a1,a2) printf(a1,a2); fflush(stdout);
 
 
 
@@ -114,11 +116,13 @@ public:
 
 class WinCap : public yarp::dev::DeviceDriver, 
 	       public yarp::dev::IFrameGrabberImage,
+	       public ISourceLister,
 	       public Publisher
 {
 private:
     bool closed;
     int ww, hh;
+  yarp::os::Bottle sourcesList;
     yarp::sig::ImageOf<yarp::sig::PixelRgb> *target;
     yarp::os::Semaphore ready, read;
     MyCallback callback;
@@ -147,7 +151,9 @@ public:
     virtual bool open(yarp::os::Searchable& config);
 
     virtual bool close() {
+      printf("closing %s:%d\n", __FILE__, __LINE__); fflush(stdout);
         if (!closed) {
+	  printf("closing %s:%d\n", __FILE__, __LINE__); fflush(stdout);
             read.post();
             if (dd!=NULL) {
                 dd->CaptureStop();
@@ -162,6 +168,7 @@ public:
                 cap = NULL;
             }
         }
+      printf("closing %s:%d\n", __FILE__, __LINE__); fflush(stdout);
         closed = true;
         //ready.post();
         return true;
@@ -190,4 +197,10 @@ public:
         xprintf("Read some camera data...\n");
         return true;
     }
+
+
+  virtual yarp::os::Bottle getSources();
+
+  virtual yarp::os::ConstString guessSource();
+
 };

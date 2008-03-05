@@ -37,6 +37,16 @@ public:
   virtual yarp::os::ConstString guessSource() {
     return "";
   }
+
+  virtual yarp::os::Bottle getOutputs() {
+    yarp::os::Bottle b;
+    b.addString("none");
+    return b;
+  }
+
+  virtual void setOutput(const char *name) {
+    printf("Cannot set output to %s or anything else\n", name);
+  }
 };
 
 #endif

@@ -3,7 +3,7 @@
 | |_| | (_| (_| | | | |  \ V / (_| (_| | | | | | |
  \__,_|\___\__,_|_| |_|   \_/ \___\__,_|_| |_| |_|
 
-ucanvcam is (C) 2007 Paul Fitzpatrick (paulfitz@alum.mit.edu)
+ucanvcam is (C) 2007, 2008 Paul Fitzpatrick (paulfitz@alum.mit.edu)
 It is free software, under the GPLv2, see GPL.TXT
 
 Sweetcam has numerous dependencies and integrated code, see DEPENDENCIES.TXT
@@ -20,3 +20,5 @@ ucanvcam currently can build in one of the following four configurations:
   standalone program on linux
   standalone program on windows
 
+To use with the current skype beta (version 2.0.0.43) on linux, you'll need 
+the "gstfakevideo" workaround (do a web search).
