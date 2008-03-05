@@ -31,6 +31,7 @@ using namespace yarp::sig;
 
 #define ID_CHOICE_SOURCE 1
 #define ID_CHOICE_EFFECT 2
+#define ID_CHOICE_OUTPUT 3
 
 extern Vcam *getVcam();
 
@@ -236,6 +237,7 @@ private:
     wxTextCtrl* m_textCtrl;
     Effect effect;
     Bottle sources;
+    Bottle outputs;
  
 public:
 
@@ -273,6 +275,16 @@ public:
         mutex.wait();
         if (!no_vcam) {
             theVcam().setSource(choice.c_str());
+        }
+        mutex.post();
+    }
+
+    void OnChoiceOutput(wxCommandEvent& e) {
+        string choice = e.GetString().c_str();
+        printf("got a choice of output: %s\n", choice.c_str());
+        mutex.wait();
+        if (!no_vcam) {
+            theVcam().setOutput(choice.c_str());
         }
         mutex.post();
     }
@@ -317,6 +329,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_BUTTON(ID_Quit, MyFrame::OnQuit)
     EVT_CHOICE(ID_CHOICE_EFFECT,MyFrame::OnChoiceEffect)
     EVT_CHOICE(ID_CHOICE_SOURCE,MyFrame::OnChoiceSource)
+    EVT_CHOICE(ID_CHOICE_OUTPUT,MyFrame::OnChoiceOutput)
     EVT_CLOSE(MyFrame::OnExit)
 END_EVENT_TABLE()
 
@@ -324,8 +337,10 @@ END_EVENT_TABLE()
 bool MyFrame::OnInit() {
     Bottle lst = effect.getEffects();
     sources = theVcam().getSources();
+    outputs = theVcam().getOutputs();
     printf("Effects are %s\n", lst.toString().c_str());
     printf("Sources are %s\n", sources.toString().c_str());
+    printf("Outputs are %s\n", outputs.toString().c_str());
 
 
     topsizer = new wxBoxSizer( wxVERTICAL );
@@ -389,6 +404,31 @@ bool MyFrame::OnInit() {
 
 
 
+    int noutchoices = outputs.size();
+    wxChoice* outputList = NULL;
+
+    if (noutchoices>=1) {
+        wxString *outchoices = new wxString[noutchoices];
+        if (outchoices==NULL) {
+            printf("memory allocation failure\n");
+            exit(1);
+        }
+        for (int i=0; i<noutchoices; i++) {
+            outchoices[i] = outputs.get(i).asString().c_str();
+        }
+        outputList = 
+            new wxChoice(this,ID_CHOICE_OUTPUT,
+                         wxDefaultPosition,
+                         wxDefaultSize,
+                         noutchoices, 
+                         outchoices);
+        delete[] outchoices;
+        outchoices = NULL;
+    }
+
+
+
+
 
     m_textCtrl = new wxTextCtrl(this, -1, wxEmptyString,
                                 wxDefaultPosition, wxSize(320,30));
@@ -412,6 +452,9 @@ bool MyFrame::OnInit() {
     topsizer->Add(view,flags);
     if (sourceList!=NULL) {
         topsizer->Add(sourceList,flags);
+    }
+    if (outputList!=NULL) {
+        topsizer->Add(outputList,flags);
     }
     topsizer->Add(effectList,flags);
     topsizer->Add(new wxStaticText(this,-1,_T("configuration")),tflags);

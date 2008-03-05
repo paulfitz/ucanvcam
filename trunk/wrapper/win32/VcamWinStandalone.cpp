@@ -13,24 +13,52 @@ using namespace yarp::dev;
 
 #include "yarpy.h"
 
+#include "modules/ISourceLister.h"
+
 class VcamWinStandalone : public Vcam {
 private:
   Network yarp;
   DriverCollection dev;
   PolyDriver source;
   IFrameGrabberImage *grabber;
+  ISourceLister *lister;
   ImageOf<PixelRgb> cache, proc;
   Bottle sources;
 public:
   VcamWinStandalone() {
-    open("test_grabber");
+    getList();
+    open("test");
+  }
+
+  bool getList() {
+    printf("Getting list\n");  fflush(stdout);
+    sources.clear();
+    sources.addString("test");
+    Property pSource;
+    pSource.put("device","vdub");
+    pSource.put("passive","1");
+    printf("Trying to open\n");  fflush(stdout);
+    bool ok = source.open(pSource);
+    lister = NULL;
+    source.view(lister);
+    if (lister!=NULL) {
+      printf("Checking sources... (%ld)\n", (long int) lister);  fflush(stdout);
+      //lister->getSources();
+      sources.append(lister->getSources());
+      printf("Done Checking sources... (%ld)\n", (long int) lister);  fflush(stdout);
+    }
+    source.close();
+    return true;
+    
   }
 
   bool open(const char *name) {
     grabber = NULL;
     source.close();
     Property pSource;
-    pSource.put("device",name);
+    pSource.put("device","vdub");
+    
+    pSource.put("source",name);
     //pSource.put("v4l",1);
     //pSource.put("v4ldevice","/dev/video0");
     //pSource.put("v4ldevice","/dev/video2");
@@ -40,7 +68,10 @@ public:
     pSource.put("h",240);
     pSource.put("mode","ball");
     //pSource.put("source","/scratch/camera/dcim/135canon/mvi_3549.avi");
-    bool ok = source.open(pSource);
+    bool ok = false;
+    if (ConstString("test")!=name) {
+      ok = source.open(pSource);
+    }
     if (!ok) {
         pSource.put("device","test_grabber");
         pSource.put("width",320);
@@ -48,7 +79,9 @@ public:
         pSource.put("mode","ball");
         source.open(pSource);
     }
-    source.view(grabber);    return true;
+    source.view(grabber);    
+    source.view(lister);
+    return true;
   }
 
   virtual bool isImage() {
@@ -72,9 +105,6 @@ public:
   }
 
   virtual yarp::os::Bottle getSources() {
-    sources.clear();
-    sources.addString("test_grabber");
-    sources.addString("vdub");
     return sources;
   }
 

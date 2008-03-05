@@ -670,7 +670,7 @@ extern HINSTANCE g_hInst;
 									isVFWDriver = true;
 								CoTaskMemFree(displayName);
 							}
-							name += (isVFWDriver ? L" (VFW>DirectShow)" : L" (DirectShow)");
+							name += (isVFWDriver ? L" (VFW>DirectShow)" : L"");
 						}
 
 						devlist.push_back(tDeviceVector::value_type(pM, name));
