@@ -13,12 +13,14 @@ I'd like to acknowledge that project as an inspiration for ucanvcam.
 Basically, one day I wanted to be able to do EffecTV effects over
 skype, and ucanvcam grew out of that.
 
-ucanvcam currently can build in one of the following four configurations:
+ucanvcam currently can build in one of the following configurations:
 
-  service using vloopback module on linux
-  activex object on windows
-  standalone program on linux
+  standalone program on linux, optionally providing output via vloopback
+  kernel module.
+
   standalone program on windows
+
+  activex object on windows
 
 To use with the current skype beta (version 2.0.0.43) on linux, you'll need 
 the "gstfakevideo" workaround (do a web search).
