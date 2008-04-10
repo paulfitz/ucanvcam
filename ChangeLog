@@ -1,0 +1,5 @@
+2008-04-10  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
+
+	* wrapper/win32/ShmemBus.h: start using shmem on windows to
+	decouple image acquisition and processing from activex voodoo.
+

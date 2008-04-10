@@ -29,6 +29,8 @@
 #include <yarp/dev/all.h>
 #include "drivers.h"
 
+#include "Register.h"
+
 using namespace yarp;
 using namespace yarp::os;
 using namespace yarp::sig;
@@ -38,7 +40,7 @@ using namespace yarp::dev;
 HWND ghApp=0;
 FILE *FOUT = NULL;
 
-#include "WinCap.h"
+//#include "WinCap.h"
 
 // WINE
 //#include <wine/uuidof.h>
@@ -53,6 +55,7 @@ FILE *FOUT = NULL;
 //////////////////////////////////////////////////////////////////////////
 CUnknown * WINAPI CVCam::CreateInstance(LPUNKNOWN lpunk, HRESULT *phr)
 {
+  printf("Hello, making a ucanvcam virtual camera\n");
   //Logger::get().silence();
   Network::init();
 #ifdef NETWORKED
@@ -60,16 +63,16 @@ CUnknown * WINAPI CVCam::CreateInstance(LPUNKNOWN lpunk, HRESULT *phr)
   Time::turboBoost();
 #endif
     yarp::dev::DriverCollection dev;
-    Drivers::factory().add(new DriverCreatorOf<WinCap>("wincap",
-                                                       "grabber",
-                                                       ""));
+    //Drivers::factory().add(new DriverCreatorOf<WinCap>("wincap",
+    //                                                 "grabber",
+    //                                                 ""));
     ASSERT(phr);
     CUnknown *punk = new CVCam(lpunk, phr);
     return punk;
 }
 
 CVCam::CVCam(LPUNKNOWN lpunk, HRESULT *phr) : 
-    CSource(NAME("Virtual Cam"), lpunk, CLSID_VirtualCam)
+    CSource(NAME("ucanvcam virtual camera"), lpunk, CLSID_VirtualCam)
 {
     ASSERT(phr);
     CAutoLock cAutoLock(&m_cStateLock);
@@ -122,7 +125,7 @@ STDMETHODIMP CVCam::NonDelegatingQueryInterface(REFIID riid, void **ppv)
 // all the stuff.
 //////////////////////////////////////////////////////////////////////////
 CVCamStream::CVCamStream(HRESULT *phr, CVCam *pParent, LPCWSTR pPinName) :
-    CSourceStream(NAME("Virtual Cam"),phr, pParent, pPinName), m_pParent(pParent)
+    CSourceStream(NAME("ucanvcam virtual camera"),phr, pParent, pPinName), m_pParent(pParent)
 {
   printf("Starting up CVCamStream\n"); fflush(stdout);
   CAutoLock cAutoLockShared(&m_cSharedState);
@@ -141,7 +144,7 @@ CVCamStream::CVCamStream(HRESULT *phr, CVCam *pParent, LPCWSTR pPinName) :
     printf("  *** %s:%d\n", __FILE__, __LINE__); fflush(stdout);
     Property pSource;
     //pSource.put("device","vfw_grabber");
-    pSource.put("device","wincap");
+    pSource.put("device","vdub");
     //pSource.put("device","test_grabber");
     pSource.put("mode","ball");
     pSource.put("width",320);
@@ -275,6 +278,9 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms)
     SAY("No image");
     Time::delay(0.03);
   }
+#ifdef MERGE_SERVICE
+  getServerImage(img);
+#endif
 
   //return NOERROR;
 

@@ -127,12 +127,14 @@ private:
     wxBitmap bmp;
     Vcam& vcam;
     wxTimer timer;
+    ImageOf<PixelRgb> img;
 public:
     MyView(wxWindow* parent, wxWindowID id, 
            const wxPoint& pos = wxDefaultPosition, 
            const wxSize& size = wxDefaultSize, 
            long style = 0, const wxString& name = wxPanelNameStr) :
         wxWindow(parent,id,pos,size,style,name), vcam(theVcam()) {
+        img.setQuantum(1);
         printf("Making MyView\n");
         screen.setQuantum(1);
         screen.resize(320,240);
@@ -182,8 +184,6 @@ public:
             //printf("paint %06d\n",ct);
             ct++;
 
-            ImageOf<PixelRgb> img;
-            img.setQuantum(1);
             mutex.wait();
             if (!no_vcam) {
                 vcam.getImage(img);
