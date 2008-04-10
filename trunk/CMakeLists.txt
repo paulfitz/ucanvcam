@@ -1,28 +1,24 @@
 PROJECT(ucanvcam)
 
-# do we want a standalone program or a plugin of some kind?
+# do we want to make a standalone program or a plugin?
 SET (STANDALONE TRUE CACHE BOOL "standalone")
 
+SET (USE_GUI TRUE CACHE BOOL "GUI or command-line?")
 
-SET (MERGED TRUE CACHE BOOL "merge standalone and service")
-
-# new GUI not ready
-SET (USE_NEW_GUI FALSE CACHE BOOL "work with new gui (not available yet!)")
-
-IF (USE_NEW_GUI)
+IF (USE_GUI)
   FIND_PACKAGE(wxWidgets REQUIRED)
   INCLUDE_DIRECTORIES(${wxWidgets_INCLUDE_DIRS})
   ADD_DEFINITIONS(${wxWidgets_DEFINITIONS})
   LINK_LIBRARIES(${wxWidgets_LIBRARIES})
   INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/wrapper/gui)
-ENDIF (USE_NEW_GUI)
-
+ENDIF (USE_GUI)
 
 FIND_PACKAGE(YARP REQUIRED)
 
 FIND_PACKAGE(SDL REQUIRED)
 INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} ${SDL_INCLUDE_DIR}/..)
 LINK_LIBRARIES(${SDL_LIBRARY})
+
 
 # Search for native effects.
 FILE(GLOB_RECURSE effects_source effects/*.cpp effects/*.c)
@@ -56,72 +52,64 @@ SET(common_sources ${common_source} ${common_header}
 
 SET(TARGET_NAME ucanvcam)
 
-IF (MINGW)
-  ADD_DEFINITIONS(-D_OBJBASE_H_)
-  SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,--add-stdcall-alias -Wl,--stack,0x200000")
-  LINK_LIBRARIES(winmm)
-ENDIF (MINGW)
+IF (WIN32)
+  FIND_PROGRAM(windres NAMES windres.exe windres mingw32-windres i586-mingw32msvc-windres PATHS /bin /usr/bin)
+  MESSAGE(STATUS "windres at ${windres}")
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resources.o
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/win32/activex/prop.rc
+		COMMAND ${windres} -I${CMAKE_CURRENT_SOURCE_DIR}
+		-i ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/win32/activex/prop.rc
+		-o ${CMAKE_CURRENT_BINARY_DIR}/resources.o)
+  INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/wrapper/win32/activex)
 
-IF (STANDALONE)
-  IF (UNIX)
-    ADD_EXECUTABLE(${TARGET_NAME} wrapper/gui/gui.cpp wrapper/linux/VcamLinux.cpp ${common_sources})
-  ELSE (UNIX)
-    IF (USE_NEW_GUI)
-      IF (MERGED)
-        # fix this for your own path to directx
-        FIND_PATH(DIRECTX_BASECLASSES_DIR NAMES amfilter.h PATHS
+  # fix this for your own path to directx
+  FIND_PATH(DIRECTX_BASECLASSES_DIR NAMES amfilter.h PATHS
 	  			$ENV{HOME}/directx 
 				$ENV{HOME}/directx/BaseClasses
 				/directx 
 				/directx/BaseClasses
 				c:/directx
 				c:/directx/BaseClasses)
-        FIND_PATH(DIRECTX_INCLUDE_DIR NAMES dsound.h PATHS
+  FIND_PATH(DIRECTX_INCLUDE_DIR NAMES dsound.h PATHS
 				$ENV{HOME}/directx 
 				$ENV{HOME}/directx/Include 
 				/directx 
 				/directx/Include 
 				c:/directx)
-        INCLUDE_DIRECTORIES(${DIRECTX_BASECLASSES_DIR} ${DIRECTX_INCLUDE_DIR})
-        FILE(GLOB_RECURSE directx_source ${DIRECTX_BASECLASSES_DIR}/*.cpp)
-        #ADD_DEFINITIONS(-DMERGE_SERVICE)
-        ADD_DEFINITIONS(-DSHMEM_SERVICE)
-        ADD_EXECUTABLE(${TARGET_NAME} wrapper/gui/gui.cpp wrapper/win32/VcamWin.cpp  wrapper/win32/activex/Filters.cpp wrapper/win32/activex/Dll.cpp ${common_sources} ${directx_source})
-      ELSE (MERGED)
-        ADD_EXECUTABLE(${TARGET_NAME} wrapper/gui/gui.cpp wrapper/win32/VcamWin.cpp ${common_sources})
-      ENDIF (MERGED)
-    ELSE (USE_NEW_GUI)
-      ADD_EXECUTABLE(${TARGET_NAME} wrapper/win32/standalone_windows.cpp ${common_sources})
-    ENDIF (USE_NEW_GUI)
-  ENDIF (UNIX)
-ELSE (STANDALONE)
-  IF (UNIX)
-    ADD_EXECUTABLE(${TARGET_NAME} wrapper/gui/gui.cpp wrapper/linux/VcamLinux.cpp ${common_sources})
-  ELSE (UNIX)
-    FIND_PROGRAM(windres NAMES windres.exe windres mingw32-windres i586-mingw32msvc-windres PATHS /bin /usr/bin)
-    MESSAGE(STATUS "windres at ${windres}")
-    ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resources.o
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/win32/activex/prop.rc
-		COMMAND ${windres} -I${CMAKE_CURRENT_SOURCE_DIR}
-		-i ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/win32/activex/prop.rc
-		-o ${CMAKE_CURRENT_BINARY_DIR}/resources.o)
-    INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/wrapper/win32/activex)
+  INCLUDE_DIRECTORIES(${DIRECTX_BASECLASSES_DIR} ${DIRECTX_INCLUDE_DIR})
+  FILE(GLOB_RECURSE directx_source ${DIRECTX_BASECLASSES_DIR}/*.cpp)
+  # fix this for your own path to directx
+  #SET(DIRECTX_BASECLASSES_DIR $ENV{HOME}/directx/BaseClasses)
+  #INCLUDE_DIRECTORIES(${DIRECTX_BASECLASSES_DIR})
+  #FILE(GLOB_RECURSE directx_source ${DIRECTX_BASECLASSES_DIR}/*.cpp)
 
-    # fix this for your own path to directx
-    SET(DIRECTX_BASECLASSES_DIR $ENV{HOME}/directx/BaseClasses)
-    INCLUDE_DIRECTORIES(${DIRECTX_BASECLASSES_DIR})
-    FILE(GLOB_RECURSE directx_source ${DIRECTX_BASECLASSES_DIR}/*.cpp)
+  ADD_LIBRARY(ucanvcamx SHARED wrapper/win32/activex/Filters.cpp wrapper/win32/activex/Dll.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source})
 
-    ADD_LIBRARY(${TARGET_NAME} SHARED wrapper/win32/activex/Filters.cpp wrapper/win32/activex/Dll.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source} ${common_sources})
-  ENDIF (UNIX)
-ENDIF (STANDALONE)
+  TARGET_LINK_LIBRARIES(ucanvcamx advapi32 gdi32 ole32 oleaut32 user32 winmm uuid strmiids comctl32)
+
+ENDIF (WIN32)
+
+IF (MINGW)
+  ADD_DEFINITIONS(-D_OBJBASE_H_)
+  SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,--add-stdcall-alias -Wl,--stack,0x200000")
+  LINK_LIBRARIES(winmm)
+ENDIF (MINGW)
+
+IF (UNIX)
+
+  ADD_EXECUTABLE(${TARGET_NAME} wrapper/gui/gui.cpp wrapper/linux/VcamLinux.cpp ${common_sources})
+
+ELSE (UNIX)
+
+  # assume Windows
+
+  ADD_DEFINITIONS(-DSHMEM_SERVICE)
+  ADD_EXECUTABLE(${TARGET_NAME} wrapper/gui/gui.cpp wrapper/win32/VcamWin.cpp  ${common_sources})
+ENDIF (UNIX)
 
 TARGET_LINK_LIBRARIES(${TARGET_NAME} gd freetype)
 
-
-
 ADD_SUBDIRECTORY(modules)
-
 
 SET(vcammod_DIR ${CMAKE_CURRENT_BINARY_DIR})
 

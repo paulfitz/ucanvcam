@@ -37,10 +37,10 @@
 
 #include <string>
 using namespace std;
-#include "registry.h"
-#include "registry_keys.h"
+//#include "registry.h"
+//#include "registry_keys.h"
 
-#include "Register.h"
+//#include "Register.h"
 
 #define PFSTDAPI EXTERN_C EXPORT HRESULT STDAPICALLTYPE
 
@@ -168,6 +168,7 @@ static HANDLE me = 0;
 PFSTDAPI DllRegisterServer()
 {
   printf("Register all\n"); fflush(stdout);
+  /*
   if (me!=0) {
     char buf[1000];
     GetModuleFileName((HINSTANCE)(me),&buf[0],1000);
@@ -187,6 +188,7 @@ PFSTDAPI DllRegisterServer()
     std::string readback = getRegistry(KEY_ROOT);
     printf(">>>>> reg  %s\n", readback.c_str());
   }
+  */
 
   AMovieDllRegisterServer2(TRUE);
   printf("Register filters\n"); fflush(stdout);

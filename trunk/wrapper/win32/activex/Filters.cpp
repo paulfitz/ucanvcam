@@ -27,9 +27,9 @@
 #include <yarp/os/all.h>
 #include <yarp/sig/all.h>
 #include <yarp/dev/all.h>
-#include "drivers.h"
+//#include "drivers.h"
 
-#include "Register.h"
+//#include "Register.h"
 
 using namespace yarp;
 using namespace yarp::os;
@@ -37,6 +37,7 @@ using namespace yarp::sig;
 using namespace yarp::sig::file;
 using namespace yarp::dev;
 
+HINSTANCE g_hInst=0;
 HWND ghApp=0;
 FILE *FOUT = NULL;
 
@@ -62,7 +63,7 @@ CUnknown * WINAPI CVCam::CreateInstance(LPUNKNOWN lpunk, HRESULT *phr)
 #else
   Time::turboBoost();
 #endif
-    yarp::dev::DriverCollection dev;
+  //yarp::dev::DriverCollection dev;
     //Drivers::factory().add(new DriverCreatorOf<WinCap>("wincap",
     //                                                 "grabber",
     //                                                 ""));
@@ -332,8 +333,8 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms)
       dest2.setExternal((char*)pData,ww,hh);
       //dest1.resize(ww,hh);
       if (m_lSaturation<50) {
-	yarpy_apply(img,dest2);
-	//dest2.copy(dest1);
+	//yarpy_apply(img,dest2);
+	dest2.copy(img);
       } else {
 	dest2.copy(img);
       }
