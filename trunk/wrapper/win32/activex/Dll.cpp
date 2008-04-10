@@ -40,6 +40,8 @@ using namespace std;
 #include "registry.h"
 #include "registry_keys.h"
 
+#include "Register.h"
+
 #define PFSTDAPI EXTERN_C EXPORT HRESULT STDAPICALLTYPE
 
 #define CreateComObject(clsid, iid, var) CoCreateInstance( clsid, NULL, CLSCTX_INPROC_SERVER, iid, (void **)&var);
@@ -76,7 +78,7 @@ const AMOVIESETUP_PIN AMSPinVCam=
 const AMOVIESETUP_FILTER AMSFilterVCam =
 {
     &CLSID_VirtualCam,  // Filter CLSID
-    L"Virtual Cam",     // String name
+    L"ucanvcam virtual camera",     // String name
     MERIT_DO_NOT_USE,      // Filter merit
     1,                     // Number pins
     &AMSPinVCam             // Pin details
@@ -85,7 +87,7 @@ const AMOVIESETUP_FILTER AMSFilterVCam =
 CFactoryTemplate g_Templates[] = 
 {
     {
-        L"Virtual Cam",
+        L"ucanvcam virtual camera",
         &CLSID_VirtualCam,
         CVCam::CreateInstance,
         NULL,
@@ -122,7 +124,7 @@ PFSTDAPI RegisterFilters( BOOL bRegister )
     hr = CoInitialize(0);
     if(bRegister)
     {
-        hr = AMovieSetupRegisterServer(CLSID_VirtualCam, L"Virtual Cam", achFileName, L"Both", L"InprocServer32");
+        hr = AMovieSetupRegisterServer(CLSID_VirtualCam, L"ucanvcam virtual camera", achFileName, L"Both", L"InprocServer32");
     }
 
     if( SUCCEEDED(hr) )
@@ -139,7 +141,7 @@ PFSTDAPI RegisterFilters( BOOL bRegister )
                 rf2.dwMerit = MERIT_DO_NOT_USE;
                 rf2.cPins = 1;
                 rf2.rgPins = &AMSPinVCam;
-                hr = fm->RegisterFilter(CLSID_VirtualCam, L"Virtual Cam", &pMoniker, &CLSID_VideoInputDeviceCategory, NULL, &rf2);
+                hr = fm->RegisterFilter(CLSID_VirtualCam, L"ucanvcam virtual camera", &pMoniker, &CLSID_VideoInputDeviceCategory, NULL, &rf2);
             }
             else
             {
@@ -166,24 +168,25 @@ static HANDLE me = 0;
 PFSTDAPI DllRegisterServer()
 {
   printf("Register all\n"); fflush(stdout);
-  char buf[1000];
-  GetModuleFileName((HINSTANCE)(me),&buf[0],1000);
-  printf(">>>>> file %s\n", buf);
-
-  std::string path("");
-  std::string sfname = buf;
-  int index = sfname.rfind('/');
-  if (index==-1) {
-    index = sfname.rfind('\\');
+  if (me!=0) {
+    char buf[1000];
+    GetModuleFileName((HINSTANCE)(me),&buf[0],1000);
+    printf(">>>>> file %s\n", buf);
+    
+    std::string path("");
+    std::string sfname = buf;
+    int index = sfname.rfind('/');
+    if (index==-1) {
+      index = sfname.rfind('\\');
+    }
+    if (index!=-1) {
+      path = sfname.substr(0,index);
+    }
+    printf(">>>>> path %s\n", path.c_str());
+    putRegistry(KEY_ROOT,path.c_str());
+    std::string readback = getRegistry(KEY_ROOT);
+    printf(">>>>> reg  %s\n", readback.c_str());
   }
-  if (index!=-1) {
-    path = sfname.substr(0,index);
-  }
-  printf(">>>>> path %s\n", path.c_str());
-  putRegistry(KEY_ROOT,path.c_str());
-  std::string readback = getRegistry(KEY_ROOT);
-  printf(">>>>> reg  %s\n", readback.c_str());
-
 
   AMovieDllRegisterServer2(TRUE);
   printf("Register filters\n"); fflush(stdout);
@@ -205,3 +208,16 @@ DllMain(HANDLE hModule, DWORD  dwReason, LPVOID lpReserved)
   me = hModule;
   return DllEntryPoint((HINSTANCE)(hModule), dwReason, lpReserved);
 }
+
+
+void RegisterService() {
+  DllRegisterServer();
+}
+
+void UnregisterService() {
+  DllUnregisterServer();
+}
+
+
+
+

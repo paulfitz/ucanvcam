@@ -3,6 +3,9 @@ PROJECT(ucanvcam)
 # do we want a standalone program or a plugin of some kind?
 SET (STANDALONE TRUE CACHE BOOL "standalone")
 
+
+SET (MERGED TRUE CACHE BOOL "merge standalone and service")
+
 # new GUI not ready
 SET (USE_NEW_GUI FALSE CACHE BOOL "work with new gui (not available yet!)")
 
@@ -64,7 +67,29 @@ IF (STANDALONE)
     ADD_EXECUTABLE(${TARGET_NAME} wrapper/gui/gui.cpp wrapper/linux/VcamLinux.cpp ${common_sources})
   ELSE (UNIX)
     IF (USE_NEW_GUI)
-      ADD_EXECUTABLE(${TARGET_NAME} wrapper/gui/gui.cpp wrapper/win32/VcamWinStandalone.cpp ${common_sources})
+      IF (MERGED)
+        # fix this for your own path to directx
+        FIND_PATH(DIRECTX_BASECLASSES_DIR NAMES amfilter.h PATHS
+	  			$ENV{HOME}/directx 
+				$ENV{HOME}/directx/BaseClasses
+				/directx 
+				/directx/BaseClasses
+				c:/directx
+				c:/directx/BaseClasses)
+        FIND_PATH(DIRECTX_INCLUDE_DIR NAMES dsound.h PATHS
+				$ENV{HOME}/directx 
+				$ENV{HOME}/directx/Include 
+				/directx 
+				/directx/Include 
+				c:/directx)
+        INCLUDE_DIRECTORIES(${DIRECTX_BASECLASSES_DIR} ${DIRECTX_INCLUDE_DIR})
+        FILE(GLOB_RECURSE directx_source ${DIRECTX_BASECLASSES_DIR}/*.cpp)
+        #ADD_DEFINITIONS(-DMERGE_SERVICE)
+        ADD_DEFINITIONS(-DSHMEM_SERVICE)
+        ADD_EXECUTABLE(${TARGET_NAME} wrapper/gui/gui.cpp wrapper/win32/VcamWin.cpp  wrapper/win32/activex/Filters.cpp wrapper/win32/activex/Dll.cpp ${common_sources} ${directx_source})
+      ELSE (MERGED)
+        ADD_EXECUTABLE(${TARGET_NAME} wrapper/gui/gui.cpp wrapper/win32/VcamWin.cpp ${common_sources})
+      ENDIF (MERGED)
     ELSE (USE_NEW_GUI)
       ADD_EXECUTABLE(${TARGET_NAME} wrapper/win32/standalone_windows.cpp ${common_sources})
     ENDIF (USE_NEW_GUI)

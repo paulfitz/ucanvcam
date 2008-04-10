@@ -5,13 +5,12 @@ ENDIF (COMPILE_DEVICE_LIBRARY)
 IF (NOT SKIP_vdub)
 
   # no real standard for where directx might be installed
-  FIND_PATH(DIRECTX_INCLUDE_DIR1 NAMES dsound.h PATHS
+  FIND_PATH(DIRECTX_INCLUDE_DIR NAMES dsound.h PATHS
 				$ENV{HOME}/directx 
 				$ENV{HOME}/directx/Include 
 				/directx 
 				/directx/Include 
 				c:/directx)
-  SET(DIRECTX_INCLUDE_DIR $ENV{HOME}/directx/Include)
 
   FIND_PACKAGE(YARP REQUIRED)
 
