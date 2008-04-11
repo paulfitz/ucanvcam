@@ -109,7 +109,7 @@ bool WinCap::open(yarp::os::Searchable& config) {
       dd = cap->CreateDriver(ilongest);
     }
     if (dd!=NULL) {
-      xprintf("Capture device made\n");
+      xprintf("Capture device made, ok\n");
       
       if (!dd->Init((VDGUIHandle)ghApp)) {
 	printf("Failure to init capture device\n");

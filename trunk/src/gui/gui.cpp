@@ -40,6 +40,9 @@ static bool no_vcam = false;
 
 static Semaphore mutex(1);
 
+int g_hinstance = 0;
+int g_hwnd = 0;
+
 Vcam& theVcam() {
     if (myVcam==NULL) {
         myVcam = getVcam();
@@ -116,7 +119,11 @@ bool MyApp::OnCmdLineParsed(wxCmdLineParser& parser) {
     return true;
 }
 
+#ifdef WIN32
+IMPLEMENT_APP_NO_MAIN(MyApp);
+#else
 IMPLEMENT_APP(MyApp);
+#endif
 
 
 class MyView : public wxWindow {
@@ -301,7 +308,9 @@ enum
 bool MyApp::OnInit()
 {
     MyFrame *frame = new MyFrame( _T("ucanvcam"), wxPoint(50,50), wxSize(450,340) );
-    
+
+    g_hwnd = (int)(frame->GetHandle());
+
     if (!wxApp::OnInit()) {
         return false;
     }
@@ -531,4 +540,16 @@ Includes sybig.ttf font from the Larabie font collection."),
 }
 
 
+
+
+#ifdef WIN32
+int WINAPI WinMain(HINSTANCE hInstance,
+                   HINSTANCE hPrevInstance,
+                   LPSTR m_lpCmdLine, int nCmdShow) {
+
+    g_hinstance = (int)(hInstance);    
+    return wxEntry(hInstance,hPrevInstance,m_lpCmdLine,nCmdShow);
+}
+
+#endif
 

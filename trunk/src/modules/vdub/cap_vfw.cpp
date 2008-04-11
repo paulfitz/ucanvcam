@@ -1261,6 +1261,7 @@ const wchar_t *VDCaptureSystemVFW::GetDeviceName(int index) {
 }
 
 IVDCaptureDriver *VDCaptureSystemVFW::CreateDriver(int index) {
+  printf("WELCOME to vfw\n");
 	if ((unsigned)index >= (unsigned)mDriverCount)
 		return NULL;
 
