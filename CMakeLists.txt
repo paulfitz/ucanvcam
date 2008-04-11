@@ -8,6 +8,9 @@ PROJECT(ucanvcam)
 ##SET (STANDALONE TRUE CACHE BOOL "standalone program or plugin?")
 ##SET (USE_GUI TRUE CACHE BOOL "GUI or command-line?")
 
+SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+
 #########################################################################
 # most of the work is done here 
 #########################################################################

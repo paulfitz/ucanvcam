@@ -25,6 +25,9 @@ using namespace yarp::dev;
 
 static bool touched = false;
 
+extern int g_hinstance;
+extern int g_hwnd;
+
 #ifdef MERGE_SERVICE
 Semaphore service_sema(1);
 bool getServerImage(ImageOf<PixelRgb>& img) {
@@ -102,6 +105,8 @@ public:
     pSource.put("w",320);
     pSource.put("h",240);
     pSource.put("mode","ball");
+    pSource.put("hinstance",g_hinstance);
+    pSource.put("hwnd",g_hwnd);
     //pSource.put("source","/scratch/camera/dcim/135canon/mvi_3549.avi");
     bool ok = false;
     if (ConstString("test")!=name) {

@@ -96,17 +96,18 @@ extern HINSTANCE g_hInst;
 	#pragma warning(disable: 4355)		// warning C4355: 'this' : used in base member initializer list
 #endif
 
+#define _DEBUG_NOT
 #ifdef _DEBUG_NOT
 	#define DS_VERIFY(exp, msg) if (FAILED(hr = (exp))) { VDDEBUG("Failed: " msg " [%08lx : %s]\n", hr, GetDXErrorName(hr)); VDDumpFilterGraphDShow(mpGraph); TearDownGraph(); return false; } else
 #else
 	#define DS_VERIFY(exp, msg) if (FAILED(hr = (exp))) { VDLog(kVDLogWarning, VDStringW(L"CapDShow: Failed to build filter graph: " L##msg L"\n")); TearDownGraph(); return false; } else
 #endif
 
-#ifdef DS_VERIFY
-#undef DS_VERIFY
-#endif
+//#ifdef DS_VERIFY
+//#undef DS_VERIFY
+//#endif
 
-#define DS_VERIFY(exp,msg) if (FAILED(hr = (exp))) { printf("FAIL\n"); return false; } else
+//#define DS_VERIFY(exp,msg) if (FAILED(hr = (exp))) { printf("FAIL: %s\n", msg); return false; } else
 
 
 #include "misc.h"
@@ -1455,6 +1456,7 @@ void VDCaptureDriverDS::SetCallback(IVDCaptureDriverCallback *pCB) {
 }
 
 bool VDCaptureDriverDS::Init(VDGUIHandle hParent) {
+  printf("Hello and welcome to INIT\n");
 	mhwndParent = (HWND)hParent;
 
 	HRESULT hr;
@@ -1476,6 +1478,8 @@ bool VDCaptureDriverDS::Init(VDGUIHandle hParent) {
 	  printf("cannot make message sink\n");
 		return false;
 	}
+
+	printf("No major problems so far\n");
 
 	// Create a filter graph manager.
 	DS_VERIFY(mpGraph.CreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER), "create filter graph manager");
@@ -4018,5 +4022,6 @@ IVDCaptureDriver *VDCaptureSystemDS::CreateDriver(int index) {
 	if ((unsigned)index >= (unsigned)mDriverCount)
 		return NULL;
 
+	printf("Creating a ds driver\n");
 	return new VDCaptureDriverDS(mVideoDevices[index].first);
 }
