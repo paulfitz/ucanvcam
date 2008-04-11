@@ -325,29 +325,6 @@ static bool DeleteRegistryValue(const char *key)
 }
 
 
-int old_main() {
-
-  {
-    const char *key = 
-      "HKEY_LOCAL_MACHINE\\SOFTWARE\\MakeSweet\\Video;Root";
-    const char *val = "c:/howdy";
-    bool ok = WriteRegistryValue(key,val);
-    if (!ok) { printf("failed write\n"); }
-  }
-
-  {
-    const char *key =
-      "HKEY_LOCAL_MACHINE\\SOFTWARE\\MakeSweet\\Video;Root";
-    //"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\DirectX;Version";
-    
-    string result;
-    bool ok = ReadRegistryValue(key,result);
-    if (!ok) { printf("failed\n"); }
-    printf("%s -> %s\n", key, result.c_str());
-  }
-  return 0;
-}
-
 #endif
 
 
