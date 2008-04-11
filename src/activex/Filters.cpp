@@ -21,7 +21,7 @@
 #include <ddraw.h>
 #include "Filters.h"
 
-#include "yarpy.h"
+//#include "yarpy.h"
 //using namespace yarp::sig;
 
 #include <yarp/os/all.h>
