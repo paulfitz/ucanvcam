@@ -16,6 +16,7 @@ ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resources.o
 		-o ${CMAKE_CURRENT_BINARY_DIR}/resources.o)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../win32)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../common)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 # fix this for your own path to directx
@@ -36,7 +37,7 @@ FIND_PATH(DIRECTX_INCLUDE_DIR NAMES dsound.h PATHS
 INCLUDE_DIRECTORIES(${DIRECTX_BASECLASSES_DIR} ${DIRECTX_INCLUDE_DIR})
 FILE(GLOB_RECURSE directx_source ${DIRECTX_BASECLASSES_DIR}/*.cpp)
 
-ADD_LIBRARY(ucanvcamx SHARED Filters.cpp Dll.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source})
+ADD_LIBRARY(ucanvcamx SHARED Filters.cpp Dll.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source} ${CMAKE_CURRENT_SOURCE_DIR}/../common/registry.cpp)
 
 TARGET_LINK_LIBRARIES(ucanvcamx advapi32 gdi32 ole32 oleaut32 user32 winmm uuid strmiids comctl32)
 

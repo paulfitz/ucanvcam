@@ -8,7 +8,7 @@
 
 using namespace std;
 
-static string g_location = SWEETCAM_RESOURCE_PATH;
+static string g_location = UCANVCAM_RESOURCE_PATH;
 static bool g_located = false;
 
 std::string getResourceLocation() {
