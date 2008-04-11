@@ -24,3 +24,6 @@ ucanvcam currently can build in one of the following configurations:
 
 To use with the current skype beta (version 2.0.0.43) on linux, you'll need 
 the "gstfakevideo" workaround (do a web search).
+
+Compile with cmake.  Glitch: you currently have to run cmake twice, it
+will fail the first time.  Sorry.
