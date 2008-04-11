@@ -190,14 +190,14 @@ PFSTDAPI DllRegisterServer()
   }
   */
 
-  AMovieDllRegisterServer2(TRUE);
-  printf("Register filters\n"); fflush(stdout);
+  //AMovieDllRegisterServer2(TRUE);
+  //printf("Register filters\n"); fflush(stdout);
   return RegisterFilters(TRUE);
 }
 
 PFSTDAPI DllUnregisterServer()
 {
-  AMovieDllRegisterServer2(FALSE);
+  //AMovieDllRegisterServer2(FALSE);
   return RegisterFilters(FALSE);
 }
 
