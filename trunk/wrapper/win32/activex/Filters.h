@@ -5,6 +5,8 @@
 #include <yarp/os/Bottle.h>
 #include <yarp/dev/PolyDriver.h>
 
+#include "../ShmemBus.h"
+
 #define DECLARE_PTR(type, ptr, expr) type* ptr = (type*)(expr);
 
 EXTERN_C const GUID CLSID_VirtualCam;
@@ -159,6 +161,7 @@ private:
   int ct;
   yarp::os::BufferedPort<yarp::os::Bottle> outPort;
   yarp::dev::PolyDriver imgSrc;
+  ShmemBus bus;
 };
 
 
