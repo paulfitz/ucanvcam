@@ -1,5 +1,9 @@
 2008-04-10  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
+	* CMakeLists.txt: version bump, windows build actually works
+	well for the first time; assumes 320x240 RGB at the moment 
+	though...
+
 	* src/win32/VcamWin.cpp: mutex for access to input device.
 
 	* wrapper/win32/ShmemBus.h: start using shmem on windows to
