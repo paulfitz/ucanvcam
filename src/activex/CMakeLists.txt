@@ -41,3 +41,4 @@ ADD_LIBRARY(ucanvcamx SHARED Filters.cpp Dll.cpp ${CMAKE_CURRENT_BINARY_DIR}/res
 
 TARGET_LINK_LIBRARIES(ucanvcamx advapi32 gdi32 ole32 oleaut32 user32 winmm uuid strmiids comctl32)
 
+INSTALL(TARGETS ucanvcamx DESTINATION bin)

@@ -17,6 +17,9 @@ SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 ADD_SUBDIRECTORY(src)
 
+INSTALL(DIRECTORY media DESTINATION media 
+        PATTERN ".svn" EXCLUDE)
+
 #########################################################################
 # Information for packaging 
 #########################################################################
@@ -26,12 +29,21 @@ SET(CPACK_PACKAGE_VERSION_MAJOR "0")
 SET(CPACK_PACKAGE_VERSION_MINOR "1")
 SET(CPACK_PACKAGE_VERSION_PATCH "2")
 SET(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-SET(CPACK_GENERATOR "TGZ")
+IF (WIN32)
+  SET(CPACK_GENERATOR "NSIS")
+  #SET(CPACK_PACKAGE_ICON "/home/paulfitz/view.bmp")
+ELSEIF (WIN32)
+  SET(CPACK_GENERATOR "TGZ")
+ENDIF (WIN32)
 SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 SET(CPACK_SOURCE_IGNORE_FILES ${CPACK_SOURCE_IGNORE_FILES} "~$" ".svn$" ".svn/.*$")
 
 INCLUDE(CPack)
+
+#########################################################################
+# Building documentation
+#########################################################################
 
 ADD_CUSTOM_TARGET(dox COMMAND doxygen ${PROJECT_SOURCE_DIR}/doc/src/doxygen.conf)
 
