@@ -37,7 +37,6 @@ using namespace yarp::sig;
 using namespace yarp::sig::file;
 using namespace yarp::dev;
 
-HINSTANCE g_hInst=0;
 HWND ghApp=0;
 FILE *FOUT = NULL;
 
@@ -130,6 +129,7 @@ CVCamStream::CVCamStream(HRESULT *phr, CVCam *pParent, LPCWSTR pPinName) :
 {
   printf("Starting up CVCamStream\n"); fflush(stdout);
   CAutoLock cAutoLockShared(&m_cSharedState);
+  bus.init();
   ct = 0;
     // Set the default media type as 320x240x24@15
     GetMediaType(4, &m_mt);
@@ -168,6 +168,7 @@ CVCamStream::~CVCamStream()
 #ifdef NETWORKED
   outPort.close();
 #endif
+  bus.fini();
   //Network::fini();
 } 
 
@@ -276,8 +277,15 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms)
     grabber->getImage(img);
     //SAY3("Got image",img.width(),img.height());
   } else {
-    SAY("No image");
-    Time::delay(0.03);
+    SAY("Image diversion");
+    Time::delay(0.03); 
+
+    bus.beginRead();
+    ImageOf<PixelRgb> cp;
+    cp.setQuantum(1);
+    cp.setExternal(bus.buffer(),320,240);
+    img.copy(cp);
+    bus.endRead();
   }
 #ifdef MERGE_SERVICE
   getServerImage(img);
