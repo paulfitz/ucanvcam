@@ -6,7 +6,7 @@
 ucanvcam is (C) 2007, 2008 Paul Fitzpatrick (paulfitz@alum.mit.edu)
 It is free software, under the GPLv2, see GPL.TXT
 
-Sweetcam has numerous dependencies and integrated code, see DEPENDENCIES.TXT
+ucanvcam has numerous dependencies and integrated code, see DEPENDENCIES.TXT
 
 Certain effects from the EffecTV project are included, under the GPL.
 I'd like to acknowledge that project as an inspiration for ucanvcam.
