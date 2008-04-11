@@ -5,7 +5,7 @@
 #include <yarp/os/Bottle.h>
 #include <yarp/dev/PolyDriver.h>
 
-#include "../ShmemBus.h"
+#include "ShmemBus.h"
 
 #define DECLARE_PTR(type, ptr, expr) type* ptr = (type*)(expr);
 

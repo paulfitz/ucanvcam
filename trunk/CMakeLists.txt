@@ -4,8 +4,9 @@ PROJECT(ucanvcam)
 # general compile options
 #########################################################################
 
-SET (STANDALONE TRUE CACHE BOOL "standalone program or plugin?")
-SET (USE_GUI TRUE CACHE BOOL "GUI or command-line?")
+#### All options currently disabled; should come back eventually though.
+##SET (STANDALONE TRUE CACHE BOOL "standalone program or plugin?")
+##SET (USE_GUI TRUE CACHE BOOL "GUI or command-line?")
 
 #########################################################################
 # most of the work is done here 
