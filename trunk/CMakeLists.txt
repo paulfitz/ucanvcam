@@ -17,7 +17,7 @@ SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 ADD_SUBDIRECTORY(src)
 
-INSTALL(DIRECTORY media DESTINATION media 
+INSTALL(DIRECTORY media DESTINATION ${CMAKE_INSTALL_PREFIX} 
         PATTERN ".svn" EXCLUDE)
 
 #########################################################################
