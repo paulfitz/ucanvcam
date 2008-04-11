@@ -47,9 +47,9 @@ private:
 #ifdef SHMEM_SERVICE
   ShmemBus bus;
 #endif
-  Semaphore service;
+  Semaphore service, inputMutex;
 public:
-  VcamWin() : service(1) {
+  VcamWin() : service(1), inputMutex(1) {
     output = false;
     cache.setQuantum(1);
     getList();
@@ -58,6 +58,10 @@ public:
 
   virtual ~VcamWin() {
     stopOutput();
+    inputMutex.wait();
+    source.close();
+    grabber = NULL;
+    inputMutex.post();
   }
 
   bool getList() {
@@ -83,8 +87,9 @@ public:
   }
 
   bool open(const char *name) {
-    grabber = NULL;
+    inputMutex.wait();
     source.close();
+    grabber = NULL;
     Property pSource;
     pSource.put("device","vdub");
     
@@ -111,6 +116,7 @@ public:
     }
     source.view(grabber);    
     source.view(lister);
+    inputMutex.post();
     return true;
   }
 
@@ -134,7 +140,12 @@ public:
   }
 
   virtual bool getImage(ImageOf<PixelRgb>& img) {
-    bool result = grabber->getImage(cache);
+    inputMutex.wait();
+    bool result = false;
+    if (grabber!=NULL) {
+      result = grabber->getImage(cache);
+    }
+    inputMutex.post();
     if (!result) return false;
 
 #ifdef SHMEM_SERVICE
