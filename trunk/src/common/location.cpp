@@ -14,10 +14,16 @@ static bool g_located = false;
 std::string getResourceLocation() {
   //printf("Checking for resource location\n");
   if (!g_located) {
-    std::string result = getRegistry(KEY_ROOT);
+    std::string result = getRegistry(KEY_NEW_ROOT);
     if (result!="") {
-      printf("Registry reports resource location %s\n", result.c_str());
-      g_location = result;
+      //printf("Registry reports dll resource location %s\n", result.c_str());
+      g_location = result + "/media";
+    } else {
+      result = getRegistry(KEY_ROOT);
+      if (result!="") {
+	//printf("Registry reports resource location %s\n", result.c_str());
+	g_location = result;
+      }
     }
   }
   return g_location;
