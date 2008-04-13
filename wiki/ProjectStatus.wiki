@@ -1,6 +1,9 @@
 #summary The status of the project
 #labels Featured
 
+==2008/04/13==
+  * [http://www.makesweet.com/webcam/ucanvcam Windows installer] available.
+
 ==2008/04/10==
 Release 0.1.2, which works on windows/linux, but looks ugly (both code and GUI).  Silly restrictions:
   * (Windows) Make sure your camera is giving 320x240 images before even trying it.
