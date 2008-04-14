@@ -18,7 +18,7 @@
 #include <yarp/sig/Image.h>
 
 #include "Vcam.h"
-#include "Effect.h"
+#include "Effects.h"
 
 #include <string>
 
@@ -242,7 +242,7 @@ class MyFrame: public wxFrame
 private:
     wxBoxSizer *topsizer;
     wxTextCtrl* m_textCtrl;
-    Effect effect;
+    Effects effect;
     Bottle sources;
     Bottle outputs;
  

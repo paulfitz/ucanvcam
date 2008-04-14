@@ -2,11 +2,12 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "yeffects.h"
-
 #include <yarp/sig/Image.h>
 #include <yarp/sig/ImageDraw.h>
 #include <yarp/os/all.h>
+
+#include "EffectGroup.h"
+
 
 using namespace yarp::os;
 using namespace yarp::sig;
