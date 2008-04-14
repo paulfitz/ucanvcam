@@ -16,9 +16,9 @@ using namespace yarp::sig;
 #define NETWORKED 1
 #endif
 
-class ParamEffect : public YarpEffect, public PortReader {
+class ParamEffect : public Effect, public PortReader {
 private:
-  YarpEffect *current;
+  Effect *current;
   BufferedPort<Bottle> msg;
   Semaphore mutex;
 public:
@@ -34,9 +34,9 @@ public:
     ConstString cmd = bot->get(0).asString();
     if (cmd == "set") {
       ConstString str = bot->get(1).asString();
-      YarpEffect *next = YarpEffects::get().search(str.c_str());
+      Effect *next = EffectGroup::get().search(str.c_str());
       if (next==NULL) {
-	next = YarpEffects::get().search("BrokenTV");
+	next = EffectGroup::get().search("BrokenTV");
       }
       if (next!=NULL) {
 	if (current!=NULL) {
@@ -47,7 +47,7 @@ public:
       }
       out.fromString("[ok]");
     } else if (cmd == "list") {
-      out = YarpEffects::get().getList();
+      out = EffectGroup::get().getList();
     } else {
       out.fromString("[fail] \"command not recognized\"");
     }
@@ -73,7 +73,7 @@ public:
     if (!ok) return false;
 #endif
     if (current==NULL) {
-      current = YarpEffects::get().search("TickerTV");
+      current = EffectGroup::get().search("TickerTV");
       return current->start();
     }
     return false;
@@ -115,7 +115,7 @@ public:
   }
 };
 
-YarpEffect *yparamRegister() {
+Effect *paramRegister() {
   return new ParamEffect();
 }
 

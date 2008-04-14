@@ -75,17 +75,17 @@ static effect *currentEffect = NULL;
 
 static ImageOf<PixelBgra> srcTV, destTV;
 
-class YarpEffectTV : public YarpEffect { //, public DriverCreator {
+class PortEffectTV : public Effect { //, public DriverCreator {
 public:
   std::string name;
   effect *e;
 
-  YarpEffectTV() {
+  PortEffectTV() {
     name = "none";
     e = NULL;
   }
 
-  YarpEffectTV(const char *name, effect *e) {
+  PortEffectTV(const char *name, effect *e) {
     this->name = name;
     this->e = e;
   }
@@ -95,7 +95,7 @@ public:
     this->e = e;
   }
 
-  virtual ~YarpEffectTV() {
+  virtual ~PortEffectTV() {
     if (e!=NULL) free(e);
     e = NULL;
   }
@@ -134,13 +134,13 @@ public:
 };
 
 
-void YarpEffects::add(YarpEffect *effect) {
+void EffectGroup::add(Effect *effect) {
   effects.push_back(effect);
   printf("%s Registered\n",effect->getName().c_str());
   effectMax++;
 }
 
-int YarpEffects::init()
+int EffectGroup::init()
 {
 	int i, n;
 	effect *entry;
@@ -151,13 +151,13 @@ int YarpEffects::init()
 		entry = (*effects_register_list[i])();
 		if(entry) {
 		  //effectsList[effectMax] = entry;
-		  add(new YarpEffectTV(entry->name,entry));
+		  add(new PortEffectTV(entry->name,entry));
 		  //Drivers::factory().add(
 		}
 	}
-	add(ytickerRegister());
-	add(ypaulfitzRegister());
-	add(yparamRegister());
+	add(tickerRegister());
+	add(engageRegister());
+	add(paramRegister());
 	printf("%d effects are available.\n",effectMax);
 	return effectMax;
 }
@@ -236,7 +236,7 @@ effect *getEffect(const char *name) {
 }
 
 
-YarpEffect *searchGeneralEffect(const char *str) {
+Effect *searchGeneralEffect(const char *str) {
 }
 
 
@@ -246,12 +246,12 @@ YarpEffect *searchGeneralEffect(const char *str) {
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 
-YarpEffects::YarpEffects() {
+EffectGroup::EffectGroup() {
 }
 
 
 /*
-int YarpEffects::init() {
+int EffectGroup::init() {
   int i, n;
   effect *entry;
   
@@ -271,7 +271,7 @@ int YarpEffects::init() {
 }
 */
 
-YarpEffect *YarpEffects::search(const char *str) {
+Effect *EffectGroup::search(const char *str) {
   for (int i=0; i<effects.size(); i++) {
     if (effects[i]->getName() == str) {
       printf("Found effect %s\n", str);
@@ -283,11 +283,11 @@ YarpEffect *YarpEffects::search(const char *str) {
 }
 
 
-YarpEffects *g_effects = NULL;
+EffectGroup *g_effects = NULL;
 
-YarpEffects& YarpEffects::get() {
+EffectGroup& EffectGroup::get() {
   if (g_effects == NULL) {
-    g_effects = new YarpEffects;
+    g_effects = new EffectGroup;
     g_effects->init();
   }
   return *g_effects;
