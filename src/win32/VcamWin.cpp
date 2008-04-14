@@ -11,7 +11,7 @@ using namespace yarp::dev;
 
 #include "drivers.h"
 
-#include "yarpy.h"
+#include "Effect.h"
 
 #include "modules/ISourceLister.h"
 
@@ -137,7 +137,7 @@ public:
     exit(1);
     bool result = grabber->getImage(cache);
     if (!result) return NULL;
-    yarpy_apply(cache,proc);
+    Effect::apply(cache,proc);
     if (touched) {
       proc.zero();
     }
@@ -166,7 +166,7 @@ public:
       shouldEnd = true;
     }
 #endif
-    yarpy_apply(cache,img);
+    Effect::apply(cache,img);
     if (touched) {
       img.zero();
     }
