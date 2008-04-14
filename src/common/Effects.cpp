@@ -38,16 +38,16 @@ void screen_setcaption(const char *str) {
   printf("set caption %s\n", str);
 }
 
-static YarpEffect *ye = NULL;
+static Effect *ye = NULL;
 static ImageOf<PixelBgra> src, dest;
 
 static void ucanvcam_init() {
   static bool first = true;
   if (first) {
     //ye = effects.search("NervousTV");
-    ye = YarpEffects::get().search("TickerTV");
-    //ye = YarpEffects::get().search("EngageTV");
-    //ye = YarpEffects::get().search("BrokenTV");
+    ye = EffectGroup::get().search("TickerTV");
+    //ye = EffectGroup::get().search("EngageTV");
+    //ye = EffectGroup::get().search("BrokenTV");
   }
   first = false;
 }
@@ -76,9 +76,9 @@ static void ucanvcam_start(Image& in) {
 
 #ifdef WIN32
 #else
-      //      ye = YarpEffects::get().search("ParamTV");
+      //      ye = EffectGroup::get().search("ParamTV");
 #endif
-      //ye = YarpEffects::get().search("BrokenTV");
+      //ye = EffectGroup::get().search("BrokenTV");
 
       if (ye!=NULL) {
 	ye->start();
@@ -152,15 +152,15 @@ static bool ucanvcam_stop() {
   return true;
 }
 
-static YarpEffect *ucanvcam_get_effect() {
+static Effect *ucanvcam_get_effect() {
   return ye;
 }
 
-static YarpEffect *ucanvcam_take_effect() {
+static Effect *ucanvcam_take_effect() {
   if (ye!=NULL) {
     ye->stop();
   }
-  YarpEffect *tmp = ye;
+  Effect *tmp = ye;
   ye = NULL;
   return tmp;
 }
@@ -170,11 +170,11 @@ Effects::Effects() {
 }
 
 yarp::os::Bottle Effects::getEffects() {
-  return YarpEffects::get().getList();
+  return EffectGroup::get().getList();
 }
 
 bool Effects::setEffect(const char *name) {
-  YarpEffect *next = YarpEffects::get().search(name);
+  Effect *next = EffectGroup::get().search(name);
   if (next==NULL) {
     return false;
   }
@@ -206,7 +206,7 @@ bool Effects::apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in,
 }
 
 yarp::os::Property Effects::getConfiguration() {
-  YarpEffect *e = ucanvcam_get_effect();
+  Effect *e = ucanvcam_get_effect();
   if (e!=NULL) {
     return e->getConfiguration();
   }
@@ -214,7 +214,7 @@ yarp::os::Property Effects::getConfiguration() {
 }
 
 void Effects::setConfiguration(yarp::os::Property& prop) {
-  YarpEffect *e = ucanvcam_get_effect();
+  Effect *e = ucanvcam_get_effect();
   if (e!=NULL) {
     e->reconfigure(prop);
   }

@@ -13,17 +13,17 @@
 #include "Effect.h"
 
 
-class YarpEffects {
+class EffectGroup {
 private:
-  std::vector <YarpEffect *> effects;
-  void add(YarpEffect *effect);
+  std::vector <Effect *> effects;
+  void add(Effect *effect);
 public:
-  YarpEffects();
+  EffectGroup();
   int init();
 
-  YarpEffect *search(const char *str);
+  Effect *search(const char *str);
 
-  virtual ~YarpEffects() {
+  virtual ~EffectGroup() {
     for (int i=0; i<effects.size(); i++) {
       if (effects[i]!=NULL) {
 	delete effects[i];
@@ -33,7 +33,7 @@ public:
     effects.clear();
   }
 
-  static YarpEffects& get();
+  static EffectGroup& get();
 
   yarp::os::Bottle getList() {
     yarp::os::Bottle bot;
@@ -45,12 +45,10 @@ public:
 };
 
 
-
-YarpEffect *ypaulfitzRegister();
-
-YarpEffect *ytickerRegister();
-
-YarpEffect *yparamRegister();
+// specific effects - should get moved
+Effect *engageRegister();
+Effect *tickerRegister();
+Effect *paramRegister();
 
 #endif
 

@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-class YarpEffect : public yarp::dev::DeviceDriver {
+class Effect : public yarp::dev::DeviceDriver {
 public:
   virtual bool open(yarp::os::Searchable& config) {
     return true;
@@ -67,7 +67,7 @@ public:
     return "anon";
   }
 
-  virtual ~YarpEffect() {
+  virtual ~Effect() {
   }
 
   virtual bool start() {

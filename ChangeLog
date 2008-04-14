@@ -1,3 +1,8 @@
+2008-04-14  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
+
+	* src/common/Effect.h: (and many other files) made class
+	names and filenames less obscure.
+
 2008-04-12  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
 	* CMakeLists.txt: improved NSIS packaging, version bump.

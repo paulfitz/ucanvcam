@@ -20,7 +20,7 @@ using namespace yarp::sig;
 
 using namespace std;
 
-class TickerEffect : public YarpEffect {
+class TickerEffect : public Effect {
 private:
   gdImageStruct access;
   ImageOf<PixelBgra> idest;
@@ -56,7 +56,7 @@ public:
   }
 };
 
-YarpEffect *ytickerRegister() {
+Effect *tickerRegister() {
   return new TickerEffect();
 }
 
@@ -131,60 +131,6 @@ yarp::sig::Image *TickerEffect::pdraw(yarp::sig::Image& src,
   if (brect[2]<0) {
     first = now;
   }
-
-
-
-  //#else
-  /*
-      gdImageString(im, gdFontLarge,
-		src.width()-(int)(offset+0.5), 20, (unsigned char*)"Hello, you fool, I love you.  Come on the joy ride.  I said: Hello, you fool, I love you.  Come on the joy ride!", 
-		gdTrueColorAlpha(255, 255, 0, 0));
-      
-      if (now-first>10) {
-	first=now;
-      }
-  */
-
-  //#endif
-
-  /*
-  dest2.resize(base);
-  IMGFOR(base,x,y) {
-    PixelRgb& pix1 = dest2.safePixel(x,y);
-    PixelBgr *pix0 = (PixelBgr*)(im->tpixels[y] + x);
-    //pix1 = (*pix0);
-    if (pix0->r != 0 || pix0->g != 0 || pix0->b != 0) {
-      pix1.r = pix0->r;
-      pix1.g = pix0->g;
-      pix1.b = pix0->b;
-    }
-    //gdImageGetPixel(im,x,y);
-  }
-  */
-
-  //dest2.copy(src2);
-
-  /*
-  if (im->tpixels==NULL) {
-    printf("no image\n");
-    //    exit(1);
-  }
-
-  int start = src2.height()-margin;
-  IMGFOR(dest2,x,y) {
-    if (y>=start) {
-      PixelRgb& pix1 = dest2.safePixel(x,y);
-      PixelBgr *pix0 = (PixelBgr*)(im->tpixels[y-start] + x);
-      //pix1 = (*pix0);
-      if (pix0->r != 0 || pix0->g != 0 || pix0->b != 0) {
-	pix1.r = pix0->r;
-	pix1.g = pix0->g;
-	pix1.b = pix0->b;
-      }
-    }
-  }
-  */
-  //gdImageDestroy(im);
 
   return &idest;
 }

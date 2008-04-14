@@ -13,7 +13,7 @@ using namespace yarp::sig;
 
 #include "EdgeMan.h"
 
-class EngageEffect : public YarpEffect {
+class EngageEffect : public Effect {
   virtual bool draw(ImageOf<PixelRgb>& src2, ImageOf<PixelRgb>& dest2);
 
   virtual std::string getName() {
@@ -21,7 +21,7 @@ class EngageEffect : public YarpEffect {
   }
 };
 
-YarpEffect *ypaulfitzRegister() {
+Effect *engageRegister() {
   return new EngageEffect();
 }
 
