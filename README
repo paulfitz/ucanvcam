@@ -6,7 +6,9 @@
 ucanvcam is (C) 2007, 2008 Paul Fitzpatrick (paulfitz@alum.mit.edu)
 It is free software, under the GPLv2, see GPL.TXT
 
-ucanvcam has numerous dependencies and integrated code, see DEPENDENCIES.TXT
+ucanvcam depends on the following free libraries:
+  gd, freetype, SDL, YARP, wxwidgets
+See DEPENDENCIES.TXT for details
 
 Certain effects from the EffecTV project are included, under the GPL.
 I'd like to acknowledge that project as an inspiration for ucanvcam.
