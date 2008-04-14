@@ -21,15 +21,9 @@
 #include <ddraw.h>
 #include "Filters.h"
 
-//#include "yarpy.h"
-//using namespace yarp::sig;
-
 #include <yarp/os/all.h>
 #include <yarp/sig/all.h>
 #include <yarp/dev/all.h>
-//#include "drivers.h"
-
-//#include "Register.h"
 
 using namespace yarp;
 using namespace yarp::os;
@@ -341,7 +335,6 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms)
       dest2.setExternal((char*)pData,ww,hh);
       //dest1.resize(ww,hh);
       if (m_lSaturation<50) {
-	//yarpy_apply(img,dest2);
 	dest2.copy(img);
       } else {
 	dest2.copy(img);
@@ -354,7 +347,6 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms)
     // quantum rules seem similar, check this though
     src.setExternal((char*)pData,ww,hh);
     dest.setExternal((char*)pData,ww,hh);
-    //yarpy_apply(src,dest);
     */
 
     pms->SetSyncPoint(TRUE);
