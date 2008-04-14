@@ -11,7 +11,7 @@ using namespace yarp::dev;
 
 #include "drivers.h"
 
-#include "yarpy.h"
+#include "Effect.h"
 
 #include "modules/ISourceLister.h"
 
@@ -94,14 +94,14 @@ public:
   virtual yarp::sig::Image *getImage() {
     bool result = grabber->getImage(cache);
     if (!result) return NULL;
-    yarpy_apply(cache,proc);
+    Effect::apply(cache,proc);
     return &proc;
   }
 
   virtual bool getImage(ImageOf<PixelRgb>& img) {
     bool result = grabber->getImage(cache);
     if (!result) return false;
-    yarpy_apply(cache,img);
+    Effect::apply(cache,img);
   }
 
   virtual yarp::os::Bottle getSources() {
