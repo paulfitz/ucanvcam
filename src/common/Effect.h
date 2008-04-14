@@ -5,7 +5,6 @@
 // get cleaned up step-by-step
 
 #include "yeffects.h"
-#include "yarpy.h"
 
 /**
  *
@@ -17,9 +16,7 @@
 class Effect {
 private:
 public:
-  Effect() {
-    yarpy_init();
-  }
+  Effect();
 
   virtual ~Effect() {
     stop();
@@ -30,23 +27,14 @@ public:
    * Get a list of the available effects.
    *
    */
-  yarp::os::Bottle getEffects() {
-    return YarpEffects::get().getList();
-  }
+  yarp::os::Bottle getEffects();
 
   /**
    *
    * Choose a named effect.
    *
    */
-  bool setEffect(const char *name) {
-    YarpEffect *e = YarpEffects::get().search(name);
-    if (e==NULL) {
-      return false;
-    }
-    yarpy_set_effect(e);
-    return true;
-  }
+  bool setEffect(const char *name);
 
   /**
    *
@@ -54,9 +42,7 @@ public:
    *
    */
   static bool apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
-	     yarp::sig::ImageOf<yarp::sig::PixelRgb>& out) {
-    return yarpy_apply(in,out);
-  }
+		    yarp::sig::ImageOf<yarp::sig::PixelRgb>& out);
 
   /**
    *
@@ -64,9 +50,7 @@ public:
    *
    */
   static bool apply(yarp::sig::ImageOf<yarp::sig::PixelBgr>& in, 
-	     yarp::sig::ImageOf<yarp::sig::PixelBgr>& out) {
-    return yarpy_apply(in,out);
-  }
+		    yarp::sig::ImageOf<yarp::sig::PixelBgr>& out);
 
   /**
    *
@@ -74,39 +58,24 @@ public:
    *
    */
   static bool apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
-		    yarp::sig::ImageOf<yarp::sig::PixelBgr>& out) {
-    return yarpy_apply(in,out);
-  }
-
+		    yarp::sig::ImageOf<yarp::sig::PixelBgr>& out);
+  
   /**
    *
    * Get the configuration of the current effect.
    *
    */
-  yarp::os::Property getConfiguration() {
-    YarpEffect *e = yarpy_get_effect();
-    if (e!=NULL) {
-      return e->getConfiguration();
-    }
-    return yarp::os::Property();
-  }
+  yarp::os::Property getConfiguration();
 
   /**
    *
    * Reconfigure the current effect.
    *
    */
-  void setConfiguration(yarp::os::Property& prop) {
-    YarpEffect *e = yarpy_get_effect();
-    if (e!=NULL) {
-      e->reconfigure(prop);
-    }
-  }
+  void setConfiguration(yarp::os::Property& prop);
 
 private:
-  void stop() {
-    yarpy_stop();
-  }
+  void stop();
 };
 
 #endif

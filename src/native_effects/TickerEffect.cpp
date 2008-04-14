@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 
-//#include "yarpy1.h"
 #include "yeffects.h"
 
 #include <yarp/sig/Image.h>
@@ -21,14 +20,14 @@ using namespace yarp::sig;
 
 using namespace std;
 
-class YarpyTickerEffect : public YarpEffect {
+class TickerEffect : public YarpEffect {
 private:
   gdImageStruct access;
   ImageOf<PixelBgra> idest;
   Property options;
   string txt;
 public:
-  YarpyTickerEffect() {
+  TickerEffect() {
     access.sx = 0;
     access.sy = 0;
     options.put("text", "Welcome to ucanvcam!");
@@ -58,11 +57,11 @@ public:
 };
 
 YarpEffect *ytickerRegister() {
-  return new YarpyTickerEffect();
+  return new TickerEffect();
 }
 
 
-yarp::sig::Image *YarpyTickerEffect::pdraw(yarp::sig::Image& src,
+yarp::sig::Image *TickerEffect::pdraw(yarp::sig::Image& src,
 					   yarp::sig::Image& dest) {
 
   gdImagePtr im;
