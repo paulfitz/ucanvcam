@@ -1,5 +1,7 @@
 2008-04-14  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
+	* configure: add dummy configure script that calls cmake.
+
 	* src/common/Effect.h: (and many other files) made class
 	names and filenames less obscure.
 
