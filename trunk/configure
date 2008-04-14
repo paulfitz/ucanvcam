@@ -11,7 +11,7 @@ mkdir -p build
 base=$PWD
 cd build
 # we have a bug: we need to run cmake twice at the moment.
-cmake .. > /dev/null
+cmake .. > /dev/null 2> /dev/null
 cmake .
 cd $base
 (
