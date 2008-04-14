@@ -1,0 +1,22 @@
+#!/bin/bash
+
+which cmake || (
+    echo "*** ERROR: We need cmake to compile.  Please install it."
+    echo "  Package name: usually 'cmake'"
+    echo "  Website: http://www.cmake.org"
+)
+
+# for cleanliness, do an out-of-source build
+mkdir -p build
+base=$PWD
+cd build
+# we have a bug: we need to run cmake twice at the moment.
+cmake .. > /dev/null
+cmake .
+cd $base
+(
+echo "default:"
+echo -e "\tcd build; make"
+echo "install:"
+echo -e "\tcd build; make install"
+) > Makefile
