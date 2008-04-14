@@ -5,8 +5,6 @@
 #include <yarp/sig/Image.h>
 #include <yarp/os/Bottle.h>
 
-#include "Effect.h"
-
 class Vcam {
 public:
   virtual ~Vcam() {}

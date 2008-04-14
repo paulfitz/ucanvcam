@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "yeffects.h"
+#include "Effect.h"
 
 #include <yarp/sig/Image.h>
 #include <yarp/sig/ImageDraw.h>

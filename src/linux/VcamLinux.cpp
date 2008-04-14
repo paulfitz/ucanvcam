@@ -26,7 +26,7 @@ using namespace yarp::dev;
 
 #include "drivers.h"
 
-#include "Effect.h"
+#include "Effects.h"
 
 static int exitRequested = 0;
 
@@ -151,10 +151,10 @@ public:
     bool result = grabber->getImage(cache);
     if (!result) return NULL;
     if (!output) {
-      Effect::apply(cache,proc);
+      Effects::apply(cache,proc);
       return &proc;
     } else {
-      Effect::apply(cache,dest);
+      Effects::apply(cache,dest);
       if (put_image(hout, vidOut, w, h)==0) {
 	printf("*** FAILED to send image\n");
       }      
@@ -166,7 +166,7 @@ public:
     if (grabber==NULL) return false;
     bool result = grabber->getImage(cache);
     if (!result) return false;
-    Effect::apply(cache,img);
+    Effects::apply(cache,img);
     if (output) {
       dest.copy(img);
       if (put_image(hout, vidOut, w, h)==0) {

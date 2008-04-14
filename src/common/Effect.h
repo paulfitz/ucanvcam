@@ -1,82 +1,84 @@
 #ifndef EFFECT_INC
 #define EFFECT_INC
 
-// put an API around all the messy code, which should then
-// get cleaned up step-by-step
+#include <yarp/sig/Image.h>
+#include <yarp/os/Bottle.h>
+#include <yarp/os/Property.h>
+#include <yarp/dev/DeviceDriver.h>
 
-#include "yeffects.h"
+#include <string>
+#include <vector>
 
-/**
- *
- * Standard interface to the available effects.
- * The Effect::apply method applies an effect selected using Effect::setEffect.
- * The apply method can be called with various image formats.
- *
- */
-class Effect {
-private:
+class YarpEffect : public yarp::dev::DeviceDriver {
 public:
-  Effect();
-
-  virtual ~Effect() {
-    stop();
+  virtual bool open(yarp::os::Searchable& config) {
+    return true;
   }
 
-  /**
-   *
-   * Get a list of the available effects.
-   *
-   */
-  yarp::os::Bottle getEffects();
+  virtual bool close() {
+    return true;
+  }
 
-  /**
-   *
-   * Choose a named effect.
-   *
-   */
-  bool setEffect(const char *name);
+  virtual bool reconfigure(yarp::os::Searchable& config) {
+    return true;
+  }
 
-  /**
-   *
-   * Apply the current effect to an image, RGB version.
-   *
-   */
-  static bool apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
-		    yarp::sig::ImageOf<yarp::sig::PixelRgb>& out);
+  virtual yarp::os::Property getConfiguration() {
+    return yarp::os::Property();
+  }
 
-  /**
-   *
-   * Apply the current effect to an image, BGR version.
-   *
-   */
-  static bool apply(yarp::sig::ImageOf<yarp::sig::PixelBgr>& in, 
-		    yarp::sig::ImageOf<yarp::sig::PixelBgr>& out);
+  virtual bool draw(yarp::sig::ImageOf<yarp::sig::PixelRgb>& src,
+		    yarp::sig::ImageOf<yarp::sig::PixelRgb>& dest) {
+    return false;
+  }
 
-  /**
-   *
-   * Apply the current effect to an image, RGB to BGR version.
-   *
-   */
-  static bool apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
-		    yarp::sig::ImageOf<yarp::sig::PixelBgr>& out);
-  
-  /**
-   *
-   * Get the configuration of the current effect.
-   *
-   */
-  yarp::os::Property getConfiguration();
+  virtual yarp::sig::Image *pdraw(yarp::sig::Image& src,
+				  yarp::sig::Image& dest) {
+    yarp::sig::ImageOf<yarp::sig::PixelRgb> src2;
+    yarp::sig::ImageOf<yarp::sig::PixelRgb> dest2;
+    bool cpIn = (src.getPixelCode()!=src2.getPixelCode());
+    bool cpOut = (dest.getPixelCode()!=dest2.getPixelCode());
+    if (cpIn) {
+      src2.copy(src);
+    } else {
+      src2.wrapIplImage(src.getIplImage());
+    }
+    if (!cpOut) {
+      dest.resize(src);
+      dest2.wrapIplImage(dest.getIplImage());
+    }
+    if (!draw(src2,dest2)) {
+      return NULL;
+    }
+    if (cpOut) {
+      dest.copy(dest2);
+    }
+    return &dest;
+  }
 
-  /**
-   *
-   * Reconfigure the current effect.
-   *
-   */
-  void setConfiguration(yarp::os::Property& prop);
+  /*
+  virtual bool draw(yarp::sig::ImageOf<yarp::sig::PixelRgba>& src,
+		    yarp::sig::ImageOf<yarp::sig::PixelRgba>& dest) {
+    return false;
+  }
+  */
 
-private:
-  void stop();
+  virtual std::string getName() {
+    return "anon";
+  }
+
+  virtual ~YarpEffect() {
+  }
+
+  virtual bool start() {
+  }
+
+  virtual bool stop() {
+  }
 };
 
 #endif
+
+
+
 

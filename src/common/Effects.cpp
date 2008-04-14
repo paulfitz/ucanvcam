@@ -10,8 +10,8 @@ extern "C" {
 #include "effects.h"
 }
 
-#include "yeffects.h"
-#include "Effect.h"
+#include "EffectGroup.h"
+#include "Effects.h"
 
 int video_width;
 int video_height;
@@ -165,15 +165,15 @@ static YarpEffect *ucanvcam_take_effect() {
   return tmp;
 }
 
-Effect::Effect() {
+Effects::Effects() {
   ucanvcam_init();
 }
 
-yarp::os::Bottle Effect::getEffects() {
+yarp::os::Bottle Effects::getEffects() {
   return YarpEffects::get().getList();
 }
 
-bool Effect::setEffect(const char *name) {
+bool Effects::setEffect(const char *name) {
   YarpEffect *next = YarpEffects::get().search(name);
   if (next==NULL) {
     return false;
@@ -190,22 +190,22 @@ bool Effect::setEffect(const char *name) {
 }
 
 
-bool Effect::apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
+bool Effects::apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
 	   yarp::sig::ImageOf<yarp::sig::PixelRgb>& out) {
   return ucanvcam_apply(in,out);
 }
 
-bool Effect::apply(yarp::sig::ImageOf<yarp::sig::PixelBgr>& in, 
+bool Effects::apply(yarp::sig::ImageOf<yarp::sig::PixelBgr>& in, 
 		   yarp::sig::ImageOf<yarp::sig::PixelBgr>& out) {
   return ucanvcam_apply(in,out);
 }
 
-bool Effect::apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
+bool Effects::apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
 		   yarp::sig::ImageOf<yarp::sig::PixelBgr>& out) {
   return ucanvcam_apply(in,out);
 }
 
-yarp::os::Property Effect::getConfiguration() {
+yarp::os::Property Effects::getConfiguration() {
   YarpEffect *e = ucanvcam_get_effect();
   if (e!=NULL) {
     return e->getConfiguration();
@@ -213,13 +213,13 @@ yarp::os::Property Effect::getConfiguration() {
   return yarp::os::Property();
 }
 
-void Effect::setConfiguration(yarp::os::Property& prop) {
+void Effects::setConfiguration(yarp::os::Property& prop) {
   YarpEffect *e = ucanvcam_get_effect();
   if (e!=NULL) {
     e->reconfigure(prop);
   }
 }
 
-void Effect::stop() {
+void Effects::stop() {
   ucanvcam_stop();
 }

@@ -5,7 +5,7 @@ extern "C" {
 #include "effects.h"
 }
 
-#include "yeffects.h"
+#include "EffectGroup.h"
 
 using namespace yarp::os;
 using namespace yarp::sig;
