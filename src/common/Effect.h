@@ -53,7 +53,7 @@ public:
    * Apply the current effect to an image, RGB version.
    *
    */
-  bool apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
+  static bool apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
 	     yarp::sig::ImageOf<yarp::sig::PixelRgb>& out) {
     return yarpy_apply(in,out);
   }
@@ -63,7 +63,7 @@ public:
    * Apply the current effect to an image, BGR version.
    *
    */
-  bool apply(yarp::sig::ImageOf<yarp::sig::PixelBgr>& in, 
+  static bool apply(yarp::sig::ImageOf<yarp::sig::PixelBgr>& in, 
 	     yarp::sig::ImageOf<yarp::sig::PixelBgr>& out) {
     return yarpy_apply(in,out);
   }
@@ -73,8 +73,8 @@ public:
    * Apply the current effect to an image, RGB to BGR version.
    *
    */
-  bool apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
-	     yarp::sig::ImageOf<yarp::sig::PixelBgr>& out) {
+  static bool apply(yarp::sig::ImageOf<yarp::sig::PixelRgb>& in, 
+		    yarp::sig::ImageOf<yarp::sig::PixelBgr>& out) {
     return yarpy_apply(in,out);
   }
 
