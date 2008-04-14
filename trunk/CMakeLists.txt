@@ -58,5 +58,8 @@ INCLUDE(CPack)
 # Building documentation
 #########################################################################
 
-ADD_CUSTOM_TARGET(dox COMMAND doxygen ${PROJECT_SOURCE_DIR}/doc/src/doxygen.conf)
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/doc/src/doxygen.conf.in 
+               ${CMAKE_BINARY_DIR}/doc/src/doxygen.conf
+               IMMEDIATE)
+ADD_CUSTOM_TARGET(dox COMMAND doxygen ${CMAKE_BINARY_DIR}/doc/src/doxygen.conf)
 
