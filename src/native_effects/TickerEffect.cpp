@@ -20,6 +20,13 @@ using namespace yarp::sig;
 
 using namespace std;
 
+/**
+ *
+ * A news-ticker effect.  Really needs more choice of fonts, it 
+ * is specialized for a lovey-dovey look right now.  You can
+ * change the text being scrolled at any time at runtime.
+ *
+ */
 class TickerEffect : public Effect {
 private:
   gdImageStruct access;

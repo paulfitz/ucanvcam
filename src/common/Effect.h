@@ -9,29 +9,60 @@
 #include <string>
 #include <vector>
 
+/**
+ *
+ * Base class for all effects.  For convenience, we treat effects
+ * as DeviceDrivers in YARP -- entities that can be created
+ * by name, and passed configuration information at runtime.
+ *
+ */
 class Effect : public yarp::dev::DeviceDriver {
 public:
+
+  /**
+   *
+   * Configure an effect, and prepare it to run.
+   *
+   */
   virtual bool open(yarp::os::Searchable& config) {
     return true;
   }
 
+  /**
+   * Shut an effect down.
+   */
   virtual bool close() {
     return true;
   }
 
+  /**
+   * Reconfigure an effect while it is running.
+   */
   virtual bool reconfigure(yarp::os::Searchable& config) {
     return true;
   }
 
+  /**
+   * Recover the configuration of an effect.
+   */
   virtual yarp::os::Property getConfiguration() {
     return yarp::os::Property();
   }
 
+  /**
+   * Modify an image in an effect-specific way.  This is an RGB-to-RGB
+   * specialization of Effect::pdraw - it should return false if there
+   * is no such specialization.
+   */
   virtual bool draw(yarp::sig::ImageOf<yarp::sig::PixelRgb>& src,
 		    yarp::sig::ImageOf<yarp::sig::PixelRgb>& dest) {
     return false;
   }
 
+  /**
+   * Modify an image in any format in an effect-specific way, producing
+   * an output in any format.
+   */
   virtual yarp::sig::Image *pdraw(yarp::sig::Image& src,
 				  yarp::sig::Image& dest) {
     yarp::sig::ImageOf<yarp::sig::PixelRgb> src2;
@@ -56,13 +87,9 @@ public:
     return &dest;
   }
 
-  /*
-  virtual bool draw(yarp::sig::ImageOf<yarp::sig::PixelRgba>& src,
-		    yarp::sig::ImageOf<yarp::sig::PixelRgba>& dest) {
-    return false;
-  }
-  */
-
+  /**
+   * Get the name of an effect.
+   */
   virtual std::string getName() {
     return "anon";
   }
@@ -70,9 +97,16 @@ public:
   virtual ~Effect() {
   }
 
+  /**
+   * Prepare the effect for operation.
+   */
   virtual bool start() {
   }
 
+  /**
+   * Prepare the effect to cease operation.  It may be started again without
+   * a close/open cycle.
+   */
   virtual bool stop() {
   }
 };
