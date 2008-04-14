@@ -75,6 +75,11 @@ static effect *currentEffect = NULL;
 
 static ImageOf<PixelBgra> srcTV, destTV;
 
+/**
+ *
+ * Wrap an effect from the EffecTV project.
+ *
+ */
 class PortEffectTV : public Effect { //, public DriverCreator {
 public:
   std::string name;

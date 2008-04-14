@@ -13,6 +13,11 @@ using namespace yarp::sig;
 
 #include "EdgeMan.h"
 
+/**
+ *
+ * An effect that adds a dove, heart, and bouquet.
+ *
+ */
 class EngageEffect : public Effect {
   virtual bool draw(ImageOf<PixelRgb>& src2, ImageOf<PixelRgb>& dest2);
 

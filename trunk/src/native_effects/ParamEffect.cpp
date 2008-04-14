@@ -16,6 +16,12 @@ using namespace yarp::sig;
 #define NETWORKED 1
 #endif
 
+/**
+ *
+ * A meta-effect that allows the current effect to be select remotely.
+ * Communication is via a YARP port.
+ *
+ */
 class ParamEffect : public Effect, public PortReader {
 private:
   Effect *current;

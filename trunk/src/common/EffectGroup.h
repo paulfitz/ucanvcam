@@ -12,7 +12,9 @@
 
 #include "Effect.h"
 
-
+/**
+ * Bundle a group of effects.
+ */
 class EffectGroup {
 private:
   std::vector <Effect *> effects;
@@ -21,6 +23,9 @@ public:
   EffectGroup();
   int init();
 
+  /**
+   * Find a named effect.
+   */
   Effect *search(const char *str);
 
   virtual ~EffectGroup() {
@@ -33,8 +38,15 @@ public:
     effects.clear();
   }
 
+  /**
+   * Get the global EffectGroup instance, which contains all 
+   * available effects.
+   */
   static EffectGroup& get();
 
+  /**
+   * Enumerate all effects.
+   */
   yarp::os::Bottle getList() {
     yarp::os::Bottle bot;
     for (int i=0; i<effects.size(); i++) {
