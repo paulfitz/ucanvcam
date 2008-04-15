@@ -43,7 +43,7 @@ static Semaphore mutex(1);
 int g_hinstance = 0;
 int g_hwnd = 0;
 
-Vcam& theVcam() {
+static Vcam& theVcam() {
     if (myVcam==NULL) {
         myVcam = getVcam();
         if (myVcam==NULL) {
