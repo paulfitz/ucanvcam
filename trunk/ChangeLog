@@ -1,3 +1,9 @@
+2008-04-15  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
+
+	* src/modules/CMakeLists.txt: explicitly list the
+	ffmpeg driver in YARP - needed on Linux for video4linux or
+	firewire access.
+
 2008-04-14  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
 	* src/gui/cmdline.cpp: begin a command-line version of

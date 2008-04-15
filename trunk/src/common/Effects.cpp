@@ -223,3 +223,14 @@ void Effects::setConfiguration(yarp::os::Property& prop) {
 void Effects::stop() {
   ucanvcam_stop();
 }
+
+
+yarp::os::ConstString Effects::getCurrentEffect() {
+  Effect *e = ucanvcam_get_effect();
+  if (e!=NULL) {
+    return e->getName().c_str();
+  }
+  return "";
+}
+
+

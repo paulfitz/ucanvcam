@@ -37,24 +37,43 @@ int main(int argc, char *argv[]) {
     Property options;
     options.fromCommand(argc,argv);
 
-    if (argc==1) {
+    if (options.check("help")) {
         printf("Welcome to command-line ucanvcam.\n");
-        printf("Call as:\n"); 
-        printf("  ./ucanvcam --list\n");
-        printf("  ./ucanvcam [--source /dev/videoN] [--output /dev/videoN] [--effect effect]\n");
-       exit(0);
+        printf("To get a list of effects, sources, and outputs:\n"); 
+        printf("  ucanvcam --list\n");
+        printf("To run:\n"); 
+        printf("  ucanvcam [--source </dev/videoN>]    # choose input\n");
+        printf("           [--output </dev/videoN>]    # choose output\n");
+        printf("           [--effect <effect>]         # choose effect\n");
+        printf("           [--save <prefix>]           # save frames as .ppm\n");
+        printf("To get this help:\n");
+        printf("  ucanvcam --help\n");
+        return 0;
     }
 
-    printf("command-line ucanvcam does not do anything yet, sorry.\n");
+    printf("==============================================================\n");
+    printf("== Loading effects\n");
+    printf("==\n");
 
     Effects effect;
     Bottle lst = effect.getEffects();
+
+    printf("==============================================================\n");
+    printf("== Finding inputs / outputs\n");
+    printf("==\n");
     Bottle sources = theVcam().getSources();
     Bottle outputs = theVcam().getOutputs();
-    printf("\n\n");
-    printf("Effects are %s\n", lst.toString().c_str());
-    printf("Sources are %s\n", sources.toString().c_str());
-    printf("Outputs are %s\n", outputs.toString().c_str());
+    printf("==============================================================\n");
+    printf("== Starting ucanvcam\n");
+    printf("==\n");
+    printf("EFFECTS: %s\n", lst.toString().c_str());
+    printf("SOURCES: %s\n", sources.toString().c_str());
+    printf("OUTPUTS: %s\n", outputs.toString().c_str());
+
+    if (options.check("list")) {
+        // we are done
+        return 0;
+    }
 
     if (options.check("source")) {
         theVcam().setSource(options.check("source",
@@ -71,17 +90,32 @@ int main(int argc, char *argv[]) {
                                        Value("TickerTV")).asString().c_str());
     }
 
-    // just as a test, save images...
+    printf("Selected effect is: %s\n", effect.getCurrentEffect().c_str());
+    printf("Selected source is: %s\n", theVcam().getCurrentSource().c_str());
+    printf("Selected output is: %s\n", theVcam().getCurrentOutput().c_str());
+
+
+    ConstString prefix = options.check("save",Value("demo_")).asString();
+    bool shouldSave = options.check("save");
+
     ImageOf<PixelRgb> img;
+    double start = Time::now();
+    double last = start-5.0001;
     while (true) {
-        printf("Waiting for image\n");
-        theVcam().getImage(img);
-        char buf[256];
         static int ct = 0;
-        sprintf(buf,"demo_%06d.ppm",ct);
+        double now = Time::now();
+        if (now-last>5) {
+            last += 5;
+            printf("Time %lds; Frame: %d\n",(int)(now-start+0.5),ct);
+        }
         ct++;
-        write(img,buf);
-        printf("Saved image to %s\n", buf);
+        theVcam().getImage(img);
+        if (shouldSave) {
+            char buf[1000];
+            snprintf(buf,sizeof(buf),"%s%06d.ppm",prefix.c_str(),ct);
+            write(img,buf);
+            printf("Saved image to %s\n", buf);
+        }
     }
 
     return 0;

@@ -51,11 +51,15 @@ private:
   ShmemBus bus;
 #endif
   Semaphore service, inputMutex;
+  ConstString outputName;
+  ConstString sourceName;
 public:
   VcamWin() : service(1), inputMutex(1) {
     output = false;
     cache.setQuantum(1);
     getList();
+    sourceName = "none";
+    outputName = "none";
     open("test");
   }
 
@@ -121,6 +125,7 @@ public:
     }
     source.view(grabber);    
     source.view(lister);
+    sourceName = name;
     inputMutex.post();
     return true;
   }
@@ -212,6 +217,7 @@ public:
       stopOutput();
       startOutput(name);
     }
+    outputName = name;
   }
 
 
