@@ -141,7 +141,7 @@ public:
 
 void EffectGroup::add(Effect *effect) {
   effects.push_back(effect);
-  printf("%s Registered\n",effect->getName().c_str());
+  //printf("%s Registered\n",effect->getName().c_str());
   effectMax++;
 }
 
@@ -279,7 +279,7 @@ int EffectGroup::init() {
 Effect *EffectGroup::search(const char *str) {
   for (int i=0; i<effects.size(); i++) {
     if (effects[i]->getName() == str) {
-      printf("Found effect %s\n", str);
+      //printf("Active effect is %s\n", str);
       return effects[i];
     }
   }

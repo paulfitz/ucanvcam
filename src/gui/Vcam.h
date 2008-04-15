@@ -45,6 +45,14 @@ public:
   virtual void setOutput(const char *name) {
     printf("Cannot set output to %s or anything else\n", name);
   }
+
+  virtual yarp::os::ConstString getCurrentOutput() {
+    return "none";
+  }
+
+  virtual yarp::os::ConstString getCurrentSource() {
+    return "none";
+  }
 };
 
 #endif

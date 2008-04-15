@@ -1,10 +1,6 @@
 #ifndef EFFECTS_INC
 #define EFFECTS_INC
 
-// put an API around all the messy code, which should then
-// get cleaned up step-by-step
-
-//#include "Effect.h"
 #include "EffectGroup.h"
 
 /**
@@ -29,6 +25,13 @@ public:
    *
    */
   yarp::os::Bottle getEffects();
+
+  /**
+   *
+   * Get the name of the currently active effect.
+   *
+   */
+  yarp::os::ConstString getCurrentEffect();
 
   /**
    *

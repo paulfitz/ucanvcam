@@ -42,6 +42,8 @@ private:
   IFrameGrabberImage *grabber;
   ImageOf<PixelRgb> cache, proc;
   Bottle sources;
+  ConstString outputName;
+  ConstString sourceName;
   int vformat;
   int w, h;
   int hout;
@@ -57,6 +59,8 @@ private:
 public:
   VcamLinux() {
     hout = -1;
+    sourceName = "none";
+    outputName = "none";
     open("test");
     output = false;
   }
@@ -112,6 +116,7 @@ public:
   }
 
   bool open(const char *name) {
+    sourceName = name;
     grabber = NULL;
     source.close();
     Property pSource;
@@ -229,6 +234,16 @@ public:
       stopOutput();
       startOutput(name);
     }
+    outputName = name;
+  }
+
+
+  virtual yarp::os::ConstString getCurrentOutput() {
+    return outputName;
+  }
+
+  virtual yarp::os::ConstString getCurrentSource() {
+    return sourceName;
   }
 
 };
