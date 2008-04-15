@@ -2,6 +2,8 @@
 #ifndef VCAM_INC
 #define VCAM_INC
 
+#include <stdio.h>
+
 #include <yarp/sig/Image.h>
 #include <yarp/os/Bottle.h>
 
