@@ -1,0 +1,17 @@
+/**
+ * @page install Installing ucanvcam
+ *
+
+Here are the hopelessly inadequate instructions for installing ucanvcam.
+
+\li Make sure you have CMake installed.
+\li Download ucanvcam
+\li Run "./configure"
+\li Run "make"
+\li ucanvcam should now be available in the "build" directory.
+
+\image html favicon.ico
+
+ *
+ */
+

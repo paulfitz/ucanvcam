@@ -1,0 +1,17 @@
+/**
+ * @mainpage Welcome to ucanvcam
+ *
+
+Hello good evening and welcome to ucanvcam.
+
+This is a cross-platform framework for building virtual
+cameras. Virtual cameras offer the same interface as regular cameras
+to client applications (such as Skype), but provide user-generated or
+user-modified imagery rather than imagery directly from a
+camera. While ucanvcam comes with a set of special effects, the main
+intent is to make building virtual cameras easier for people without
+OS-specific knowledge, so they can focus purely on image processing.
+
+ *
+ */
+
