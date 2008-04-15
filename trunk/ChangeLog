@@ -1,5 +1,8 @@
 2008-04-14  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
+	* src/gui/cmdline.cpp: begin a command-line version of
+	ucanvcam, for use without a GUI.
+
 	* configure: add dummy configure script that calls cmake.
 
 	* src/common/Effect.h: (and many other files) made class

@@ -46,25 +46,29 @@ IF (MINGW)
   LINK_LIBRARIES(winmm)
 ENDIF (MINGW)
 
+# gui directory should really be called ui
+SET(INTERFACE_SOURCE ${PROJECT_SOURCE_DIR}/src/gui/cmdline.cpp)
 
 IF (USE_GUI)
   FIND_PACKAGE(wxWidgets REQUIRED)
   INCLUDE_DIRECTORIES(${wxWidgets_INCLUDE_DIRS})
   ADD_DEFINITIONS(${wxWidgets_DEFINITIONS})
   LINK_LIBRARIES(${wxWidgets_LIBRARIES})
-  INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/gui)
+  SET(INTERFACE_SOURCE ${PROJECT_SOURCE_DIR}/src/gui/gui.cpp)
 ENDIF (USE_GUI)
+
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/gui)
 
 IF (UNIX)
 
-  ADD_EXECUTABLE(${TARGET_NAME} gui/gui.cpp linux/VcamLinux.cpp ${common_sources})
+  ADD_EXECUTABLE(${TARGET_NAME} ${INTERFACE_SOURCE} linux/VcamLinux.cpp ${common_sources})
 
 ELSE (UNIX)
 
   # assume Windows
 
   ADD_DEFINITIONS(-DSHMEM_SERVICE)
-  ADD_EXECUTABLE(${TARGET_NAME} gui/gui.cpp win32/VcamWin.cpp  ${common_sources})
+  ADD_EXECUTABLE(${TARGET_NAME} ${INTERFACE_SOURCE} win32/VcamWin.cpp  ${common_sources})
 ENDIF (UNIX)
 
 TARGET_LINK_LIBRARIES(${TARGET_NAME} gd freetype)
