@@ -3,7 +3,7 @@
 
 ==2008/04/14==
 
-  * [file:///home/paulfitz/wide/desktop/links3.html Source-code documentation] starting to come online.
+  * [http://ucanvcam.googlecode.com/svn/trunk/doc/index.html Source-code documentation] starting to come online.
 
 ==2008/04/13==
   * [http://www.makesweet.com/webcam/ucanvcam Windows installer] available.
