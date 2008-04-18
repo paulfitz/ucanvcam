@@ -35,6 +35,8 @@
 #include <yarp/sig/all.h>
 #include <yarp/dev/all.h>
 
+#include "ShmemImage.h"
+
 using namespace yarp;
 using namespace yarp::os;
 using namespace yarp::sig;
@@ -97,6 +99,7 @@ STDMETHODIMP CVCam::NonDelegatingQueryInterface(REFIID riid, void **ppv) {
 //////////////////////////////////////////////////////////////////////////
 CVCamStream::CVCamStream(HRESULT *phr, CVCam *pParent, LPCWSTR pPinName) :
     CSourceStream(NAME("ucanvcam virtual camera"),phr, pParent, pPinName), m_pParent(pParent) {
+    Network::init();
     printf("Starting up CVCamStream\n"); fflush(stdout);
     CAutoLock cAutoLockShared(&m_cSharedState);
     bus.init();
@@ -106,13 +109,16 @@ CVCamStream::CVCamStream(HRESULT *phr, CVCam *pParent, LPCWSTR pPinName) :
     printf("  *** %s:%d\n", __FILE__, __LINE__); fflush(stdout);
     running = true;
     printf("Started up CVCamStream\n"); fflush(stdout);
+    lastId = 0;
+    lastChange = -1000;
+    haveId = false;
 }
 
 CVCamStream::~CVCamStream() {
     SAY("~CVCamStream");
     CAutoLock cAutoLockShared(&m_cSharedState);
     bus.fini();
-    //Network::fini();
+    Network::fini();
 } 
 
 HRESULT CVCamStream::QueryInterface(REFIID riid, void **ppv)
@@ -207,11 +213,34 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
         SAY("Image diversion");
         Time::delay(0.03); 
         bus.beginRead();
-        ImageOf<PixelRgb> cp;
-        cp.setQuantum(1);
-        cp.setExternal(bus.buffer(),320,240);
-        img.copy(cp);
+        ShmemImageHeader header;
+        ShmemImage cp(bus);
+        //ImageOf<PixelRgb> cp;
+        //cp.setQuantum(1);
+        //cp.setExternal(bus.buffer(),320,240);
+        img.copy(cp.getImage(),320,240);
+        header = cp.getHeader();
         bus.endRead();
+
+        double now = Time::now();
+        int id = header.tick;
+        if (!haveId) {
+            lastId = id;
+            haveId = true;
+        } else {
+            if (id!=lastId) {
+                lastChange = now;
+            }
+        }
+        lastId = id;
+
+        bool ok = (now-lastChange<2);
+
+        if (!ok) {
+            IMGFOR(img,x,y) {
+                img(x,y).b = 255;
+            }
+        }
 
         //return NOERROR;
 

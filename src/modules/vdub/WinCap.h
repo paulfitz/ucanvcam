@@ -14,12 +14,12 @@ using namespace nsVDCapture;
 
 //extern HWND ghApp;
 
+extern FILE *FOUT;
+#define xprintf(a) printf(a); if (FOUT!=NULL) {fprintf(FOUT,a); fflush(FOUT);}
+#define xprintf2(a1,a2) printf(a1,a2); if (FOUT!=NULL) {fprintf(FOUT,a1,a2); fflush(FOUT);}
 
-//#define xprintf(a) printf(a); if (FOUT!=NULL) {fprintf(FOUT,a); fflush(FOUT);}
-//#define xprintf2(a1,a2) printf(a1,a2); if (FOUT!=NULL) {fprintf(FOUT,a1,a2); fflush(FOUT);}
-
-#define xprintf(a) printf(a); fflush(stdout);
-#define xprintf2(a1,a2) printf(a1,a2); fflush(stdout);
+//#define xprintf(a) printf(a); fflush(stdout);
+//#define xprintf2(a1,a2) printf(a1,a2); fflush(stdout);
 
 
 
@@ -151,27 +151,27 @@ public:
     virtual bool open(yarp::os::Searchable& config);
 
     virtual bool close() {
-      printf("closing %s:%d\n", __FILE__, __LINE__); fflush(stdout);
-        if (!closed) {
-	  printf("closing %s:%d\n", __FILE__, __LINE__); fflush(stdout);
-            read.post();
-            if (dd!=NULL) {
-                dd->CaptureStop();
-            }
-            xprintf("Capture stop\n");
-            if (dd!=NULL) {
-                delete dd;
-                dd = NULL;
-            }
-            if (cap!=NULL) {
-                delete cap;
-                cap = NULL;
-            }
-        }
-      printf("closing %s:%d\n", __FILE__, __LINE__); fflush(stdout);
-        closed = true;
-        //ready.post();
-        return true;
+      xprintf("closing 1\n");
+      if (!closed) {
+	xprintf("closing 2\n");
+	read.post();
+	if (dd!=NULL) {
+	  dd->CaptureStop();
+	}
+	xprintf("Capture stop\n");
+	if (dd!=NULL) {
+	  delete dd;
+	  dd = NULL;
+	}
+	if (cap!=NULL) {
+	  delete cap;
+	  cap = NULL;
+	}
+      }
+      xprintf("closing done\n");
+      closed = true;
+      //ready.post();
+      return true;
     }
 
     bool accept(yarp::sig::ImageOf<yarp::sig::PixelBgr>& image) {

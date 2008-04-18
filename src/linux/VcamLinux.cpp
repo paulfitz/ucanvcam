@@ -226,7 +226,7 @@ public:
     return b;
   }
 
-  virtual void setOutput(const char *name) {
+  virtual bool setOutput(const char *name) {
     printf("Should set output to %s\n", name);
     if (ConstString(name)=="none") {
       stopOutput();
@@ -235,6 +235,7 @@ public:
       startOutput(name);
     }
     outputName = name;
+    return true;
   }
 
 

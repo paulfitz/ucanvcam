@@ -39,6 +39,7 @@ static Vcam *myVcam = NULL;
 static bool no_vcam = false;
 
 static Semaphore mutex(1);
+static bool needReset = false;
 
 int g_hinstance = 0;
 int g_hwnd = 0;
@@ -192,6 +193,11 @@ public:
             ct++;
 
             mutex.wait();
+            if (needReset) {
+                // make sure we don't access external memory
+                img.resize(0,0);
+                needReset = false;
+            }
             if (!no_vcam) {
                 vcam.getImage(img);
             }
@@ -291,7 +297,10 @@ public:
         printf("got a choice of output: %s\n", choice.c_str());
         mutex.wait();
         if (!no_vcam) {
-            theVcam().setOutput(choice.c_str());
+            bool resetBuffer = theVcam().setOutput(choice.c_str());
+            if (resetBuffer) {
+                needReset = true;
+            }
         }
         mutex.post();
     }
@@ -524,6 +533,7 @@ void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
     //wxCloseEvent ev;
     //wxPostEvent(this,ev);
+    removeVcam();
     Close(TRUE);
 }
 
@@ -543,10 +553,14 @@ Includes sybig.ttf font from the Larabie font collection."),
 
 
 #ifdef WIN32
+
+FILE *FOUT = NULL;
+
 int WINAPI WinMain(HINSTANCE hInstance,
                    HINSTANCE hPrevInstance,
                    LPSTR m_lpCmdLine, int nCmdShow) {
 
+    //FOUT = fopen("log.txt","w");
     g_hinstance = (int)(hInstance);    
     return wxEntry(hInstance,hPrevInstance,m_lpCmdLine,nCmdShow);
 }
