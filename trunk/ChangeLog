@@ -1,3 +1,10 @@
+2008-04-18  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
+
+	* src/win32/VcamWin.cpp: fix up possible deadlock
+
+	* src/win32/ShmemImage.h: factor out image-over-shmem
+	logic.
+
 2008-04-15  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
 	* src/modules/CMakeLists.txt: explicitly list the

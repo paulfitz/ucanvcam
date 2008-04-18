@@ -44,8 +44,9 @@ public:
     return b;
   }
 
-  virtual void setOutput(const char *name) {
+  virtual bool setOutput(const char *name) {
     printf("Cannot set output to %s or anything else\n", name);
+    return true;
   }
 
   virtual yarp::os::ConstString getCurrentOutput() {

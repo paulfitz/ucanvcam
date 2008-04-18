@@ -21,9 +21,12 @@ using namespace yarp::dev;
 
 #ifdef SHMEM_SERVICE
 #include "ShmemBus.h"
+#include "ShmemImage.h"
 #endif
 
 static bool touched = false;
+
+#define DBG
 
 extern int g_hinstance;
 extern int g_hwnd;
@@ -47,28 +50,36 @@ private:
   ImageOf<PixelRgb> cache, proc;
   Bottle sources;
   bool output;
+  bool stopOutputReq;
 #ifdef SHMEM_SERVICE
   ShmemBus bus;
+  ShmemImage busImage;
+  ShmemImageHeader header;
 #endif
-  Semaphore service, inputMutex;
+  Semaphore service, inputMutex, stopped;
   ConstString outputName;
   ConstString sourceName;
 public:
-  VcamWin() : service(1), inputMutex(1) {
+  VcamWin() : service(1), inputMutex(1), stopped(0), busImage(bus) {
     output = false;
     cache.setQuantum(1);
     getList();
     sourceName = "none";
     outputName = "none";
     open("test");
+    memset((void*)(&header),0,sizeof(header));
+    stopOutputReq = false;
   }
 
   virtual ~VcamWin() {
+    service.wait();
+    printf("Shut down output\n");
     stopOutput();
-    inputMutex.wait();
+    printf("Shut down source\n");
     source.close();
+    printf("Shut down vcam\n");
     grabber = NULL;
-    inputMutex.post();
+    service.post();
   }
 
   bool getList() {
@@ -160,25 +171,44 @@ public:
 
 #ifdef SHMEM_SERVICE
     bool shouldEnd = false;
+    service.wait();
     if (output) {
-      service.wait();
       bus.beginWrite();
-      if (bus.buffer()!=img.getRawImage()) {
+      /*
+	if (bus.buffer()!=img.getRawImage()) {
 	img.setQuantum(1);
 	img.setExternal(bus.buffer(),cache.width(),cache.height());
 	printf("*** redirected cache\n");
-      }
+	}
+      */
       shouldEnd = true;
+      Effects::apply(cache,busImage.getImage());
+      if (touched) {
+	busImage.getImage().zero();
+      }
+      header.tick++;
+      busImage.getHeader() = header;
+      if (busImage.getImage().getRawImage()!=img.getRawImage()) {
+	img.setQuantum(1);
+	img.setExternal(busImage.getImage().getRawImage(),
+			busImage.getImage().width(),
+			busImage.getImage().height());
+	printf("*** redirected cache\n");
+      }
+    } else {
+      Effects::apply(cache,img);
+      if (touched) {
+	img.zero();
+      }
     }
-#endif
+    if (shouldEnd) {
+      bus.endWrite();      
+    }
+    service.post();
+#else
     Effects::apply(cache,img);
     if (touched) {
       img.zero();
-    }
-#ifdef SHMEM_SERVICE
-    if (shouldEnd) {
-      bus.endWrite();
-      service.post();
     }
 #endif
     return true;
@@ -209,7 +239,7 @@ public:
     return b;
   }
 
-  virtual void setOutput(const char *name) {
+  virtual bool setOutput(const char *name) {
     printf("Should set output to %s\n", name);
     if (ConstString(name)=="none") {
       stopOutput();
@@ -218,6 +248,7 @@ public:
       startOutput(name);
     }
     outputName = name;
+    return true;
   }
 
 
@@ -227,11 +258,11 @@ public:
       UnregisterService();
 #endif
 #ifdef SHMEM_SERVICE
-      service.wait();
-      bus.fini();
-      service.post();
-#endif SHMEM_SERVICE
+      //service.wait();
       output = false;
+      bus.fini();
+      //service.post();
+#endif // SHMEM_SERVICE
     }
   }
 
@@ -246,7 +277,7 @@ public:
       service.wait();
       bus.init();
       service.post();
-#endif SHMEM_SERVICE
+#endif // SHMEM_SERVICE
       output = true;
     }
   }

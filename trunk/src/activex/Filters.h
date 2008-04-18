@@ -164,6 +164,9 @@ private:
     bool running;
     int ct;
     ShmemBus bus;
+    double lastChange;
+    int lastId;
+    bool haveId;
 };
 
 
