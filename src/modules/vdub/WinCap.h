@@ -14,12 +14,12 @@ using namespace nsVDCapture;
 
 //extern HWND ghApp;
 
-extern FILE *FOUT;
-#define xprintf(a) printf(a); if (FOUT!=NULL) {fprintf(FOUT,a); fflush(FOUT);}
-#define xprintf2(a1,a2) printf(a1,a2); if (FOUT!=NULL) {fprintf(FOUT,a1,a2); fflush(FOUT);}
+//extern FILE *FOUT;
+//#define xprintf(a) printf(a); if (FOUT!=NULL) {fprintf(FOUT,a); fflush(FOUT);}
+//#define xprintf2(a1,a2) printf(a1,a2); if (FOUT!=NULL) {fprintf(FOUT,a1,a2); fflush(FOUT);}
 
-//#define xprintf(a) printf(a); fflush(stdout);
-//#define xprintf2(a1,a2) printf(a1,a2); fflush(stdout);
+#define xprintf(a) printf(a); fflush(stdout);
+#define xprintf2(a1,a2) printf(a1,a2); fflush(stdout);
 
 
 
