@@ -1,5 +1,12 @@
 2008-04-18  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
+	* src/gui/cmdline.cpp: give help message when called with no
+	arguments, rather than running with defaults (which are not
+	usually very interesting).
+
+	* src/common/location.cpp: rudimentary logic for finding media
+	files when ucanvcam is downloaded as a binary package for Linux.
+
 	* src/gui/gui.cpp: label inputs, outputs, effects
 
 	* src/win32/VcamWin.cpp: fix up possible deadlock

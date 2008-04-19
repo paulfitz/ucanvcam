@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     Property options;
     options.fromCommand(argc,argv);
 
-    if (options.check("help")) {
+    if (options.check("help")||argc<2) {
         printf("Welcome to command-line ucanvcam.\n");
         printf("To get a list of effects, sources, and outputs:\n"); 
         printf("  ucanvcam --list\n");
@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
         printf("           [--output </dev/videoN>]    # choose output\n");
         printf("           [--effect <effect>]         # choose effect\n");
         printf("           [--save <prefix>]           # save frames as .ppm\n");
+        printf("           [--run]           # use all default options\n");
         printf("To get this help:\n");
         printf("  ucanvcam --help\n");
         return 0;

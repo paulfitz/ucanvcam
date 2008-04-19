@@ -255,8 +255,10 @@ static int start(void)
     v4lprint(&vd);
 #endif
 
-    g_cursor_state = SDL_ShowCursor(SDL_QUERY);
-    SDL_ShowCursor(g_cursor_local);
+    // PFHIT - avoid SDL-specific stuff if possible
+    //g_cursor_state = SDL_ShowCursor(SDL_QUERY);
+    //SDL_ShowCursor(g_cursor_local);
+
     spiralSetName();
 	state = 1;
 	return 0;
@@ -279,7 +281,8 @@ static int stop(void)
             g_wave_table = NULL;
         }
         
-        SDL_ShowCursor(g_cursor_state);
+	// PFHIT - avoid SDL-specific stuff if possible
+        //SDL_ShowCursor(g_cursor_state);
         state = 0;
 	}
 
@@ -435,7 +438,8 @@ static int event(SDL_Event *event)
             {
                 g_cursor_local = SDL_DISABLE;
             }
-            SDL_ShowCursor(g_cursor_local);
+	    // PFHIT - avoid SDL-specific stuff if possible
+            //SDL_ShowCursor(g_cursor_local);
         }
     }
     
