@@ -9,14 +9,19 @@ which cmake || (
 # for cleanliness, do an out-of-source build
 mkdir -p build
 base=$PWD
-cd build
-# we have a bug: we need to run cmake twice at the moment.
-cmake .. > /dev/null 2> /dev/null
-cmake -DENABLE_vcammod_ffmpeg_grabber:BOOL=TRUE .
-cd $base
 (
 echo "default:"
 echo -e "\tcd build; make"
 echo "install:"
 echo -e "\tcd build; make install"
 ) > Makefile
+cd build
+# we have a bug: we need to run cmake twice at the moment.
+cmake .. > /dev/null 2> /dev/null
+cmake -DENABLE_vcammod_ffmpeg_grabber:BOOL=TRUE . || (
+    cd $base
+    rm -f Makefile
+    exit 1
+)
+echo "To compile, type \"make\""
+echo "To check/fix configuration, type \"ccmake build\""
