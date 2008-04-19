@@ -1,5 +1,7 @@
 2008-04-18  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
+	* src/gui/gui.cpp: label inputs, outputs, effects
+
 	* src/win32/VcamWin.cpp: fix up possible deadlock
 
 	* src/win32/ShmemImage.h: factor out image-over-shmem
