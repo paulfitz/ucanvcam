@@ -469,12 +469,26 @@ bool MyFrame::OnInit() {
         wxSizerFlags(0).Align(wxALIGN_CENTER).Border(wxALL, 10);
     topsizer->Add(view,flags);
     if (sourceList!=NULL) {
-        topsizer->Add(sourceList,flags);
+        wxBoxSizer *sizer = new wxBoxSizer( wxHORIZONTAL );
+        sizer->Add(new wxStaticText(this,-1,_T("input")),flags);
+        sizer->Add(sourceList,flags);
+        //topsizer->Add(sourceList,flags);
+        topsizer->Add(sizer,flags);
     }
     if (outputList!=NULL) {
-        topsizer->Add(outputList,flags);
+        wxBoxSizer *sizer = new wxBoxSizer( wxHORIZONTAL );
+        sizer->Add(new wxStaticText(this,-1,_T("output")),flags);
+        sizer->Add(outputList,flags);
+        //topsizer->Add(outputList,flags);
+        topsizer->Add(sizer,flags);
     }
-    topsizer->Add(effectList,flags);
+
+    if (1) {
+        wxBoxSizer *sizer = new wxBoxSizer( wxHORIZONTAL );
+        sizer->Add(new wxStaticText(this,-1,_T("effect")),flags);
+        sizer->Add(effectList,flags);
+        topsizer->Add(sizer,flags);
+    }
     topsizer->Add(new wxStaticText(this,-1,_T("configuration")),tflags);
     topsizer->Add(m_textCtrl, flags);
 
