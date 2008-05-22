@@ -42,6 +42,7 @@ private:
   IFrameGrabberImage *grabber;
   ImageOf<PixelRgb> cache, proc;
   Bottle sources;
+  PolyDriver destDriver;
   ConstString outputName;
   ConstString sourceName;
   int vformat;
@@ -69,7 +70,17 @@ public:
     stopOutput();
   }
 
-  bool startOutput(const char *name = "/dev/video0") {
+  bool startFileOutput(const char *name = "capture.avi") {
+    stopOutput();
+    Property p;
+    p.put("device", "ffmpeg_writer");
+    p.put("out",name);
+    p.put("framerate", 25);  // random number
+    output = destDriver.open(p);
+    return output;
+  }
+
+  bool startDevOutput(const char *name = "/dev/video0") {
     stopOutput();
     vformat = VIDEO_PALETTE_RGB24;
     w = 320;
@@ -105,12 +116,15 @@ public:
   bool stopOutput() {
     if (output) {
       output = false;
-      ::close(hout);
-      hout = -1;
+      if (hout!=-1) {
+	::close(hout);
+	hout = -1;
+      }
       if (vidOut!=NULL) {
 	delete[] vidOut;
 	vidOut = NULL;
       }
+      destDriver.close();
     }
     return true;
   }
@@ -159,10 +173,17 @@ public:
       Effects::apply(cache,proc);
       return &proc;
     } else {
-      Effects::apply(cache,dest);
-      if (put_image(hout, vidOut, w, h)==0) {
-	printf("*** FAILED to send image\n");
-      }      
+      if (destDriver.isValid()) {
+	Effects::apply(cache,proc);
+	IFrameWriterImage *writer = NULL;
+	destDriver.view(writer);
+	writer->putImage(proc);
+      } else {
+	Effects::apply(cache,dest);
+	if (put_image(hout, vidOut, w, h)==0) {
+	  printf("*** FAILED to send image\n");
+	}
+      }
       return &dest;
     }
   }
@@ -173,9 +194,15 @@ public:
     if (!result) return false;
     Effects::apply(cache,img);
     if (output) {
-      dest.copy(img);
-      if (put_image(hout, vidOut, w, h)==0) {
-	printf("*** FAILED to send image\n");
+      if (destDriver.isValid()) {
+	IFrameWriterImage *writer = NULL;
+	destDriver.view(writer);
+	writer->putImage(img);
+      } else {
+	dest.copy(img);
+	if (put_image(hout, vidOut, w, h)==0) {
+	  printf("*** FAILED to send image\n");
+	}
       }
     }
     return true;
@@ -223,6 +250,7 @@ public:
 	printf("adding possible output %s\n", buf);
       }
     }
+    b.addString("capture.mpeg2video");
     return b;
   }
 
@@ -230,9 +258,12 @@ public:
     printf("Should set output to %s\n", name);
     if (ConstString(name)=="none") {
       stopOutput();
+    } else if (name[0]=='c') {
+      stopOutput();
+      startFileOutput(name);      
     } else {
       stopOutput();
-      startOutput(name);
+      startDevOutput(name);
     }
     outputName = name;
     return true;
