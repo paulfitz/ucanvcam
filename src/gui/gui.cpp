@@ -44,6 +44,14 @@ static bool needReset = false;
 int g_hinstance = 0;
 int g_hwnd = 0;
 
+static wxString conv(const std::string& s) {
+    return wxString(s.c_str(), wxConvUTF8);
+}
+
+static std::string conv(const wxString& s) {
+    return std::string(s.mb_str(wxConvUTF8));
+} 
+
 static Vcam& theVcam() {
     if (myVcam==NULL) {
         myVcam = getVcam();
@@ -103,8 +111,9 @@ bool MyApp::OnCmdLineParsed(wxCmdLineParser& parser) {
 
     wxString location;
     if (parser.Found(wxT("r"),&location)) {
-        printf("*** setting location to [%s]\n", location.c_str());
-        setResourceLocation(location);
+        string loc = conv(location);
+        printf("*** setting location to [%s]\n", loc.c_str());
+        setResourceLocation(loc.c_str());
     }
     
     // to get at your unnamed parameters use
@@ -270,7 +279,7 @@ public:
     void OnOK(wxCommandEvent& event);
 
     void OnChoiceEffect(wxCommandEvent& e) {
-        string choice = e.GetString().c_str();
+        string choice = conv(e.GetString());
         printf("got a choice of effect: %s\n", choice.c_str());
         mutex.wait();
         effect.setEffect(choice.c_str());
@@ -283,7 +292,7 @@ public:
     }
 
     void OnChoiceSource(wxCommandEvent& e) {
-        string choice = e.GetString().c_str();
+        string choice = conv(e.GetString());
         printf("got a choice of source: %s\n", choice.c_str());
         mutex.wait();
         if (!no_vcam) {
@@ -293,7 +302,7 @@ public:
     }
 
     void OnChoiceOutput(wxCommandEvent& e) {
-        string choice = e.GetString().c_str();
+        string choice = conv(e.GetString());
         printf("got a choice of output: %s\n", choice.c_str());
         mutex.wait();
         if (!no_vcam) {
@@ -375,7 +384,7 @@ bool MyFrame::OnInit() {
         exit(1);
     }
     for (int i=0; i<nchoices; i++) {
-        choices[i] = lst.get(i).asString().c_str();
+        choices[i] = conv(string(lst.get(i).asString().c_str()));
     }
     wxChoice* effectList = 
         new wxChoice(this,ID_CHOICE_EFFECT,
@@ -386,7 +395,7 @@ bool MyFrame::OnInit() {
     delete[] choices;
     choices = NULL;
     if (effectList!=NULL) {
-        effectList->SetStringSelection("TickerTV");
+        effectList->SetStringSelection(wxT("TickerTV"));
     }
 
 
@@ -401,7 +410,7 @@ bool MyFrame::OnInit() {
             exit(1);
         }
         for (int i=0; i<nsrcchoices; i++) {
-            srcchoices[i] = sources.get(i).asString().c_str();
+            srcchoices[i] = conv(string(sources.get(i).asString().c_str()));
         }
         sourceList = 
             new wxChoice(this,ID_CHOICE_SOURCE,
@@ -414,7 +423,7 @@ bool MyFrame::OnInit() {
         if (sourceList!=NULL) {
             ConstString guess = theVcam().guessSource();
             if (guess!="") {
-                sourceList->SetStringSelection(guess.c_str());
+                sourceList->SetStringSelection(conv(string(guess.c_str())));
             }
         }
     }
@@ -432,7 +441,7 @@ bool MyFrame::OnInit() {
             exit(1);
         }
         for (int i=0; i<noutchoices; i++) {
-            outchoices[i] = outputs.get(i).asString().c_str();
+            outchoices[i] = conv(string(outputs.get(i).asString().c_str()));
         }
         outputList = 
             new wxChoice(this,ID_CHOICE_OUTPUT,
