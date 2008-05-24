@@ -250,7 +250,7 @@ public:
 	printf("adding possible output %s\n", buf);
       }
     }
-    b.addString("capture.mpeg2video");
+    //b.addString("capture.mpeg2video");
     return b;
   }
 
