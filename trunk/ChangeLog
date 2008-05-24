@@ -1,3 +1,10 @@
+2008-05-23  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
+
+	* src/linux/VcamLinux.cpp: video capture disabled for now,
+	while compiling to distribute with a codec-stripped version
+	of the ffmpeg libraries.
+
+
 2008-05-22  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
 	* src/gui/gui.cpp: deal with string issues in version 2.6
