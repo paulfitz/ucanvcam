@@ -61,6 +61,7 @@ public:
 Effect *engageRegister();
 Effect *tickerRegister();
 Effect *paramRegister();
+Effect *picmixRegister();
 
 #endif
 
