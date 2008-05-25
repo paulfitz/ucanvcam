@@ -37,7 +37,7 @@ public:
   virtual bool draw(ImageOf<PixelRgb>& src2, ImageOf<PixelRgb>& dest2);
 
   virtual std::string getName() {
-    return "PicmixTV";
+    return "PicMixTV";
   }
 
   virtual bool reconfigure(yarp::os::Searchable& config) {
@@ -56,24 +56,14 @@ public:
     return options;
   }
 
-  void readEffectData() {
-    if (workDir!=readDir||workVersion!=readVersion) {
-      printf("Reading pixmix effect data from dir [%s] (version [%s])\n",
-	     readVersion.c_str(),
-	     readDir.c_str());
-      readDir = workDir;
-      readVersion = workVersion;
-    } else {
-      printf("Pixmix effect data is current for dir [%s] (version [%s])\n",
-	     readVersion.c_str(),
-	     readDir.c_str());
-    }
-  }
+  void readEffectData();
+
 private:
   int frame;
   string workDir, readDir;
   string workVersion, readVersion;
   Property options;
+  Property effectConfig;
 };
 
 Effect *picmixRegister() {
@@ -82,8 +72,32 @@ Effect *picmixRegister() {
 
 bool PicmixEffect::draw(ImageOf<PixelRgb>& src2, ImageOf<PixelRgb>& dest2) {
   printf("*** warning: Picmix effect not implemented yet\n");
-  printf("*** warning: if it were, it would look in %s\n", workDir.c_str());
   dest2 = src2;
   return true;
 }
 
+void PicmixEffect::readEffectData() {
+  if (workDir==readDir&&workVersion==readVersion) {
+    printf("Pixmix effect data is current for dir [%s] (version [%s])\n",
+	   readVersion.c_str(),
+	   readDir.c_str());
+    return;
+  }
+
+  printf("Reading pixmix effect data from dir [%s] (version [%s])\n",
+	 readVersion.c_str(),
+	 readDir.c_str());
+  readDir = workDir;
+  readVersion = workVersion;
+
+  string configFile = readDir;
+  if (readDir!="") { configFile += "/"; }
+  configFile += "config.ini";
+  printf("Reading config file %s\n", configFile.c_str());
+  bool ok = effectConfig.fromConfigFile(configFile.c_str());
+  if (!ok) {
+    printf("Failed to read config file %s\n", configFile.c_str());
+    return;
+  }
+  printf("Effect configuration is %s\n", effectConfig.toString().c_str());
+}
