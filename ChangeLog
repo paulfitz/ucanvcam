@@ -1,3 +1,9 @@
+2008-05-26  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
+
+	* src/native_effects/PicmixEffect.cpp: for now, just
+	use this effect to overlay a graphic with transparency
+	on the video stream.
+
 2008-05-25  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
 	* src/native_effects/PicmixEffect.cpp: stub now reads 
