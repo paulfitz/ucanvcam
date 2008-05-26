@@ -20,6 +20,9 @@ Merged components:
   linux loopback example
     linux_loopback.cpp
 
+  some functions from imglib.cc (see ImageLoader.cpp), copyright (c) 2001, 2005
+  Tom Murphy 7 and distributed under the terms of the GPL.
+
 Optional windows parts:
 
   vdub driver, from virtualdub
