@@ -1,5 +1,9 @@
 2008-05-26  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
+	* src/native_effects/OverlayEffect.cpp: move simple overlay
+	operation to a dedicated effect, reserve picmix for specialized
+	remapping behavior.
+
 	* src/native_effects/PicmixEffect.cpp: for now, just
 	use this effect to overlay a graphic with transparency
 	on the video stream.

@@ -163,6 +163,7 @@ int EffectGroup::init()
 	add(tickerRegister());
 	add(engageRegister());
 	add(paramRegister());
+	add(overlayRegister());
 	add(picmixRegister());
 	printf("%d effects are available.\n",effectMax);
 	return effectMax;
