@@ -62,6 +62,7 @@ Effect *engageRegister();
 Effect *tickerRegister();
 Effect *paramRegister();
 Effect *picmixRegister();
+Effect *overlayRegister();
 
 #endif
 

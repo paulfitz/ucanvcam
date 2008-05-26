@@ -31,11 +31,8 @@ public:
     frame = -1;
     readDir = "";
     readVersion = "0";
-    readOverlay = "";
-    options.put("overlay",
-		(getResourceLocation()+"/"+"example.png").c_str());
-    //options.put("dir","picmix");
-    //options.put("version",0);
+    options.put("dir","picmix");
+    options.put("version",0);
     needRead = false;
     reconfigure(options);
   }
@@ -54,9 +51,6 @@ public:
     if (options.check("version")) {
       workVersion = options.check("version",Value("")).toString().c_str();
     }
-    if (options.check("overlay")) {
-      workOverlay = options.check("overlay",Value("")).toString().c_str();
-    }
     needRead = true;
     return true;
   }
@@ -71,7 +65,6 @@ private:
   int frame;
   string workDir, readDir;
   string workVersion, readVersion;
-  string workOverlay, readOverlay;
   Property options;
   Property effectConfig;
   ImageLoader img;
@@ -115,15 +108,6 @@ bool PicmixEffect::draw(ImageOf<PixelRgb>& src2, ImageOf<PixelRgb>& dest2) {
 }
 
 void PicmixEffect::readEffectData() {
-  if (workOverlay!="") {
-    if (workOverlay!=readOverlay) {
-      img.load(workOverlay.c_str());
-      printf("overlay size %dx%d\n", img.width(), img.height());
-      readOverlay = workOverlay;
-    }
-    return;
-  }
-
   if (workDir==readDir&&workVersion==readVersion) {
     printf("Reading pixmix effect data from dir [%s] (version [%s])\n",
 	   workDir.c_str(),
