@@ -1,5 +1,15 @@
 2008-05-26  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
+	* src/native_effects/PicmixEffect.cpp: first crude but working
+	effort at using picmix caches for effects.  Tried it with the
+	flag (http://makesweet.com/mixer/my-flag) effect and it worked.
+	No shading, or surface selection, and rather slow so far.
+
+	* src/native_effects/ImageLoader.h: add image sequence cache.
+
+	* src/native_effects/MapCache.h: add key for interpreting
+	picmix maps.
+
 	* src/native_effects/OverlayEffect.cpp: move simple overlay
 	operation to a dedicated effect, reserve picmix for specialized
 	remapping behavior.
