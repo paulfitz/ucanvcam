@@ -10,15 +10,16 @@
 
 #include <string>
 
+#include <ImageLoader.h>
+#include "location.h"
+#include "MapCache.h"
+
 using namespace yarp::os;
 using namespace yarp::sig;
 
 using namespace std;
 
 
-#include <ImageLoader.h>
-
-#include "location.h"
 
 /**
  *
@@ -28,13 +29,16 @@ using namespace std;
 class PicmixEffect : public Effect {
 public:
   PicmixEffect() {
-    frame = -1;
     readDir = "";
     readVersion = "0";
     options.put("dir","picmix");
     options.put("version",0);
     needRead = false;
     reconfigure(options);
+    first = last = current = 1;
+    step = 1;
+    linger = 0;
+    currentLinger = 0;
   }
 
   virtual bool draw(ImageOf<PixelRgb>& src2, ImageOf<PixelRgb>& dest2);
@@ -62,13 +66,13 @@ public:
   void readEffectData();
 
 private:
-  int frame;
+  int first, last, current, step, linger, currentLinger;
   string workDir, readDir;
   string workVersion, readVersion;
   Property options;
   Property effectConfig;
-  ImageLoader img;
   bool needRead;
+  ImageSeq iseq, xseq, yseq;
 };
 
 Effect *picmixRegister() {
@@ -82,28 +86,62 @@ bool PicmixEffect::draw(ImageOf<PixelRgb>& src2, ImageOf<PixelRgb>& dest2) {
   }
   dest2 = src2;
 
-  if (img.isValid()) {
-    for (int x=0; x<dest2.width()&&x<img.width(); x++) {
-      for (int y=0; y<dest2.height()&&y<img.height(); y++) {
-	PixelBgra v = img.pixel(x,y);
-	if (v.a==0) {
-	  dest2(x,y) = PixelRgb(v.r,v.g,v.b);
-	} else if (v.a>=127) {
-	  // do nothing, leave copied value
-	} else {
-	  PixelRgb& o = dest2(x,y);
-	  float f = v.a/127.0;
-	  if (f>1) f = 1;
-	  int r = (int)((1-f)*v.r+f*o.r);
-	  int g = (int)((1-f)*v.g+f*o.g);
-	  int b = (int)((1-f)*v.b+f*o.b);
-	  dest2(x,y) = PixelRgb(r,g,b);
-	}
+  //printf("At %d\n", current);
+
+  iseq.go(current);
+  ImageLoader *pbase = iseq.get();
+  if (pbase==NULL) {
+    printf("Failed to get template\n");
+    return false;
+  }
+
+  xseq.go(current);
+  ImageLoader *px = xseq.get();
+  if (px==NULL) {
+    printf("Failed to get x cache\n");
+    return false;
+  }
+
+  yseq.go(current);
+  ImageLoader *py = yseq.get();
+  if (px==NULL) {
+    printf("Failed to get y cache\n");
+    return false;
+  }
+
+  currentLinger++;
+  if (currentLinger>=linger) {
+    current+=step;
+    if (current>last) current = first;
+    currentLinger = 0;
+  }
+
+  ImageLoader& img = *pbase;
+  int ww = src2.width();
+  int hh = src2.height();
+  if (pbase->width()<ww) ww = pbase->width();
+  if (pbase->height()<hh) hh = pbase->height();
+
+  for (int x=0; x<ww; x++) {
+    for (int y=0; y<hh; y++) {
+      PixelBgra cx = px->pixel(x,y);
+      PixelBgra cy = py->pixel(x,y);
+      MapCache cache(cx,cy);
+      int idx = cache.getIndex()-1;
+      if (idx>=0) {
+	//int ox = x;
+	//int oy = y;
+	int ox = int(0.5+(cache.getX()/cache.getScale())*ww);
+	int oy = int(0.5+(cache.getY()/cache.getScale())*ww);
+
+	dest2(x,y) = src2.safePixel(ox,oy);
+	//dest2(x,y) = PixelRgb(0,0,0);
+      } else {
+	PixelBgra ref = pbase->pixel(x,y);
+	dest2(x,y) = PixelRgb(ref.r,ref.g,ref.b);
       }
     }
   }
-
-
   return true;
 }
 
@@ -132,7 +170,19 @@ void PicmixEffect::readEffectData() {
     return;
   }
   printf("Effect configuration is %s\n", effectConfig.toString().c_str());
-  string frame = effectConfig.check("frame",Value("default.png")).asString().c_str();
-  img.load((base+frame).c_str());
-  printf("image size %dx%d\n", img.width(), img.height());
+  string icache = effectConfig.check("icache",Value("%04d.png")).asString().c_str();
+  string xcache = effectConfig.check("xcache",Value("outx_%04d.png")).asString().c_str();
+  string ycache = effectConfig.check("ycache",Value("outy_%04d.png")).asString().c_str();
+  iseq.setPattern((base+icache).c_str());
+  xseq.setPattern((base+xcache).c_str());
+  yseq.setPattern((base+ycache).c_str());
+  //printf("Reading from %s\n", buf);
+  //img.load((base+frame).c_str());
+  //printf("image size %dx%d\n", img.width(), img.height());
+  first = effectConfig.check("first",Value(1)).asInt();
+  last = effectConfig.check("last",Value(1)).asInt();
+  step = effectConfig.check("step",Value(1)).asInt();
+  linger = effectConfig.check("linger",Value(1)).asInt();
+  current = first;
+  currentLinger = 0;
 }
