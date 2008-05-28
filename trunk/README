@@ -11,21 +11,11 @@ ucanvcam depends on the following free libraries:
 See DEPENDENCIES.TXT for details
 
 Certain effects from the EffecTV project are included, under the GPL.
-I'd like to acknowledge that project as an inspiration for ucanvcam.
-Basically, one day I wanted to be able to do EffecTV effects over
-skype, and ucanvcam grew out of that.
 
-ucanvcam currently can build in one of the following configurations:
-
-  standalone program on linux, optionally providing output via vloopback
-  kernel module.
-
-  standalone program on windows
-
-  activex object on windows
+ucanvcam currently builds on linux and windows.
 
 To use with the current skype beta (version 2.0.0.43) on linux, you'll need 
 the "gstfakevideo" workaround (do a web search).
 
 Compile with cmake.  Glitch: you currently have to run cmake twice, it
-will fail the first time.  Sorry.
+may fail the first time.
