@@ -1,0 +1,15 @@
+/**
+ * @page doxygen_images Doxygen images
+ *
+
+This page lists the images used by doxygen in constructing this site.
+
+\image html favicon.ico
+
+\image html ucanvcam-for-linux.jpg
+
+\image html ucanvcam-for-windows.jpg
+
+
+*
+*/

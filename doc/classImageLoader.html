@@ -67,7 +67,7 @@ div.title {
 }
 
 </style>
-<title>ucanvcam: Member List</title>
+<title>ucanvcam: ImageLoader Class Reference</title>
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <LINK REL="SHORTCUT ICON" HREF="favicon.ico">
@@ -142,18 +142,42 @@ div.title {
   </div>
 </div>
 <div class="contents">
-<h1>Effect Member List</h1>This is the complete list of members for <a class="el" href="classEffect.html">Effect</a>, including all inherited members.<p><table>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#69256c845b706b63677a87d060be9629">close</a>()</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#6712f0106ef9b0f7983bd43166808f21">draw</a>(yarp::sig::ImageOf&lt; yarp::sig::PixelRgb &gt; &amp;src, yarp::sig::ImageOf&lt; yarp::sig::PixelRgb &gt; &amp;dest)</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#aa847888782c0c4a8b66ba213747c948">getConfiguration</a>()</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#c6c21860f136929583987a8fe3ba3bb3">getName</a>()</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#58ef340fb485dfa9d11d772c7ed4ea90">open</a>(yarp::os::Searchable &amp;config)</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#25091d88fbac71150817ccee45105113">pdraw</a>(yarp::sig::Image &amp;src, yarp::sig::Image &amp;dest)</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#68153459aa689db491d7654658b905d6">reconfigure</a>(yarp::os::Searchable &amp;config)</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#144d9f7f7ec8a6d69e4fb5cd49684c09">start</a>()</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#22e1a125086c38f05b13df3411f8edfb">stop</a>()</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr bgcolor="#f0f0f0"><td><b>~Effect</b>() (defined in <a class="el" href="classEffect.html">Effect</a>)</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-</table></div>
+<h1>ImageLoader Class Reference</h1><!-- doxytag: class="ImageLoader" -->Very light wrapper around gd for reading images from file.  
+<a href="#_details">More...</a>
+<p>
+<code>#include &lt;ImageLoader.h&gt;</code>
+<p>
+
+<p>
+<a href="classImageLoader-members.html">List of all members.</a><table border="0" cellpadding="0" cellspacing="0">
+<tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="73dea8fc1ca84aa6ae1da60662e5a111"></a><!-- doxytag: member="ImageLoader::load" ref="73dea8fc1ca84aa6ae1da60662e5a111" args="(const char *fname)" -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>load</b> (const char *fname)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="126f00329a0e7278848e887ae523eec9"></a><!-- doxytag: member="ImageLoader::clear" ref="126f00329a0e7278848e887ae523eec9" args="()" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="f15f1562c834e5a11052215019dbd2e8"></a><!-- doxytag: member="ImageLoader::pixel" ref="f15f1562c834e5a11052215019dbd2e8" args="(int x, int y)" -->
+yarp::sig::PixelBgra&nbsp;</td><td class="memItemRight" valign="bottom"><b>pixel</b> (int x, int y)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="d38653bc2bcae588e6a53d487d8b5562"></a><!-- doxytag: member="ImageLoader::isValid" ref="d38653bc2bcae588e6a53d487d8b5562" args="()" -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isValid</b> ()</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="9972308f5954ea4e1316961fe0169a97"></a><!-- doxytag: member="ImageLoader::width" ref="9972308f5954ea4e1316961fe0169a97" args="()" -->
+int&nbsp;</td><td class="memItemRight" valign="bottom"><b>width</b> ()</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="7f4bd9f1aaf8ad78299256e85b176212"></a><!-- doxytag: member="ImageLoader::height" ref="7f4bd9f1aaf8ad78299256e85b176212" args="()" -->
+int&nbsp;</td><td class="memItemRight" valign="bottom"><b>height</b> ()</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="d84191a21a0ee4cf9940646ee483b352"></a><!-- doxytag: member="ImageLoader::take" ref="d84191a21a0ee4cf9940646ee483b352" args="()" -->
+gdImagePtr&nbsp;</td><td class="memItemRight" valign="bottom"><b>take</b> ()</td></tr>
+
+</table>
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+Very light wrapper around gd for reading images from file. <hr>The documentation for this class was generated from the following files:<ul>
+<li>src/native_effects/ImageLoader.h<li>src/native_effects/ImageLoader.cpp</ul>
+</div>
 
 </div>
 
