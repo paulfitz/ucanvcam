@@ -67,7 +67,7 @@ div.title {
 }
 
 </style>
-<title>ucanvcam: EngageEffect Class Reference</title>
+<title>ucanvcam: OverlayEffect Class Reference</title>
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <LINK REL="SHORTCUT ICON" HREF="favicon.ico">
@@ -142,26 +142,45 @@ div.title {
   </div>
 </div>
 <div class="contents">
-<h1>EngageEffect Class Reference</h1><!-- doxytag: class="EngageEffect" --><!-- doxytag: inherits="Effect" -->An effect that adds a dove, heart, and bouquet.  
+<h1>OverlayEffect Class Reference</h1><!-- doxytag: class="OverlayEffect" --><!-- doxytag: inherits="Effect" -->An effect that places a still image over the video stream, respecting transparency.  
 <a href="#_details">More...</a>
 <p>
 <div class="dynheader">
-Inheritance diagram for EngageEffect:</div>
+Inheritance diagram for OverlayEffect:</div>
 <div class="dynsection">
 
-<p><center><img src="classEngageEffect.png" usemap="#EngageEffect_map" border="0" alt=""></center>
-<map name="EngageEffect_map">
-<area href="classEffect.html" alt="Effect" shape="rect" coords="0,0,88,24">
+<p><center><img src="classOverlayEffect.png" usemap="#OverlayEffect_map" border="0" alt=""></center>
+<map name="OverlayEffect_map">
+<area href="classEffect.html" alt="Effect" shape="rect" coords="0,0,91,24">
 </map>
 </div>
 
 <p>
-<a href="classEngageEffect-members.html">List of all members.</a><table border="0" cellpadding="0" cellspacing="0">
+<a href="classOverlayEffect-members.html">List of all members.</a><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="9f6f15e2451e30e78a67c9c7cad730d4"></a><!-- doxytag: member="OverlayEffect::draw" ref="9f6f15e2451e30e78a67c9c7cad730d4" args="(ImageOf&lt; PixelRgb &gt; &amp;src2, ImageOf&lt; PixelRgb &gt; &amp;dest2)" -->
+virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>draw</b> (ImageOf&lt; PixelRgb &gt; &amp;src2, ImageOf&lt; PixelRgb &gt; &amp;dest2)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="38fba5631b21230eecfafd9a8151e328"></a><!-- doxytag: member="OverlayEffect::getName" ref="38fba5631b21230eecfafd9a8151e328" args="()" -->
+virtual std::string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOverlayEffect.html#38fba5631b21230eecfafd9a8151e328">getName</a> ()</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the name of an effect. <br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="c15adaf1838fbbc19109a6ae26575c79"></a><!-- doxytag: member="OverlayEffect::reconfigure" ref="c15adaf1838fbbc19109a6ae26575c79" args="(yarp::os::Searchable &amp;config)" -->
+virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOverlayEffect.html#c15adaf1838fbbc19109a6ae26575c79">reconfigure</a> (yarp::os::Searchable &amp;config)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reconfigure an effect while it is running. <br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="ef50a44a4dd720a767c0caf333ff9706"></a><!-- doxytag: member="OverlayEffect::getConfiguration" ref="ef50a44a4dd720a767c0caf333ff9706" args="()" -->
+virtual Property&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOverlayEffect.html#ef50a44a4dd720a767c0caf333ff9706">getConfiguration</a> ()</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Recover the configuration of an effect. <br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="a78cdf50ac52f84650daf388f4b6475f"></a><!-- doxytag: member="OverlayEffect::readEffectData" ref="a78cdf50ac52f84650daf388f4b6475f" args="()" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>readEffectData</b> ()</td></tr>
+
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-An effect that adds a dove, heart, and bouquet. <hr>The documentation for this class was generated from the following file:<ul>
-<li>src/native_effects/EngageEffect.cpp</ul>
+An effect that places a still image over the video stream, respecting transparency. <hr>The documentation for this class was generated from the following file:<ul>
+<li>src/native_effects/OverlayEffect.cpp</ul>
 </div>
 
 </div>

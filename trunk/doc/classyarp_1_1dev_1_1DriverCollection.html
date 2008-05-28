@@ -67,7 +67,7 @@ div.title {
 }
 
 </style>
-<title>ucanvcam: Member List</title>
+<title>ucanvcam: yarp::dev::DriverCollection Class Reference</title>
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <LINK REL="SHORTCUT ICON" HREF="favicon.ico">
@@ -140,20 +140,37 @@ div.title {
       <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
   </div>
+  <div class="navpath"><b>yarp</b>::<b>dev</b>::<a class="el" href="classyarp_1_1dev_1_1DriverCollection.html">DriverCollection</a>
+  </div>
 </div>
 <div class="contents">
-<h1>Effect Member List</h1>This is the complete list of members for <a class="el" href="classEffect.html">Effect</a>, including all inherited members.<p><table>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#69256c845b706b63677a87d060be9629">close</a>()</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#6712f0106ef9b0f7983bd43166808f21">draw</a>(yarp::sig::ImageOf&lt; yarp::sig::PixelRgb &gt; &amp;src, yarp::sig::ImageOf&lt; yarp::sig::PixelRgb &gt; &amp;dest)</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#aa847888782c0c4a8b66ba213747c948">getConfiguration</a>()</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#c6c21860f136929583987a8fe3ba3bb3">getName</a>()</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#58ef340fb485dfa9d11d772c7ed4ea90">open</a>(yarp::os::Searchable &amp;config)</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#25091d88fbac71150817ccee45105113">pdraw</a>(yarp::sig::Image &amp;src, yarp::sig::Image &amp;dest)</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#68153459aa689db491d7654658b905d6">reconfigure</a>(yarp::os::Searchable &amp;config)</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#144d9f7f7ec8a6d69e4fb5cd49684c09">start</a>()</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="classEffect.html#22e1a125086c38f05b13df3411f8edfb">stop</a>()</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr bgcolor="#f0f0f0"><td><b>~Effect</b>() (defined in <a class="el" href="classEffect.html">Effect</a>)</td><td><a class="el" href="classEffect.html">Effect</a></td><td><code> [inline, virtual]</code></td></tr>
-</table></div>
+<h1>yarp::dev::DriverCollection Class Reference</h1><!-- doxytag: class="yarp::dev::DriverCollection" -->This is an automatically generated class to initialize a collection of drivers.  
+<a href="#_details">More...</a>
+<p>
+<code>#include &lt;drivers.h&gt;</code>
+<p>
+
+<p>
+<a href="classyarp_1_1dev_1_1DriverCollection-members.html">List of all members.</a><table border="0" cellpadding="0" cellspacing="0">
+<tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="a981228f64a9786679c8b91f2fa93374"></a><!-- doxytag: member="yarp::dev::DriverCollection::DriverCollection" ref="a981228f64a9786679c8b91f2fa93374" args="()" -->
+&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyarp_1_1dev_1_1DriverCollection.html#a981228f64a9786679c8b91f2fa93374">DriverCollection</a> ()</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Add devices from all imported libraries. <br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="f14555d1138b54ba254ddb537a5a0edd"></a><!-- doxytag: member="yarp::dev::DriverCollection::status" ref="f14555d1138b54ba254ddb537a5a0edd" args="()" -->
+yarp::os::ConstString&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyarp_1_1dev_1_1DriverCollection.html#f14555d1138b54ba254ddb537a5a0edd">status</a> ()</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Return a string listing all devices, to allow sanity-checking. <br></td></tr>
+</table>
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+This is an automatically generated class to initialize a collection of drivers. 
+<p>
+Instantiate it in your main() function as: yarp::dev::DeviceCollection dev;<p>
+That's all! You can print the output of the dev.status() method just to make sure that all the devices you expect to be present actually are.<p>
+To actually instantiate devices, use the yarp::dev::PolyDriver class. <hr>The documentation for this class was generated from the following file:<ul>
+<li>src/generated/drivers.h</ul>
+</div>
 
 </div>
 
