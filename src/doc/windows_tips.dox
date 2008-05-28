@@ -1,0 +1,14 @@
+/**
+ * @page windows_tips Windows tips
+ *
+
+Operation of ucanvcam is quite simple once installed on Windows.
+You should see an extra camera input called something like
+"ucanvcam virtual camera" or similar.  This input will initially
+be a still blue image.  It should come to life when you run ucanvcam
+(start -> ucanvcam), and select an input and an output.
+The input to ucanvcam should typically be a real camera, and the 
+output is "ucanvcam virtual camera" or similar name.
+
+*
+*/

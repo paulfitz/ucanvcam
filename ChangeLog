@@ -1,5 +1,9 @@
 2008-05-28  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
+	* src/doc/linux_tips.dox: add some linux help.
+
+	* src/doc/windows_tips.dox: add some windows help.
+
 	* src/native_effects/PicmixEffect.cpp: fix aspect ratio,
 	improve compatibility with existing picmix config files.
 

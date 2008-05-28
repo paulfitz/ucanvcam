@@ -1,0 +1,41 @@
+/**
+ * @page linux_tips Linux tips
+ *
+
+ucanvcam should work out of the box on linux, in the sense that you
+can read images from a webcam and apply effects.  However, in order to
+output the result as a "virtual camera" that something like skype can
+read from, you need the vloopback module.  And video support
+specifically in skype on linux currently has some limitations, so you
+may need the common "gstfakevideo" workaround to make it happy.
+
+@section linux_tips_module vloopback module
+
+The vloopback module lets you create a virtual video4linux device.
+
+See http://www.lavrsen.dk/twiki/bin/view/Motion/VideoFourLinuxLoopbackDevice
+
+ucanvcam is tested against vloopback-1.1 (look for vloopback-1.1.tar.gz or
+newer).  Download, install, and "modprobe" the vloopback device.
+
+When you restart ucanvcam, you should now have two
+/dev/videoN listings that do not correspond to any physical 
+hardware that you possess.  One of these (the lower number) is where ucanvcam 
+should output to, and the other is where other applications can read the
+transform video stream from.
+
+@section linux_tips_skype skype support
+
+Hopefully by the time you read this skype's video support on linux will 
+have improved.  In the meantime you may need to download gstfakevideo -
+See http://code.google.com/p/gstfakevideo/
+
+Run a command like the following:
+\verbatim
+  gstfakevideo v4lsrc device=/dev/video1 ! ffmpegcolorspace
+\endverbatim
+(replacing /dev/video1 with whatever is appropriate on your system).
+
+
+ *
+ */

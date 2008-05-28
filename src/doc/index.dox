@@ -12,6 +12,16 @@ camera. While ucanvcam comes with a set of special effects, the main
 intent is to make building virtual cameras easier for people without
 OS-specific knowledge, so they can focus purely on image processing.
 
+
+\htmlonly 
+
+<a href="http://www.makesweet.com/webcam/ucanvcam/"><img src="ucanvcam-for-linux.jpg"></a>
+
+<a href="http://www.makesweet.com/webcam/ucanvcam/"><img src="ucanvcam-for-windows.jpg"></a>
+
+\endhtmlonly
+
+
  *
  */
 
