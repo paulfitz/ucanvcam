@@ -2,20 +2,10 @@
  * @page install Installing ucanvcam
  *
 
-You can download ucanvcam in compiled from from http://www.makesweet.com
+You can download ucanvcam in compiled form from http://www.makesweet.com
 
 
-\htmlonly 
-
-<a href="http://www.makesweet.com/webcam/ucanvcam/"><img src="ucanvcam-for-linux.jpg"></a>
-
-<a href="http://www.makesweet.com/webcam/ucanvcam/"><img src="ucanvcam-for-windows.jpg"></a>
-
-\endhtmlonly
-
-
-Here are some rather inadequate instructions for 
-compiling and installing ucanvcam:
+Here are the basic instructions for compiling and installing ucanvcam:
 
 \li Make sure you have CMake installed.
 \li Download ucanvcam
