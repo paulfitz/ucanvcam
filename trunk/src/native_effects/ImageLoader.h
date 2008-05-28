@@ -72,15 +72,24 @@ public:
   }
 
   virtual ~ImageSeq() {
+    clear();
+  }
+
+  void clear() {
+    at = -1;
+    ext = -1;
+    pattern = "";
     for (int i=0; i<store.size(); i++) {
       if (store[i]!=NULL) {
 	delete store[i];
 	store[i] = NULL;
       }
     }
+    idx.clear();
   }
 
   void setPattern(const char *pattern) {
+    clear();
     this->pattern = pattern;
   }
 
@@ -106,10 +115,10 @@ public:
 	}
 	bool ok = img->load(buf2);
 	if (!ok) {
-	  printf("Could not load %s\n", buf2);
-	  delete img;
-	  at = -1;
-	  return false;
+	  printf("(Could not load %s)\n", buf2);
+	  //delete img;
+	  //at = -1;
+	  //return false;
 	}
 	return add(img);
       }

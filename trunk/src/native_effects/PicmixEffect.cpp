@@ -124,18 +124,23 @@ bool PicmixEffect::draw(ImageOf<PixelRgb>& src2, ImageOf<PixelRgb>& dest2) {
 
   for (int x=0; x<ww; x++) {
     for (int y=0; y<hh; y++) {
-      PixelBgra cx = px->pixel(x,y);
-      PixelBgra cy = py->pixel(x,y);
-      MapCache cache(cx,cy);
-      int idx = cache.getIndex()-1;
-      if (idx>=0) {
-	//int ox = x;
-	//int oy = y;
-	int ox = int(0.5+(cache.getX()/cache.getScale())*ww);
-	int oy = int(0.5+(cache.getY()/cache.getScale())*ww);
-
-	dest2(x,y) = src2.safePixel(ox,oy);
-	//dest2(x,y) = PixelRgb(0,0,0);
+      if (px->isValid()&&py->isValid()) {
+	PixelBgra cx = px->pixel(x,y);
+	PixelBgra cy = py->pixel(x,y);
+	MapCache cache(cx,cy);
+	int idx = cache.getIndex()-1;
+	if (idx>=0) {
+	  //int ox = x;
+	  //int oy = y;
+	  int ox = int(0.5+(cache.getX()/cache.getScale())*ww);
+	  int oy = int(0.5+(cache.getY()/cache.getScale())*ww-(ww-hh)/2);
+	  
+	  dest2(x,y) = src2.safePixel(ox,oy);
+	  //dest2(x,y) = PixelRgb(0,0,0);
+	} else {
+	  PixelBgra ref = pbase->pixel(x,y);
+	  dest2(x,y) = PixelRgb(ref.r,ref.g,ref.b);
+	}
       } else {
 	PixelBgra ref = pbase->pixel(x,y);
 	dest2(x,y) = PixelRgb(ref.r,ref.g,ref.b);
@@ -181,8 +186,10 @@ void PicmixEffect::readEffectData() {
   //printf("image size %dx%d\n", img.width(), img.height());
   first = effectConfig.check("first",Value(1)).asInt();
   last = effectConfig.check("last",Value(1)).asInt();
-  step = effectConfig.check("step",Value(1)).asInt();
-  linger = effectConfig.check("linger",Value(1)).asInt();
+  first = effectConfig.check("firstAvailable",Value(first)).asInt();
+  last = effectConfig.check("lastAvailable",Value(last)).asInt();
+  step = effectConfig.check("step",Value(5)).asInt();
+  linger = effectConfig.check("linger",Value(2)).asInt();
   current = first;
   currentLinger = 0;
 }
