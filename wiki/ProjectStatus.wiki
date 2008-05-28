@@ -1,6 +1,10 @@
 #summary The status of the project
 #labels Featured
 
+==2008/05/28==
+
+  * [http://ucanvcam.googlecode.com/svn/trunk/doc/index.html Manual] updated.
+
 ==2008/05/24==
 
   * [http://www.makesweet.com/webcam/ucanvcam Linux version] available in compiled form.
