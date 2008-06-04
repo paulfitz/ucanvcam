@@ -99,6 +99,7 @@ bool PicmixEffect::draw(ImageOf<PixelRgb>& src2, ImageOf<PixelRgb>& dest2) {
   ImageLoader *px = xseq.get();
   if (px==NULL) {
     printf("Failed to get x cache\n");
+    dest2 = src2;
     return false;
   }
 
@@ -135,7 +136,12 @@ bool PicmixEffect::draw(ImageOf<PixelRgb>& src2, ImageOf<PixelRgb>& dest2) {
 	  int ox = int(0.5+(cache.getX()/cache.getScale())*ww);
 	  int oy = int(0.5+(cache.getY()/cache.getScale())*ww-(ww-hh)/2);
 	  
-	  dest2(x,y) = src2.safePixel(ox,oy);
+	  if (ox>=0&&oy>=0&&ox<src2.width()&&oy<src2.height()) {
+	    dest2(x,y) = src2.safePixel(ox,oy);
+	  } else {
+	    PixelBgra ref = pbase->pixel(x,y);
+	    dest2(x,y) = PixelRgb(ref.r,ref.g,ref.b);
+	  }
 	  //dest2(x,y) = PixelRgb(0,0,0);
 	} else {
 	  PixelBgra ref = pbase->pixel(x,y);
@@ -174,6 +180,15 @@ void PicmixEffect::readEffectData() {
     printf("Failed to read config file %s\n", configFile.c_str());
     return;
   }
+
+  ConstString parent = effectConfig.check("parent",Value("")).asString();
+  if (parent!="") {
+    string cfg2 = (base+"/"+parent.c_str()+"/config.ini").c_str();
+    printf("Reading options also from %s\n", cfg2.c_str());
+    effectConfig.fromConfigFile(cfg2.c_str(),false);
+    effectConfig.fromConfigFile(configFile.c_str(),false);
+  }
+
   printf("Effect configuration is %s\n", effectConfig.toString().c_str());
   string icache = effectConfig.check("icache",Value("%04d.png")).asString().c_str();
   string xcache = effectConfig.check("xcache",Value("outx_%04d.png")).asString().c_str();

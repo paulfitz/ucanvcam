@@ -78,9 +78,10 @@ public:
       dest.resize(src);
       dest2.wrapIplImage(dest.getIplImage());
     }
-    if (!draw(src2,dest2)) {
-      return NULL;
-    }
+    //if (!draw(src2,dest2)) {
+    //return NULL;
+    //}
+    draw(src2,dest2);
     if (cpOut) {
       dest.copy(dest2);
     }
