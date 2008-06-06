@@ -178,7 +178,13 @@ void PicmixEffect::readEffectData() {
   bool ok = effectConfig.fromConfigFile(configFile.c_str());
   if (!ok) {
     printf("Failed to read config file %s\n", configFile.c_str());
-    return;
+    configFile = base + "effect.ini";
+    printf("Reading config file %s\n", configFile.c_str());
+    ok = effectConfig.fromConfigFile(configFile.c_str());
+    if (!ok) {
+      printf("Failed to read config file %s\n", configFile.c_str());
+      return;
+    }
   }
 
   ConstString parent = effectConfig.check("parent",Value("")).asString();
