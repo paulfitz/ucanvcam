@@ -1,5 +1,7 @@
 2008-06-14  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
+	* conf/PackageInfo.cmake: bump version to 0.1.5
+
 	* src/native_effects/ImageLoader.cpp: fixed bug where image
 	file was not being opened in binary mode (trouble on windows)
 
