@@ -1,6 +1,10 @@
 #summary The status of the project
 #labels Featured
 
+==2008/06/14==
+
+  * Version 0.1.5 released, includes "picmix" effect that lets you embed your camera feed on a surface in a blender design (still or animation).
+
 ==2008/05/28==
 
   * [http://ucanvcam.googlecode.com/svn/trunk/doc/index.html Manual] updated.
