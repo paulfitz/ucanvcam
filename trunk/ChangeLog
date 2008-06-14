@@ -1,3 +1,8 @@
+2008-06-14  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
+
+	* src/native_effects/ImageLoader.cpp: fixed bug where image
+	file was not being opened in binary mode (trouble on windows)
+
 2008-06-06  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
 	* src/native_effects/PicmixEffect.cpp: accept "effect.ini"

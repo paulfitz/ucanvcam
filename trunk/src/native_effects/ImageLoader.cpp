@@ -63,6 +63,7 @@ const char * isjpg(const char * name, int & result) {
 
 
 static gdImagePtr loadImage(const char *iname) {
+  printf("Load image: looking at %s\n", iname);
   string local = iname;
   char *fname = (char*)local.c_str();
   gdImagePtr img = NULL;
@@ -87,13 +88,15 @@ static gdImagePtr loadImage(const char *iname) {
     }
   }
 
-  fd = fopen(fname,"r");
+  fd = fopen(fname,"rb");
   if (fd==NULL) {
     return NULL;
   }
   if (strcasecmp(suffix,".png")==0) {
     img = gdImageCreateFromPng(fd);
-    gdImageAlphaBlending(img, 0);
+    if (img!=NULL) {
+      gdImageAlphaBlending(img, 0);
+    }
   } else if (strcasecmp(suffix,".jpg")*strcasecmp(suffix,".jpeg")==0) {
     img = gdImageCreateFromJpeg(fd);
   } else if (strcasecmp(suffix,".gif")==0) {

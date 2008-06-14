@@ -131,7 +131,7 @@ public:
         pSource.put("device","test_grabber");
         pSource.put("width",320);
         pSource.put("height",240);
-        pSource.put("mode","ball");
+        pSource.put("mode","grid");
         source.open(pSource);
     }
     source.view(grabber);    
