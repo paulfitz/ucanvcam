@@ -33,11 +33,14 @@ private:
   ImageOf<PixelBgra> idest;
   Property options;
   string txt;
+  string fnt;
 public:
   TickerEffect() {
     access.sx = 0;
     access.sy = 0;
     options.put("text", "Welcome to ucanvcam!");
+    options.put("font",
+		(getResourceLocation()+"/"+"sybig.ttf").c_str());
     reconfigure(options);
   }
 
@@ -54,6 +57,9 @@ public:
     options.fromString(config.toString());
     if (options.check("text")) {
       txt = options.check("text",Value("huh?")).toString().c_str();
+    }
+    if (options.check("font")) {
+      fnt = options.check("font",Value("notset.ttf")).toString().c_str();
     }
     return true;
   }
@@ -111,10 +117,10 @@ yarp::sig::Image *TickerEffect::pdraw(yarp::sig::Image& src,
 
   int brect[8];
   //"/font/comic.ttf",
-  char buf[1000];
-  sprintf(buf,"%s/sybig.ttf",getResourceLocation().c_str());
+  //char buf[1000];
+  //sprintf(buf,"%s",getResourceLocation().c_str());
   //char *fnt = "/usr/share/fonts/truetype/ttf-larabie-uncommon/sybig___.ttf";
-  char *fnt = buf;
+  //char *fnt = buf;
   int pt = 24;
   int xx = src.width()-(int)(offset+0.5);
   int yy = src.height()-10;
@@ -125,14 +131,14 @@ yarp::sig::Image *TickerEffect::pdraw(yarp::sig::Image& src,
       if (i!=0&&j!=0) {
 	gdImageStringFT(im, &brect[0], 
 			gdTrueColorAlpha(10, 10, 10, 0),
-			fnt, pt, 0, xx+i, yy+j, (char*)txt.c_str());
+			(char*)fnt.c_str(), pt, 0, xx+i, yy+j, (char*)txt.c_str());
       }
     }
   }
 
   gdImageStringFT(im, &brect[0], 
 		  gdTrueColorAlpha(255, colr, 0, 0),
-		  fnt, pt, 0, xx, yy, (char*)txt.c_str());
+		  (char*)fnt.c_str(), pt, 0, xx, yy, (char*)txt.c_str());
 
   // we've gone off the left; wrap
   if (brect[2]<0) {
