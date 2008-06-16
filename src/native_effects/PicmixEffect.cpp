@@ -31,7 +31,8 @@ public:
   PicmixEffect() {
     readDir = "";
     readVersion = "0";
-    options.put("dir","pm/pm_web2");
+    options.put("dir",
+		(getResourceLocation()+"/"+"pm").c_str());
     options.put("version",0);
     needRead = false;
     reconfigure(options);
