@@ -1,5 +1,7 @@
 2008-06-16  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
+	* conf/PackageInfo.cmake: bump version to 0.1.6
+
 	* src/native_effects/PicmixEffect.cpp: give a default example.
 
 	* src/native_effects/TickerEffect.cpp: make font configurable.
