@@ -1,3 +1,8 @@
+2008-07-01  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
+
+	* src/native_effects/ParamEffect.cpp: allow remote configuration
+	of events (handy for scripting a demo).
+
 2008-06-16  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
 	* conf/PackageInfo.cmake: bump version to 0.1.6

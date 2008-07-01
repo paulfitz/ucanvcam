@@ -12,9 +12,9 @@
 using namespace yarp::os;
 using namespace yarp::sig;
 
-#ifndef WIN32
 #define NETWORKED 1
-#endif
+//#ifndef WIN32
+//#endif
 
 /**
  *
@@ -48,6 +48,11 @@ public:
 	if (current!=NULL) {
 	  current->stop();
 	}
+	Bottle config = bot->tail().tail();
+	if (config.size()>=1) {
+	  printf("Configuring effect: %s\n", config.toString().c_str());
+	}
+	next->reconfigure(config);
 	next->start();
 	current = next;
       }
@@ -60,6 +65,7 @@ public:
   }
 
   virtual bool read(yarp::os::ConnectionReader& connection) {
+    printf("READING\n");
     Bottle in, out;
     bool ok = in.read(connection);
     if (!ok) return false;
