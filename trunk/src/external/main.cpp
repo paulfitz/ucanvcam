@@ -3,21 +3,12 @@
 
 #include "ShmemBus.h"
 
-/*
+///////////////////////////////////////////////////////////////////////
+//
+// Basic test of shared memory bus - read/write strings
+//
 
-To send an image:
-
-Modify write_test to put data in the buffer in this format:
-
-  A four byte little-endian integer holding a count that increments
-  A four byte little-endian integer holding the number 320 (width)
-  A four byte little-endian integer holding the number 240 (height)
-  A zero-filled 17*4 byte sequence
-  A 320*240*3 byte sequence holding your image in RGBRGBRGBRGB... format
-
-*/
-
-void write_test(const char *msg) {
+void write_test_string(const char *msg) {
   ShmemBus bus;
   bus.init();
   bus.beginWrite();
@@ -33,7 +24,7 @@ void write_test(const char *msg) {
   bus.fini();
 }
 
-void read_test() {
+void read_test_string() {
   ShmemBus bus;
   bus.init();
   for (int i=0; i<100; i++) {
@@ -46,11 +37,61 @@ void read_test() {
   bus.fini();
 }
 
+///////////////////////////////////////////////////////////////////////
+//
+// Here's the code needed to write an image. 
+// Not tested though!  (you can't even call it in this test program).
+// The code uses C-style casting that would be tricky in other
+// languages.  No problem, just make sure the same bytes get written
+// in the order given here.
+//
+
+// Use packing to make sure no gaps are inserted in structure 
+// during optimization
+#pragma warning (disable:4103)
+#pragma pack(push, 1)
+class ShmemImageHeader {
+public:
+  DWORD tick;
+  DWORD w, h;
+  DWORD blank[17];
+};
+class PixelRgb {
+public:
+  unsigned char r, g, b;
+};
+#pragma pack(pop)
+
+void write_test_image() {
+  ShmemBus bus;
+  bus.init();
+  bus.beginWrite();
+  char *base = (char *)bus.buffer();
+  ShmemImageHeader *header = (ShmemImageHeader *)base;
+  header->tick = 0; // to work, this will need to increment, or at least change
+  header->w = 320;
+  header->h = 240;
+  for (int i=0; i<17; i++) {
+    header->blank[i] = 0;
+  }
+  PixelRgb *image = (PixelRgb *)(base+sizeof(ShmemImageHeader));
+  for (int w=0; w<320; w++) {
+    for (int h=0; h<240; h++) {
+      image->r = w % 256;
+      image->g = h % 256;
+      image->b = (w+h) % 256;
+      image++;
+    }
+  }
+  bus.endWrite();
+  bus.fini();
+}
+
 int main(int argc, char *argv[]) {
   if (argc<2) {
-    read_test();
+    read_test_string();
   } else {
-    write_test(argv[1]);
+    write_test_string(argv[1]);
   }
   return 0;
 }
