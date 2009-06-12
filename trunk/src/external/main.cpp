@@ -12,6 +12,7 @@ Modify write_test to put data in the buffer in this format:
   A four byte little-endian integer holding a count that increments
   A four byte little-endian integer holding the number 320 (width)
   A four byte little-endian integer holding the number 240 (height)
+  A zero-filled 17*4 byte sequence
   A 320*240*3 byte sequence holding your image in RGBRGBRGBRGB... format
 
 */
