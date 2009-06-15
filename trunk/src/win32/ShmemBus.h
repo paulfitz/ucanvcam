@@ -62,6 +62,7 @@ public:
     CloseHandle(writeEvent);
     UnmapViewOfFile(shmemBuffer);
     CloseHandle(shmemHandle);
+    return true;
   }
 
   bool beginRead() {
