@@ -1,7 +1,7 @@
 2009-06-15  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
 	* src/win32/ShmemBus.h: missing return value (reported by 
-	"Hayden", thanks!)
+	Hayden Dunnicliffe, thanks!)
 
 2008-07-01  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
