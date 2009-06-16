@@ -83,6 +83,12 @@ void write_test_image() {
       image++;
     }
   }
+
+  FILE *f = fopen("target.ppm","wb");
+  fprintf (f, "P6\n%d %d\n255\n", header->w, header->h);
+  fwrite (base+sizeof(ShmemImageHeader), header->w * 3 * header->h, 1, f);
+  fclose(f);
+
   bus.endWrite();
   bus.fini();
 }
@@ -90,8 +96,10 @@ void write_test_image() {
 int main(int argc, char *argv[]) {
   if (argc<2) {
     read_test_string();
-  } else {
+  } else if (argc==2) {
     write_test_string(argv[1]);
+  } else {
+    write_test_image();
   }
   return 0;
 }
