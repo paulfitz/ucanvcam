@@ -7,7 +7,7 @@
 extern "C" {
 #include "EffecTV.h"
 #include "utils.h"
-#include "effects.h"
+#include "effect_list.h"
 }
 
 #include "EffectGroup.h"

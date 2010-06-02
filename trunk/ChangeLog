@@ -1,3 +1,9 @@
+2010-06-02  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
+
+	* src/common/effect_list.h: renamed from effects.h, which
+	collided with Effects.h on Windows (thanks Thijs Wenker for
+	reporting this problem)
+
 2009-06-15  Paul Fitzpatrick  <paulfitz@alum.mit.edu>
 
 	* src/win32/ShmemBus.h: missing return value (reported by 
