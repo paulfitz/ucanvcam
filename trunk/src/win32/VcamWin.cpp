@@ -9,7 +9,7 @@ using namespace yarp::os;
 using namespace yarp::sig;
 using namespace yarp::dev;
 
-#include "drivers.h"
+YARP_DECLARE_PLUGINS(vcammod);
 
 #include "Effects.h"
 
@@ -43,7 +43,7 @@ bool getServerImage(ImageOf<PixelRgb>& img) {
 class VcamWin : public Vcam {
 private:
   Network yarp;
-  DriverCollection dev;
+  //DriverCollection dev;
   PolyDriver source;
   IFrameGrabberImage *grabber;
   ISourceLister *lister;
@@ -69,6 +69,7 @@ public:
     open("test");
     memset((void*)(&header),0,sizeof(header));
     stopOutputReq = false;
+    YARP_REGISTER_PLUGINS(vcammod);
   }
 
   virtual ~VcamWin() {

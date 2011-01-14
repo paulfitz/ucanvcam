@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.6)
+
 PROJECT(ucanvcam)
 
 #########################################################################
@@ -10,6 +12,8 @@ SET (USE_GUI TRUE CACHE BOOL "GUI or command-line?")
 
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+
+SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/conf ${CMAKE_MODULE_PATH})
 
 #########################################################################
 # most of the work is done here 

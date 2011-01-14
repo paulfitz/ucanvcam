@@ -19,20 +19,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../win32)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../common)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
-# fix this for your own path to directx
-FIND_PATH(DIRECTX_BASECLASSES_DIR NAMES amfilter.h PATHS
-	  			$ENV{HOME}/directx 
-				$ENV{HOME}/directx/BaseClasses
-				/directx 
-				/directx/BaseClasses
-				c:/directx
-				c:/directx/BaseClasses)
-FIND_PATH(DIRECTX_INCLUDE_DIR NAMES dsound.h PATHS
-				$ENV{HOME}/directx 
-				$ENV{HOME}/directx/Include 
-				/directx 
-				/directx/Include 
-				c:/directx)
+FIND_PACKAGE(DIRECTX REQUIRED)
 
 INCLUDE_DIRECTORIES(${DIRECTX_BASECLASSES_DIR} ${DIRECTX_INCLUDE_DIR})
 FILE(GLOB_RECURSE directx_source ${DIRECTX_BASECLASSES_DIR}/*.cpp)

@@ -3,13 +3,15 @@ PROJECT(UcanvcamModules)
 
 FIND_PACKAGE(YARP REQUIRED)
 
-BEGIN_DEVICE_LIBRARY(vcammod)
+INCLUDE(${YARP_MODULE_PATH}/YarpPlugin.cmake)
+
+BEGIN_PLUGIN_LIBRARY(vcammod)
     #ADD_SUBDIRECTORY(wxsdl)
     ADD_SUBDIRECTORY(vdub)
     IF (UNIX)
       # make sure we have the ffmpeg device
-      ADD_SUBDIRECTORY($ENV{YARP_ROOT}/src/modules/ffmpeg 
+      ADD_SUBDIRECTORY(${YARP_MODULE_PATH}/../src/modules/ffmpeg 
 	${CMAKE_BINARY_DIR}/ffmpeg)
     ENDIF (UNIX)
-END_DEVICE_LIBRARY(vcammod)
+END_PLUGIN_LIBRARY(vcammod)
 
