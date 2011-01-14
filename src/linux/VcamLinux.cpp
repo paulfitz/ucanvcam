@@ -24,9 +24,9 @@ using namespace yarp::os;
 using namespace yarp::sig;
 using namespace yarp::dev;
 
-#include "drivers.h"
-
 #include "Effects.h"
+
+YARP_DECLARE_PLUGINS(vcammod);
 
 static int exitRequested = 0;
 
@@ -37,7 +37,7 @@ void sig_handler(int signo) {
 class VcamLinux : public Vcam {
 private:
   Network yarp;
-  DriverCollection dev;
+  //DriverCollection dev;
   PolyDriver source;
   IFrameGrabberImage *grabber;
   ImageOf<PixelRgb> cache, proc;
@@ -64,6 +64,7 @@ public:
     outputName = "none";
     open("test");
     output = false;
+    YARP_REGISTER_PLUGINS(vcammod);
   }
 
   virtual ~VcamLinux() {
@@ -86,10 +87,8 @@ public:
     w = 320;
     h = 240;
     printf("Loopback device has assumptions that should be generalized:\n");
-    printf("   use format VIDEO_PALETTE_RGB24 (as opposed to YUV420P\n");
+    printf("   use format VIDEO_PALETTE_RGB24 (as opposed to YUV420P)\n");
     printf("   w x h = 320 x 240\n");
-    printf("   video output to /dev/video0\n");
-    printf("   (loopback device should mirror /dev/video0 to /dev/video1)\n");
     printf("Make sure you have vloopback module loaded.\n");
     hout = -1;
     hout = ::open(name,O_RDWR);
@@ -135,7 +134,7 @@ public:
     source.close();
     Property pSource;
     pSource.put("device","ffmpeg_grabber");
-    pSource.put("v4l",1);
+    pSource.put("v4l2",1);
     //pSource.put("v4ldevice","/dev/video0");
     pSource.put("v4ldevice",name);
     pSource.put("width",320);

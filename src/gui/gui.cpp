@@ -327,7 +327,11 @@ bool MyApp::OnInit()
 {
     MyFrame *frame = new MyFrame( _T("ucanvcam"), wxPoint(50,50), wxSize(450,340) );
 
+#if WIN32
     g_hwnd = (int)(frame->GetHandle());
+#else
+    g_hwnd = 0;
+#endif
 
     if (!wxApp::OnInit()) {
         return false;

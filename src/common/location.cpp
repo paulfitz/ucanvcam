@@ -12,6 +12,8 @@
 
 #include <yarp/os/Time.h>
 
+#include <stdio.h>
+
 using namespace std;
 using namespace yarp::os;
 
