@@ -8,7 +8,7 @@
 
 // Based on an example by rep movsd via the mad hatter
 
-#define EXPORT __declspec(dllexport)
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <streams.h>
 #include <olectl.h>
@@ -16,13 +16,26 @@
 #include <dllsetup.h>
 #include "Filters.h"
 
+#ifdef ALLOW_STL
 #include <string>
 using namespace std;
 #include "registry.h"
 #include "registry_keys.h"
+#endif
+
+#include <stdio.h>
 
 // we need to be careful here with MINGW
+#define EXPORT __declspec(dllexport)
+#ifdef _MINGW
 #define PFSTDAPI EXTERN_C EXPORT HRESULT STDAPICALLTYPE
+#else
+#define PFSTDAPI STDAPI
+#pragma comment (linker, "/EXPORT:DllRegisterServer=_DllRegisterServer@0,PRIVATE")
+#pragma comment (linker, "/EXPORT:DllGetClassObject=_DllGetClassObject@12,PRIVATE")
+#pragma comment (linker, "/EXPORT:DllUnregisterServer=_DllUnregisterServer@0,PRIVATE")
+#pragma comment (linker, "/EXPORT:DllCanUnloadNow=_DllCanUnloadNow@0,PRIVATE")
+#endif
 
 #define CreateComObject(clsid, iid, var) CoCreateInstance( clsid, NULL, CLSCTX_INPROC_SERVER, iid, (void **)&var);
 
@@ -136,6 +149,8 @@ PFSTDAPI DllRegisterServer() {
     // We used to need the dll location, in order to get
     // media resources stored nearby.  Not actually needed any more,
     // with NSIS install.
+
+#ifdef ALLOW_STL
     if (me!=0) {
         char buf[1000];
         GetModuleFileName((HINSTANCE)(me),&buf[0],1000);
@@ -155,6 +170,7 @@ PFSTDAPI DllRegisterServer() {
         std::string readback = getRegistry(KEY_ROOT);
         printf(">>>>> registered %s\n", readback.c_str());
     }
+#endif
     
     return RegisterFilters(TRUE);
 }
@@ -167,6 +183,10 @@ extern "C" BOOL WINAPI DllEntryPoint(HINSTANCE, ULONG, LPVOID);
 
 EXTERN_C EXPORT BOOL STDAPICALLTYPE
 DllMain(HANDLE hModule, DWORD  dwReason, LPVOID lpReserved) {
+    YarpOut hello;
+    hello.init("main");
+    hello.say("dllmain");
+    hello.fini();
     me = hModule;
     return DllEntryPoint((HINSTANCE)(hModule), dwReason, lpReserved);
 }

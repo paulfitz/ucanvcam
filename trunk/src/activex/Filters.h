@@ -11,12 +11,14 @@
 #ifndef UCANVCAM_FILTERS
 #define UCANVCAM_FILTERS
 
-#include <yarp/os/BufferedPort.h>
-#include <yarp/os/Bottle.h>
-#include <yarp/dev/PolyDriver.h>
+//#include <yarp/os/BufferedPort.h>
+//#include <yarp/os/Bottle.h>
+//#include <yarp/dev/PolyDriver.h>
 
 #include "resources.h"
 #include "ShmemBus.h"
+
+#include "YarpOut.h"
 
 EXTERN_C const GUID CLSID_VirtualCam;
 
@@ -49,10 +51,11 @@ public:
     IFilterGraph *GetGraph() {return m_pGraph;}
 
 
-
+    virtual ~CVCam();
 
 private:
     CVCam(LPUNKNOWN lpunk, HRESULT *phr);
+    YarpOut yarp_out;
 };
 
 class CVCamStream : public CSourceStream, public IAMStreamConfig, 
@@ -167,6 +170,7 @@ private:
     double lastChange;
     int lastId;
     bool haveId;
+    YarpOut yarp_out;
 };
 
 
@@ -191,7 +195,9 @@ public:
         CBasePropertyPage(NAME("GrayProp"), pUnk, IDD_PROPPAGE, 
                           IDS_PROPPAGE_TITLE),
         m_pGray(0)
-    { }
+    { 
+        yarp_out.init("gray");
+    }
 
     /* ... */
 
@@ -215,6 +221,7 @@ public:
 
     static CUnknown * WINAPI CreateInstance(LPUNKNOWN pUnk, HRESULT *pHr);
 
+    YarpOut yarp_out;
 
 };
 

@@ -1,7 +1,9 @@
 
 IF (MINGW)
-  ADD_DEFINITIONS(-D_OBJBASE_H_)
-  SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,--add-stdcall-alias -Wl,--stack,0x200000")
+  ADD_DEFINITIONS(-D_OBJBASE_H_ -fno-exceptions)
+  SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,--add-stdcall-alias -Wl,--stack,0xF00000")
+  #SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,--add-stdcall-alias -Wl,--stack,0x200000")
+  #SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,--add-stdcall-alias")
   LINK_LIBRARIES(winmm)
 ENDIF (MINGW)
 
@@ -24,8 +26,11 @@ FIND_PACKAGE(DIRECTX REQUIRED)
 INCLUDE_DIRECTORIES(${DIRECTX_BASECLASSES_DIR} ${DIRECTX_INCLUDE_DIR})
 FILE(GLOB_RECURSE directx_source ${DIRECTX_BASECLASSES_DIR}/*.cpp)
 
-ADD_LIBRARY(ucanvcamx SHARED Filters.cpp Dll.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source} ${CMAKE_CURRENT_SOURCE_DIR}/../common/registry.cpp)
+#ADD_LIBRARY(ucanvcamx SHARED Filters.cpp Dll.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source} ${CMAKE_CURRENT_SOURCE_DIR}/../common/registry.cpp)
+ADD_LIBRARY(ucanvcamx SHARED Filters.cpp Dll.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source})
 
 TARGET_LINK_LIBRARIES(ucanvcamx advapi32 gdi32 ole32 oleaut32 user32 winmm uuid strmiids comctl32)
+TARGET_LINK_LIBRARIES(ucanvcamx ${YARP_LIBRARIES} ${SDL_LIBRARIES})
+
 
 INSTALL(TARGETS ucanvcamx DESTINATION bin)

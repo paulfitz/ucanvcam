@@ -1,16 +1,20 @@
 #ifndef SHMEMBUS_INC
 #define SHMEMBUS_INC
 
-#include <iostream>
+//#include <iostream>
 #include <windows.h>
 #include <tchar.h>
 #define SHMEM_SIZE (1024*1024)
 #define SHMEM_TIMEOUT 100
 #define SHMEM_MAX_READERS 3
 
+#include <stdio.h>
 
 class ShmemBus {
 public:
+  ShmemBus() {
+    shmemBuffer = NULL;
+  }
   
   bool init() {
     writeOk = false;
@@ -22,9 +26,9 @@ public:
     writeEvent = NULL;
     shmemHandle = NULL;
     shmemBuffer = NULL;
-    TCHAR readEventName[] = _T("ucanvcam_read");
-    TCHAR writeEventName[] = _T("ucanvcam_write");
-    TCHAR shmemName[] = _T("ucanvcam_shmem");
+    TCHAR readEventName[] = _T("ucanvcam2_read");
+    TCHAR writeEventName[] = _T("ucanvcam2_write");
+    TCHAR shmemName[] = _T("ucanvcam2_shmem");
 
     TCHAR buf[256];
     for (int i=0; i<SHMEM_MAX_READERS; i++) {
@@ -53,6 +57,7 @@ public:
 				0,
 				SHMEM_SIZE);    
     if (shmemBuffer==NULL) return false;
+	return true;
   }
 
   bool fini() {
