@@ -414,55 +414,6 @@ HRESULT CVCamStream::SetMediaType(const CMediaType *pmt) {
 }
 
 
-#if 0
-// See Directshow help topic for IAMStreamConfig for details on this method
-HRESULT CVCamStream::GetMediaType(int iPosition, CMediaType *pmt) {
-    SAY("MediaType");
-    CheckPointer(pmt,E_POINTER);
-    CAutoLock cAutoLock(m_pFilter->pStateLock());
-
-    if(iPosition < 0) return E_INVALIDARG;
-    if(iPosition > 8) return VFW_S_NO_MORE_ITEMS;
-
-    if(iPosition == 0) 
-        {
-            *pmt = m_mt;
-            return S_OK;
-        }
-
-    DECLARE_PTR(VIDEOINFOHEADER, pvi, pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER)));
-    ZeroMemory(pvi, sizeof(VIDEOINFOHEADER));
-
-    pvi->bmiHeader.biCompression = BI_RGB;
-    pvi->bmiHeader.biBitCount    = 24;
-    pvi->bmiHeader.biSize       = sizeof(BITMAPINFOHEADER);
-    pvi->bmiHeader.biWidth      = 80 * iPosition;
-    pvi->bmiHeader.biHeight     = 60 * iPosition;
-    pvi->bmiHeader.biPlanes     = 1;
-    pvi->bmiHeader.biSizeImage  = GetBitmapSize(&pvi->bmiHeader);
-    pvi->bmiHeader.biClrImportant = 0;
-
-    pvi->AvgTimePerFrame = 1000000;
-
-    SetRectEmpty(&(pvi->rcSource)); // we want the whole image area rendered.
-    SetRectEmpty(&(pvi->rcTarget)); // no particular destination rectangle
-
-    pmt->SetType(&MEDIATYPE_Video);
-    pmt->SetFormatType(&FORMAT_VideoInfo);
-    pmt->SetTemporalCompression(FALSE);
-
-    // Work out the GUID for the subtype from the header info.
-    const GUID SubTypeGUID = GetBitmapSubtype(&pvi->bmiHeader);
-    pmt->SetSubtype(&SubTypeGUID);
-    pmt->SetSampleSize(pvi->bmiHeader.biSizeImage);
-    
-    return NOERROR;
-
-} // GetMediaType
-
-#endif
-
-
 // See Directshow help topic for IAMStreamConfig for details on this method
 HRESULT CVCamStream::GetMediaType(int iPosition, CMediaType *pmt) {
     SAY3("GetMediaType",iPosition,0);
@@ -522,8 +473,19 @@ HRESULT CVCamStream::CheckMediaType(const CMediaType *pMediaType) {
     CAutoLock cAutoLock(m_pFilter->pStateLock());
 
     VIDEOINFOHEADER *pvi = (VIDEOINFOHEADER *)(pMediaType->Format());
-    if(*pMediaType != m_mt) 
+    SAY3("Size",pvi->bmiHeader.biWidth,pvi->bmiHeader.biHeight);
+    if(
+       pvi->bmiHeader.biWidth != 320 ||
+       pvi->bmiHeader.biHeight != 240
+       ) {
+        SAY("CheckMediaType size fail");
         return E_INVALIDARG;
+    }
+    //if(*pMediaType != m_mt) {
+    //SAY("CheckMediaType reject");
+    //return E_INVALIDARG;
+    //}
+    SAY("CheckMediaType accept");
     return S_OK;
 } // CheckMediaType
 
@@ -600,13 +562,13 @@ HRESULT STDMETHODCALLTYPE CVCamStream::GetNumberOfCapabilities(int *piCount, int
     CheckPointer(piCount,E_POINTER);
     CheckPointer(piSize,E_POINTER);
     CAutoLock cAutoLock(m_pFilter->pStateLock());
-    *piCount = 8;
+    *piCount = 1;
     *piSize = sizeof(VIDEO_STREAM_CONFIG_CAPS);
     return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE CVCamStream::GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC) {
-    SAY("GetStreamCaps");
+    SAY3("GetStreamCaps", iIndex, 0);
     CheckPointer(pmt,E_POINTER);
     CheckPointer(pSCC,E_POINTER);
 
@@ -641,21 +603,21 @@ HRESULT STDMETHODCALLTYPE CVCamStream::GetStreamCaps(int iIndex, AM_MEDIA_TYPE *
     
     pvscc->guid = FORMAT_VideoInfo;
     pvscc->VideoStandard = AnalogVideo_None;
-    pvscc->InputSize.cx = 640;
-    pvscc->InputSize.cy = 480;
-    pvscc->MinCroppingSize.cx = 80;
-    pvscc->MinCroppingSize.cy = 60;
-    pvscc->MaxCroppingSize.cx = 640;
-    pvscc->MaxCroppingSize.cy = 480;
+    pvscc->InputSize.cx = 320;
+    pvscc->InputSize.cy = 240;
+    pvscc->MinCroppingSize.cx = 320;
+    pvscc->MinCroppingSize.cy = 240;
+    pvscc->MaxCroppingSize.cx = 320;
+    pvscc->MaxCroppingSize.cy = 240;
     pvscc->CropGranularityX = 80;
     pvscc->CropGranularityY = 60;
     pvscc->CropAlignX = 0;
     pvscc->CropAlignY = 0;
 
-    pvscc->MinOutputSize.cx = 80;
-    pvscc->MinOutputSize.cy = 60;
-    pvscc->MaxOutputSize.cx = 640;
-    pvscc->MaxOutputSize.cy = 480;
+    pvscc->MinOutputSize.cx = 320;
+    pvscc->MinOutputSize.cy = 240;
+    pvscc->MaxOutputSize.cx = 320;
+    pvscc->MaxOutputSize.cy = 240;
     pvscc->OutputGranularityX = 0;
     pvscc->OutputGranularityY = 0;
     pvscc->StretchTapsX = 0;
