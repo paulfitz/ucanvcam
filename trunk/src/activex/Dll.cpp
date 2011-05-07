@@ -8,6 +8,8 @@
 
 // Based on an example by rep movsd via the mad hatter
 
+#include "memy.h"
+
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <streams.h>
@@ -27,7 +29,7 @@ using namespace std;
 
 // we need to be careful here with MINGW
 #define EXPORT __declspec(dllexport)
-#ifdef _MINGW
+#ifdef MINGW
 #define PFSTDAPI EXTERN_C EXPORT HRESULT STDAPICALLTYPE
 #else
 #define PFSTDAPI STDAPI
@@ -54,7 +56,7 @@ const AMOVIESETUP_MEDIATYPE AMSMediaTypesVCam =
 
 const AMOVIESETUP_PIN AMSPinVCam=
 {
-    L"Output",             // Pin string name
+    (LPWSTR)L"Output",             // Pin string name
     FALSE,                 // Is it rendered
     TRUE,                  // Is it an output
     FALSE,                 // Can we have none
