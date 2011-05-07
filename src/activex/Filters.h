@@ -44,9 +44,9 @@ public:
     //  IUnknown
     //////////////////////////////////////////////////////////////////////////
     static CUnknown * WINAPI CreateInstance(LPUNKNOWN lpunk, HRESULT *phr);
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
+    //STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
 
-    STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv);
+    //STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv);
 
     IFilterGraph *GetGraph() {return m_pGraph;}
 
@@ -58,22 +58,23 @@ private:
     YarpOut yarp_out;
 };
 
-class CVCamStream : public CSourceStream, public IAMStreamConfig, 
+class CVCamStream : public CSourceStream
+/*, public IAMStreamConfig, 
                     public IKsPropertySet,
                     public ISaturation,
                     public ISpecifyPropertyPages,
-                    public IAMVfwCaptureDialogs
+                    public IAMVfwCaptureDialogs */
 {
 public:
 
     //////////////////////////////////////////////////////////////////////////
     //  IUnknown
     //////////////////////////////////////////////////////////////////////////
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
+    //STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
     STDMETHODIMP_(ULONG) AddRef() { return GetOwner()->AddRef(); }                                                          \
     STDMETHODIMP_(ULONG) Release() { return GetOwner()->Release(); }
 
-    STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv);
+    //STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv);
     
 
 

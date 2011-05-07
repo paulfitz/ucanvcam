@@ -8,6 +8,8 @@
 
 // Based on an example by rep movsd via the mad hatter
 
+#include "memy.h"
+
 #define _CRT_SECURE_NO_WARNINGS
 
 #ifdef MINGW
@@ -33,12 +35,17 @@
 #include "Filters.h"
 //#include "registry.h"
 
-//#include <yarp/os/all.h>
+
+#ifdef USE_YARP
+#include <yarp/os/all.h>
+#endif
 //#include <yarp/sig/all.h>
 //#include <yarp/dev/all.h>
 
 #define SKIP_YARP
 #include "ShmemImage.h"
+
+//#define SKIP_PIN
 
 HWND ghApp=0;
 FILE *FOUT = NULL;
@@ -68,10 +75,24 @@ CVCam::CVCam(LPUNKNOWN lpunk, HRESULT *phr) :
     yarp_out.init("cam");
     SAY("CVCam::CVCam");
     ASSERT(phr);
-    CAutoLock cAutoLock(&m_cStateLock);
     // Create the one and only output pin
+
+    // new[] seems broken?
+    //AddPin(new CVCamStream(phr, this, L"Virtual Cam"));
+
+    #ifndef SKIP_PIN 
+    CAutoLock cAutoLock(&m_cStateLock);
     m_paStreams = (CSourceStream **) new CVCamStream*[1];
+    if (m_paStreams==NULL) {
+        *phr = E_OUTOFMEMORY;
+        return;
+    }
     m_paStreams[0] = new CVCamStream(phr, this, L"Virtual Cam");
+    if (m_paStreams[0]==NULL) {
+        *phr = E_OUTOFMEMORY;
+        return;
+        }
+    #endif
 }
 
 CVCam::~CVCam() {
@@ -79,24 +100,31 @@ CVCam::~CVCam() {
     yarp_out.fini();
 }
 
+/*
 HRESULT CVCam::QueryInterface(REFIID riid, void **ppv) {
+    CheckPointer(ppv, E_POINTER);
     SAY("Query interface CVCam");
     //Forward request for IAMStreamConfig & IKsPropertySet to the pin
     //if(riid == _uuidof(IAMStreamConfig) || riid == _uuidof(IKsPropertySet))
     if(riid == IID_IAMStreamConfig || riid == IID_IKsPropertySet ||
        riid == IID_ISpecifyPropertyPages || riid == IID_ISaturation ||
-       riid == IID_IAMVfwCaptureDialogs)
-        return m_paStreams[0]->QueryInterface(riid, ppv);
-    else
+       riid == IID_IAMVfwCaptureDialogs) {
+#ifdef SKIP_PIN
         return CSource::QueryInterface(riid, ppv);
+#else
+        return m_paStreams[0]->QueryInterface(riid, ppv); //PFHIT
+#endif
+    } else {
+        return CSource::QueryInterface(riid, ppv);
+    }
 }
-
+*/
 
 void toString(REFIID guid, YarpOut& yarp_out) {
     char buf[1000];
     char buf2[1000];
     sprintf(buf,"%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-            guid.Data1,
+            (unsigned int)guid.Data1,
             guid.Data2,
             guid.Data3,
             guid.Data4[0],
@@ -113,7 +141,9 @@ void toString(REFIID guid, YarpOut& yarp_out) {
     //    SAY(val.c_str());
 }
 
+/*
 STDMETHODIMP CVCam::NonDelegatingQueryInterface(REFIID riid, void **ppv) {
+    CheckPointer(ppv, E_POINTER);
     SAY("non-delegating Query interface CVCam!");
     toString(riid,yarp_out);
     toString(IID_IAMStreamConfig,yarp_out);
@@ -137,7 +167,11 @@ STDMETHODIMP CVCam::NonDelegatingQueryInterface(REFIID riid, void **ppv) {
     }
     if(riid == IID_IAMStreamConfig || riid == IID_IKsPropertySet ||
        riid == IID_ISpecifyPropertyPages || riid == IID_ISaturation) {
+#ifdef SKIP_PIN
+        HRESULT r= CSource::NonDelegatingQueryInterface(riid, ppv);
+#else
         HRESULT r = m_paStreams[0]->NonDelegatingQueryInterface(riid, ppv);
+#endif
         SAY("uncaptured riid done (1)");
         return r;
     } else {
@@ -146,6 +180,7 @@ STDMETHODIMP CVCam::NonDelegatingQueryInterface(REFIID riid, void **ppv) {
         return r;
     }
 }
+*/
 
 //////////////////////////////////////////////////////////////////////////
 // CVCamStream is the one and only output pin of CVCam which handles 
@@ -161,7 +196,9 @@ CVCamStream::CVCamStream(HRESULT *phr, CVCam *pParent, LPCWSTR pPinName) :
     bus.init();
     ct = 0;
     // Set the default media type as 320x240x24@15
-    GetMediaType(0, &m_mt);
+#ifndef SKIP_PIN
+    GetMediaType(0, &m_mt); //PFHIT
+#endif
     //GetMediaType(4, &m_mt);
     printf("  *** %s:%d\n", __FILE__, __LINE__); fflush(stdout);
     running = true;
@@ -169,7 +206,11 @@ CVCamStream::CVCamStream(HRESULT *phr, CVCam *pParent, LPCWSTR pPinName) :
     lastId = 0;
     lastChange = -1000;
     haveId = false;
+#ifdef USE_YARP
     //yarp::os::Network::init();
+#endif
+    //CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
     // only does something on Microsoft Windows
     /*
     TIMECAPS tm;
@@ -186,6 +227,7 @@ CVCamStream::~CVCamStream() {
     bus.fini();
 } 
 
+/*
 HRESULT CVCamStream::QueryInterface(REFIID riid, void **ppv)
 {   
     SAY("QueryInterface CVCamStream");
@@ -221,9 +263,10 @@ HRESULT CVCamStream::QueryInterface(REFIID riid, void **ppv)
     AddRef();
     return S_OK;
 }
+*/
 
 
-
+ /*
 STDMETHODIMP CVCamStream::NonDelegatingQueryInterface(REFIID riid, void **ppv) {
     SAY("non-delegating Query interface CVCamStream");
 
@@ -255,7 +298,7 @@ STDMETHODIMP CVCamStream::NonDelegatingQueryInterface(REFIID riid, void **ppv) {
     AddRef();
     return S_OK;
 }
-
+ */
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -273,40 +316,57 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
     {
         CAutoLock cAutoLockShared(&m_cSharedState);
 
-        //ImageOf<PixelRgb> img;
-        //Time::delay(0.03); 
-        Sleep(30);
+        int wt = 0;
+        double now = 0;
+        bool ok = false;
+        char *at = NULL;
 
-        bus.beginRead();
-        ShmemImageHeader header;
-        ShmemImage cp(bus);
-        //ImageOf<PixelRgb> cp;
-        //cp.setQuantum(1);
-        //cp.setExternal(bus.buffer(),320,240);
-        cp.getHeader(header);
+        while (wt<5 && !ok) {
+            //ImageOf<PixelRgb> img;
+            //Time::delay(0.03); 
+            Sleep(5);
+            wt++;
 
-        FILETIME tm;
-        GetSystemTimeAsFileTime(&tm);
-        ULONGLONG ticks = (((ULONGLONG) tm.dwHighDateTime) << 32) + 
-            tm.dwLowDateTime;
-        double now = ((double)ticks)/(1000L*1000L*10L);
-
-        int id = header.get(IMGHDR_TICK);
-        if (!haveId) {
+            bus.beginRead();
+            ShmemImageHeader header;
+            ShmemImage cp(bus);
+            //ImageOf<PixelRgb> cp;
+            //cp.setQuantum(1);
+            //cp.setExternal(bus.buffer(),320,240);
+            cp.getHeader(header);
+            at = cp.getImage();
+            
+            FILETIME tm;
+            GetSystemTimeAsFileTime(&tm);
+            ULONGLONG ticks = (((ULONGLONG) tm.dwHighDateTime) << 32) + 
+                tm.dwLowDateTime;
+            double now = ((double)ticks)/(1000L*1000L*10L);
+            
+            int id = header.get(IMGHDR_TICK);
+            if (!haveId) {
+                lastId = id;
+                haveId = true;
+            } else {
+                if (id!=lastId) {
+                    lastChange = now;
+                    wt = 500;
+                    ok = true;
+                }
+            }
             lastId = id;
-            haveId = true;
-        } else {
-            if (id!=lastId) {
-                lastChange = now;
+
+            if (!ok) {
+                bus.endRead();
             }
         }
-        lastId = id;
 
-        bool ok = (now-lastChange<2);
+        if (ok) {
+            ok = (now-lastChange<2);
+        }
         SAY3("time is", (int)now, (int)lastChange);
-
+        
         //return NOERROR;
-
+        
         BYTE *pData;
         long lDataLen;
         if (FAILED(hr=pms->GetPointer(&pData))||!pData)  {
@@ -314,29 +374,28 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
             bus.endRead();
             return S_FALSE;
         }
-
+        
         lDataLen = pms->GetSize();
-
+        
         ASSERT(m_mt.formattype == FORMAT_VideoInfo);
-
+        
         REFERENCE_TIME rtNow;
-    
+        
         REFERENCE_TIME avgFrameTime = ((VIDEOINFOHEADER*)m_mt.pbFormat)->AvgTimePerFrame;
-
+        
         rtNow = m_rtLastTime;
         m_rtLastTime += avgFrameTime;
         pms->SetTime(&rtNow, &m_rtLastTime);
-
+        
         int ww = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biWidth;
         int hh = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biHeight;
         int bb = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biBitCount;
-
+        
         //for(int i = 0; i < lDataLen; ++i)
         //pData[i] = rand();
-
+        
         int pp = bb/8;
         int stride = (ww * pp + 3) & ~3;
-        char *at = cp.getImage();
         if (at==NULL || !ok) {
             // BGR order, apparently
             ct = (ct+1)%256;
@@ -359,30 +418,10 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
                     base += pp;
                 }
             }
-            /*
-            //ImageOf<PixelRgb> dest1;
-            ImageOf<PixelBgr> dest2;
-            //dest1.setTopIsLowIndex(false);
-            dest2.setTopIsLowIndex(false);
-            dest2.setExternal((char*)pData,ww,hh);
-            //dest1.resize(ww,hh);
-            if (m_lSaturation<50) {
-                dest2.copy(img);
-            } else {
-                dest2.copy(img);
-            }
-            */
         }
         bus.endRead();
     }
-    /*
-    // and if you believe that, how about this...
-    ImageOf<PixelRgb> src, dest;
-    // quantum rules seem similar, check this though
-    src.setExternal((char*)pData,ww,hh);
-    dest.setExternal((char*)pData,ww,hh);
-    */
-
+            
     pms->SetSyncPoint(TRUE);
 
     return NOERROR;
@@ -448,7 +487,7 @@ HRESULT CVCamStream::GetMediaType(int iPosition, CMediaType *pmt) {
     SAY3("media size", pvi->bmiHeader.biWidth, pvi->bmiHeader.biHeight);
     SAY3("media full", pvi->bmiHeader.biSizeImage, 0);
 
-    pvi->AvgTimePerFrame = 1000000;
+    pvi->AvgTimePerFrame = 1000*1000;
 
     SetRectEmpty(&(pvi->rcSource)); // we want the whole image area rendered.
     SetRectEmpty(&(pvi->rcTarget)); // no particular destination rectangle
@@ -513,7 +552,7 @@ HRESULT CVCamStream::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERTIE
 
 // Called when graph is run
 HRESULT CVCamStream::OnThreadCreate() {
-    SAY("OnThreadCreate");
+    //SAY("OnThreadCreate");
     CAutoLock cAutoLockShared(&m_cSharedState);
     m_rtLastTime = 0;
     return NOERROR;
@@ -521,7 +560,7 @@ HRESULT CVCamStream::OnThreadCreate() {
 
 HRESULT CVCamStream::OnThreadDestroy()
 {
-    SAY("OnThreadDestroy");
+    //SAY("OnThreadDestroy");
     CAutoLock cAutoLockShared(&m_cSharedState);
     //running = false;
     //SAY("OnThreadDestroy-ed");

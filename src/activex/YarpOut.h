@@ -1,7 +1,14 @@
+#ifndef YARPOUT_INC
+#define YARPOUT_INC
+
 #include <stdio.h>
 
+#define GOTCHA(x) {YarpOut gotcha; gotcha.init("gotcha",true); gotcha.say(__FILE__,__LINE__,x); }
+
+
 //#define USE_NETWORK
-#define USE_FILE
+//#define USE_FILE
+#define USE_DUMMY
 
 #ifdef USE_NETWORK
 
@@ -80,15 +87,17 @@ public:
       done();
     }
 
-    void init(const char *name) {
+    void init(const char *name, bool append = false) {
         if (initc == 0) {
 	  char buf[1000];
 	  sprintf(buf,"c://log//ucanvcam_%s.txt",name);
-	  fout = fopen(buf,"w");
+	  fout = fopen(buf,append?"a":"w");
+	  /*
 	  if (fout!=NULL) {
-	    fprintf(fout,"STARTING!\n");
+	    //fprintf(fout,"STARTING!\n");
 	    fflush(fout);
 	  }
+	  */
         }
         initc++;
     }
@@ -101,5 +110,31 @@ public:
         }
     }
 };
+
+#endif
+
+
+#ifdef USE_DUMMY
+class YarpOut {
+public:
+    YarpOut() {
+    }
+
+    ~YarpOut() {
+    }
+
+    void say(const char *str) {
+    }
+
+    void say(const char *str, int a, int b) {
+    }
+
+    void init(const char *name, bool append = false) {
+    }
+
+    void fini() {
+    }
+};
+#endif
 
 #endif
