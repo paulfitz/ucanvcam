@@ -63,33 +63,39 @@ public:
 #pragma pack(pop)
 
 void write_test_image() {
+  int tck = 0;
   ShmemBus bus;
   bus.init();
-  bus.beginWrite();
-  char *base = (char *)bus.buffer();
-  ShmemImageHeader *header = (ShmemImageHeader *)base;
-  header->tick = 0; // to work, this will need to increment, or at least change
-  header->w = 320;
-  header->h = 240;
-  for (int i=0; i<17; i++) {
-    header->blank[i] = 0;
-  }
-  PixelRgb *image = (PixelRgb *)(base+sizeof(ShmemImageHeader));
-  for (int w=0; w<320; w++) {
-    for (int h=0; h<240; h++) {
-      image->r = w % 256;
-      image->g = h % 256;
-      image->b = (w+h) % 256;
-      image++;
-    }
+  for (int k=0; k<10; k++) {
+	  bus.beginWrite();
+	  char *base = (char *)bus.buffer();
+	  ShmemImageHeader *header = (ShmemImageHeader *)base;
+	  header->tick = tck;
+	  tck++;
+	  header->w = 320;
+	  header->h = 240;
+	  for (int i=0; i<17; i++) {
+		header->blank[i] = 0;
+	  }
+	  PixelRgb *image = (PixelRgb *)(base+sizeof(ShmemImageHeader));
+	  for (int h=0; h<240; h++) {
+	    for (int w=0; w<320; w++) {
+		  image->r = (w/32)*25;
+		  image->g = (h/24)*25;
+		  image->b = k*25;
+		  image++;
+		}
+	  }
+	  if (k==0) {
+		  FILE *f = fopen("target.ppm","wb");
+		  fprintf (f, "P6\n%d %d\n255\n", header->w, header->h);
+		  fwrite (base+sizeof(ShmemImageHeader), header->w * 3 * header->h, 1, f);
+		  fclose(f);
+	  }
+	  bus.endWrite();
+	  Sleep(50);
   }
 
-  FILE *f = fopen("target.ppm","wb");
-  fprintf (f, "P6\n%d %d\n255\n", header->w, header->h);
-  fwrite (base+sizeof(ShmemImageHeader), header->w * 3 * header->h, 1, f);
-  fclose(f);
-
-  bus.endWrite();
   bus.fini();
 }
 
