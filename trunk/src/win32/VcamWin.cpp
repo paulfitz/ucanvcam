@@ -135,6 +135,8 @@ public:
         pSource.put("mode","grid");
         source.open(pSource);
     }
+	grabber = NULL;
+	lister = NULL;
     source.view(grabber);    
     source.view(lister);
     sourceName = name;
@@ -188,6 +190,8 @@ public:
 	busImage.getImage().zero();
       }
       header.tick++;
+	  header.w = img.width();
+	  header.h = img.height();
       busImage.getHeader() = header;
       if (busImage.getImage().getRawImage()!=img.getRawImage()) {
 	img.setQuantum(1);

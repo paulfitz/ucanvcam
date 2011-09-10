@@ -25,8 +25,12 @@ IF (STANDALONE)
   INCLUDE_DIRECTORIES(${YARP_INCLUDE_DIRS})
   SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${YARP_MODULE_PATH})
 
-  FIND_PACKAGE(SDL REQUIRED)
-  INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} ${SDL_INCLUDE_DIR}/..)
+  OPTION(USE_SDL "Use SDL-based effects" OFF)
+  OPTION(USE_GD "Use GD-based effects" OFF)
+  IF (USE_SDL)
+    FIND_PACKAGE(SDL REQUIRED)
+    INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} ${SDL_INCLUDE_DIR}/..)
+  ENDIF ()
 
   # Search for native effects.
   FILE(GLOB_RECURSE effects_source native_effects/*.cpp native_effects/*.c)
@@ -34,8 +38,10 @@ IF (STANDALONE)
 
   # Search for "effectv" effects.
   # This source code should be left unchanged from the effectv source.
-  FILE(GLOB_RECURSE effectv_source effectv_effects/*.cpp effectv_effects/*.c)
-  FILE(GLOB_RECURSE effectv_header effectv_effects/*.h)
+  IF (USE_SDL)
+    FILE(GLOB_RECURSE effectv_source effectv_effects/*.cpp effectv_effects/*.c)
+    FILE(GLOB_RECURSE effectv_header effectv_effects/*.h)
+  ENDIF ()
 
   FILE(GLOB_RECURSE common_source common/*.cpp common/*.c)
   FILE(GLOB_RECURSE common_header common/*.h)
@@ -85,21 +91,26 @@ IF (STANDALONE)
     # assume Windows
     
     ADD_DEFINITIONS(-DSHMEM_SERVICE)
-    ADD_EXECUTABLE(${TARGET_NAME} ${INTERFACE_SOURCE} win32/VcamWin.cpp  ${common_sources})
+    ADD_EXECUTABLE(${TARGET_NAME} WIN32 ${INTERFACE_SOURCE} win32/VcamWin.cpp  ${common_sources})
   ENDIF (UNIX)
   
-  TARGET_LINK_LIBRARIES(${TARGET_NAME} gd freetype)
-  TARGET_LINK_LIBRARIES(${TARGET_NAME} ${YARP_LIBRARIES})
+  IF (USE_GD)
+    TARGET_LINK_LIBRARIES(${TARGET_NAME} gd freetype)
+    TARGET_LINK_LIBRARIES(${TARGET_NAME} ${YARP_LIBRARIES})
+  ENDIF ()
+
   IF (USE_GUI)
     # SDL does not seem to be really needed anymore, is this true?
     # check effectv effects
-    TARGET_LINK_LIBRARIES(${TARGET_NAME} ${SDL_LIBRARY})
+    # TARGET_LINK_LIBRARIES(${TARGET_NAME} ${SDL_LIBRARY})
     TARGET_LINK_LIBRARIES(${TARGET_NAME} ${wxWidgets_LIBRARIES})
   ENDIF (USE_GUI)
 
 
   IF (WIN32)
-    TARGET_LINK_LIBRARIES(${TARGET_NAME} jpeg png z)
+	IF (USE_GD)
+      TARGET_LINK_LIBRARIES(${TARGET_NAME} jpeg png z)
+	ENDIF ()
   ENDIF ()
 
   #SET (DISABLE_SWSCALE TRUE)
@@ -116,4 +127,9 @@ IF (STANDALONE)
   INSTALL(TARGETS ${TARGET_NAME} RUNTIME DESTINATION bin)
 endif ()
 
+
+IF (WIN32)
+    INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/win32)
+	add_executable(test_bus external/main.cpp)
+ENDIF ()
 

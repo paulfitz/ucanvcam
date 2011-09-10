@@ -47,13 +47,15 @@ private:
 // stripped down version to avoid YARP dependency
 
 enum {
-  IMGHDR_TICK,
-  IMGHDR_W,
-  IMGHDR_H,
+  IMGHDR_TICK = 0,
+  IMGHDR_W = 1,
+  IMGHDR_H = 2,
 };
 
 #define SIZE_IMGHDR (4*20)
 
+#pragma warning (disable:4103)
+#pragma pack(push, 1)
 class ShmemImageHeader {
 public:
   unsigned char raw[SIZE_IMGHDR];
@@ -64,6 +66,7 @@ public:
     return raw[offset]+s*(raw[offset+1]+s*(raw[offset+2]+s*raw[offset+3]));
   }
 };
+#pragma pack(pop)
 
 class ShmemImage {
 public:

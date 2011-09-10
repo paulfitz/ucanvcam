@@ -23,7 +23,6 @@
 #ifndef __EFFECTV_H__
 #define __EFFECTV_H__
 
-#include <SDL/SDL.h>
 #include "screen.h"
 #include "video.h"
 

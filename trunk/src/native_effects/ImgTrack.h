@@ -134,8 +134,8 @@ public:
     void SetXYScaled(int x, int y) {
         tx = int(((float)x*128)/mw);
         ty = int(((float)y*128)/mh);
-        scaled_tx = x;
-        scaled_ty = y;
+        scaled_tx = (float)x;
+        scaled_ty = (float)y;
     }
 };
 

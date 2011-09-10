@@ -1,3 +1,5 @@
+#ifdef HAVE_GD
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -19,6 +21,7 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 using namespace std;
+
 
 /**
  *
@@ -148,5 +151,6 @@ yarp::sig::Image *TickerEffect::pdraw(yarp::sig::Image& src,
   return &idest;
 }
 
+#endif
 
 

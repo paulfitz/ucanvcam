@@ -1,7 +1,12 @@
+
+#ifndef POINTER_64
+#define POINTER_64 __ptr64
+#endif
+#include <windows.h>
+
 #include "YarpOut.h"
 #include "memy.h"
 
-#include <windows.h>
 
 #if 1
 void *operator new(size_t size) //throw(std::bad_alloc) 

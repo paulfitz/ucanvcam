@@ -13,6 +13,7 @@ using namespace yarp::dev;
 
 // -> not present
 //// -> floating point exception
+#ifdef USE_GD
 static effectRegisterFunc *effects_register_list[] =
 {
 	dumbRegister,
@@ -65,6 +66,7 @@ static effectRegisterFunc *effects_register_list[] =
 	//timeDistortionRegister,
 	//edgeBlurRegister,
 };
+#endif
 
 static effect **effectsList;
 static int effectMax;
@@ -74,6 +76,26 @@ static effect *currentEffect = NULL;
 #define RAW(x) ((RGB32*)(x).getRawImage())
 
 static ImageOf<PixelBgra> srcTV, destTV;
+
+class TestEffect : public Effect {
+public:
+  TestEffect() {
+  }
+
+  virtual bool draw(ImageOf<PixelRgb>& src2, ImageOf<PixelRgb>& dest2) {
+	dest2 = src2;
+	return true;
+  }
+
+  virtual std::string getName() {
+    return "TestTV";
+  }
+};
+
+Effect *testRegister() {
+  return new TestEffect();
+}
+
 
 /**
  *
@@ -150,8 +172,9 @@ int EffectGroup::init()
 	int i, n;
 	effect *entry;
 
-	n = sizeof(effects_register_list)/sizeof(effectRegisterFunc *);
 	effectMax = 0;
+#ifdef USE_GD
+	n = sizeof(effects_register_list)/sizeof(effectRegisterFunc *);
 	for(i=0;i<n;i++) {
 		entry = (*effects_register_list[i])();
 		if(entry) {
@@ -160,11 +183,15 @@ int EffectGroup::init()
 		  //Drivers::factory().add(
 		}
 	}
+#endif
+	add(testRegister());
+#ifdef USE_SDL
 	add(tickerRegister());
 	add(engageRegister());
 	add(paramRegister());
 	add(overlayRegister());
 	add(picmixRegister());
+#endif
 	printf("%d effects are available.\n",effectMax);
 	return effectMax;
 }
@@ -244,6 +271,7 @@ effect *getEffect(const char *name) {
 
 
 Effect *searchGeneralEffect(const char *str) {
+	return NULL;
 }
 
 
@@ -279,7 +307,7 @@ int EffectGroup::init() {
 */
 
 Effect *EffectGroup::search(const char *str) {
-  for (int i=0; i<effects.size(); i++) {
+  for (int i=0; i<(int)effects.size(); i++) {
     if (effects[i]->getName() == str) {
       //printf("Active effect is %s\n", str);
       return effects[i];

@@ -10,6 +10,10 @@
 #include "EffecTV.h"
 #include "utils.h"
 
+#ifndef M_PI
+#define M_PI 3.1415927
+#endif
+
 int utils_init(void)
 {
   // PFHIT

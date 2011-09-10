@@ -7,7 +7,7 @@
 
 
 //#define USE_NETWORK
-//#define USE_FILE
+//#define USE_FILE  <--- turn this on for log files in c:\log\ucanvcam_*
 #define USE_DUMMY
 
 #ifdef USE_NETWORK

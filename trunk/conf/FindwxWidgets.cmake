@@ -425,6 +425,17 @@ IF(wxWidgets_FIND_STYLE STREQUAL "win32")
       wxWidgets-2.9.2
       wxWidgets-2.9.1
       wxWidgets-2.9.0
+      wxWidgets-2.8.20
+      wxWidgets-2.8.19
+      wxWidgets-2.8.18
+      wxWidgets-2.8.17
+      wxWidgets-2.8.16
+      wxWidgets-2.8.15
+      wxWidgets-2.8.14
+      wxWidgets-2.8.13
+      wxWidgets-2.8.12
+      wxWidgets-2.8.11
+      wxWidgets-2.8.10
       wxWidgets-2.8.9
       wxWidgets-2.8.8
       wxWidgets-2.8.7

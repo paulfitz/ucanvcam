@@ -102,6 +102,7 @@ public:
    * Prepare the effect for operation.
    */
   virtual bool start() {
+	  return true;
   }
 
   /**
@@ -109,6 +110,7 @@ public:
    * a close/open cycle.
    */
   virtual bool stop() {
+	  return true;
   }
 };
 

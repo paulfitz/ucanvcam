@@ -21,13 +21,16 @@ ENDIF (MINGW)
 
 # for WIN32 only
 
-FIND_PROGRAM(windres NAMES windres.exe windres mingw32-windres i586-mingw32msvc-windres PATHS /bin /usr/bin)
-MESSAGE(STATUS "windres at ${windres}")
-ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resources.o
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/prop.rc
-		COMMAND ${windres} -I${CMAKE_CURRENT_SOURCE_DIR}
-		-i ${CMAKE_CURRENT_SOURCE_DIR}/prop.rc
-		-o ${CMAKE_CURRENT_BINARY_DIR}/resources.o)
+IF (WINDOWS)
+  ENABLE_LANGUAGE(RC)
+#FIND_PROGRAM(windres NAMES windres.exe windres mingw32-windres i586-mingw32msvc-windres PATHS /bin /usr/bin)
+#MESSAGE(STATUS "windres at ${windres}")
+#ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resources.o
+#		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/prop.rc
+#		COMMAND ${windres} -I${CMAKE_CURRENT_SOURCE_DIR}
+#		-i ${CMAKE_CURRENT_SOURCE_DIR}/prop.rc
+#		-o ${CMAKE_CURRENT_BINARY_DIR}/resources.o)
+ENDIF ()
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../win32)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../common)
@@ -40,14 +43,26 @@ FILE(GLOB_RECURSE directx_source ${DIRECTX_BASECLASSES_DIR}/*.cpp)
 
 #ADD_LIBRARY(ucanvcamx SHARED Filters.cpp Dll.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source} ${CMAKE_CURRENT_SOURCE_DIR}/../common/registry.cpp)
 
+ADD_LIBRARY(ucanvcamx_directx STATIC ${directx_source})
+
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/vivek)
 
-ADD_LIBRARY(ucanvcamx SHARED vivek/Filters.cpp vivek/Dll.cpp memy.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source})
+SET(UV_CODE 46)
+SET(LIBNAME ucanvcamx${UV_CODE})
+
+#ADD_LIBRARY(ucanvcamx SHARED vivek/Filters.cpp vivek/Dll.cpp memy.cpp prop.rc ${directx_source})
+ADD_LIBRARY(${LIBNAME}  SHARED Filters.cpp Filters.h Dll.cpp memy.cpp prop.rc memy.h YarpOut.h)
+# ADD_DEFINITIONS(-DUV_CODE=${UV_CODE})
+SET_PROPERTY(SOURCE Dll.cpp Filters.h APPEND PROPERTY COMPILE_DEFINITIONS UV_CODE=${UV_CODE})
+TARGET_LINK_LIBRARIES(${LIBNAME} ucanvcamx_directx)
+
+#ADD_LIBRARY(ucanvcamx SHARED vivek/Filters.cpp vivek/Dll.cpp memy.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source})
 #ADD_LIBRARY(ucanvcamx SHARED FBall.cpp Ball.cpp CBallProp.cpp memy.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source})
 #ADD_LIBRARY(ucanvcamx SHARED Filters.cpp Dll.cpp memy.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source})
 
-TARGET_LINK_LIBRARIES(ucanvcamx advapi32 gdi32 ole32 oleaut32 user32 winmm uuid strmiids comctl32)
-TARGET_LINK_LIBRARIES(ucanvcamx ${YARP_LIBRARIES} ${SDL_LIBRARIES})
+TARGET_LINK_LIBRARIES(ucanvcamx_directx advapi32 gdi32 ole32 oleaut32 user32 winmm uuid strmiids comctl32)
+TARGET_LINK_LIBRARIES(${LIBNAME} ${YARP_LIBRARIES} ${SDL_LIBRARIES})
 
 
-INSTALL(TARGETS ucanvcamx DESTINATION bin)
+INSTALL(TARGETS ${LIBNAME} DESTINATION bin)
+

@@ -9,7 +9,13 @@
 #ifndef __SCREEN_H__
 #define __SCREEN_H__
 
-#include <SDL/SDL.h>
+//#include <SDL/SDL.h>
+typedef void *SDL_Event;
+
+#if defined(WIN32) || defined(WIN64)
+#define strncasecmp _strnicmp
+#define strcasecmp _stricmp
+#endif /* Def WIN32 or Def WIN64 */
 
 //extern SDL_Surface *screen; /* display surface */  //PFHIT
 
