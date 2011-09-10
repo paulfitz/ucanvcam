@@ -85,7 +85,7 @@ public:
     if (!ok) return false;
 #endif
     if (current==NULL) {
-      current = EffectGroup::get().search("TickerTV");
+      current = EffectGroup::get().search("TestTV");
       return current->start();
     }
     return false;

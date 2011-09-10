@@ -26,9 +26,9 @@ public:
     writeEvent = NULL;
     shmemHandle = NULL;
     shmemBuffer = NULL;
-    TCHAR readEventName[] = _T("ucanvcam2_read");
-    TCHAR writeEventName[] = _T("ucanvcam2_write");
-    TCHAR shmemName[] = _T("ucanvcam2_shmem");
+    TCHAR readEventName[] = _T("ucanvcam3_read");
+    TCHAR writeEventName[] = _T("ucanvcam3_write");
+    TCHAR shmemName[] = _T("ucanvcam3_shmem");
 
     TCHAR buf[256];
     for (int i=0; i<SHMEM_MAX_READERS; i++) {

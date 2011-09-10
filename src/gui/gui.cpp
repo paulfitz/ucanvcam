@@ -118,7 +118,7 @@ bool MyApp::OnCmdLineParsed(wxCmdLineParser& parser) {
     
     // to get at your unnamed parameters use
     wxArrayString files;
-    for (int i = 0; i < parser.GetParamCount(); i++) {
+    for (int i = 0; i < (int)parser.GetParamCount(); i++) {
         files.Add(parser.GetParam(i));
     }
     
@@ -129,11 +129,11 @@ bool MyApp::OnCmdLineParsed(wxCmdLineParser& parser) {
     return true;
 }
 
-#ifdef WIN32
-IMPLEMENT_APP_NO_MAIN(MyApp);
-#else
+//#ifdef WIN32
+//IMPLEMENT_APP_NO_MAIN(MyApp);
+//#else
 IMPLEMENT_APP(MyApp);
-#endif
+//#endif
 
 
 class MyView : public wxWindow {
@@ -399,7 +399,7 @@ bool MyFrame::OnInit() {
     delete[] choices;
     choices = NULL;
     if (effectList!=NULL) {
-        effectList->SetStringSelection(wxT("TickerTV"));
+        effectList->SetStringSelection(wxT("TestTV"));
     }
 
 
@@ -579,7 +579,7 @@ Includes sybig.ttf font from the Larabie font collection."),
 
 
 
-#ifdef WIN32
+#ifdef _MSC_VER_INHIBIT
 
 FILE *FOUT = NULL;
 

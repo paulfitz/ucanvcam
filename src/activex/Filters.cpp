@@ -1,304 +1,92 @@
-// -*- mode:C++; tab-width:4; c-basic-offset:4; indent-tabs-mode:nil -*-
-
-/*
- * Copyright (C) 2008 Paul Fitzpatrick
- * CopyPolicy: Released under the terms of the GNU GPL v2.0.
- *
- */
-
-// Based on an example by rep movsd via the mad hatter
-
-#include "memy.h"
-
-#define _CRT_SECURE_NO_WARNINGS
-
-#ifdef MINGW
-#define _WIN32_IE 0x400
-#endif
-
-#include <windows.h>
-#include <commctrl.h>
-
-#define DECLARE_PTR(type, ptr, expr) type* ptr = (type*)(expr);
-
-#include <stdlib.h>
-
-#include <windows.h>
+#pragma warning(disable:4244)
+#pragma warning(disable:4711)
 
 #include <streams.h>
-#include <amfilter.h>
-#include "source.h"
 #include <stdio.h>
 #include <olectl.h>
 #include <dvdmedia.h>
-#include <ddraw.h>
 #include "Filters.h"
-//#include "registry.h"
 
-
-#ifdef USE_YARP
-#include <yarp/os/all.h>
+#ifndef _uuidof
+#define _uuidof(x) IID_ ## x
 #endif
-//#include <yarp/sig/all.h>
-//#include <yarp/dev/all.h>
 
 #define SKIP_YARP
 #include "ShmemImage.h"
 
-//#define SKIP_PIN
-
-HWND ghApp=0;
-FILE *FOUT = NULL;
-
-#define SAY(x) yarp_out.say(x)
-#define SAY3(x,y,z) yarp_out.say(x,y,z)
-
-//#define SAY(x) { Bottle b; b.clear(); b.add(Value(x)); yarp_out.say(b); printf(">>> %s\n", b.toString().c_str());   }
-
-//#define SAY3(x,y,z) { Bottle b; b.clear(); b.add(Value(x)); b.add(Value(y)); b.add(Value(z)); yarp_out.say(b); printf(">>> %s\n", b.toString().c_str());   }
+#include "YarpOut.h"
 
 //////////////////////////////////////////////////////////////////////////
 //  CVCam is the source filter which masquerades as a capture device
 //////////////////////////////////////////////////////////////////////////
-CUnknown * WINAPI CVCam::CreateInstance(LPUNKNOWN lpunk, HRESULT *phr) {
-    YarpOut yarp_out;
-    yarp_out.init("static");
-    SAY("Hello, making a ucanvcam virtual camera");
+CUnknown * WINAPI CVCam::CreateInstance(LPUNKNOWN lpunk, HRESULT *phr)
+{
     ASSERT(phr);
     CUnknown *punk = new CVCam(lpunk, phr);
-    SAY3("Made a punk",*phr,E_OUTOFMEMORY);
+	DbgLog((LOG_TRACE,3,TEXT("Testing...")));
+	YarpOut out; out.init("ziggy"); out.say("hello", 51, 2);
     return punk;
 }
 
 CVCam::CVCam(LPUNKNOWN lpunk, HRESULT *phr) : 
-    CSource(NAME("ucanvcam virtual camera"), lpunk, CLSID_VirtualCam) {
-    yarp_out.init("cam");
-    SAY("CVCam::CVCam");
+  CSource(NAME(QUOTED_CAM_NAME), lpunk, CLSID_VirtualCam) {
     ASSERT(phr);
-    // Create the one and only output pin
-
-    // new[] seems broken?
-    //AddPin(new CVCamStream(phr, this, L"Virtual Cam"));
-
-    #ifndef SKIP_PIN 
     CAutoLock cAutoLock(&m_cStateLock);
+    // Create the one and only output pin
     m_paStreams = (CSourceStream **) new CVCamStream*[1];
-    if (m_paStreams==NULL) {
-        *phr = E_OUTOFMEMORY;
-        return;
-    }
-    m_paStreams[0] = new CVCamStream(phr, this, L"Virtual Cam");
-    if (m_paStreams[0]==NULL) {
-        *phr = E_OUTOFMEMORY;
-        return;
-        }
-    #endif
+    m_paStreams[0] = new CVCamStream(phr, this, LQUOTED_CAM_NAME);
 }
 
-CVCam::~CVCam() {
-    SAY("CVCam::~CVCam");
-    yarp_out.fini();
-}
-
-/*
-HRESULT CVCam::QueryInterface(REFIID riid, void **ppv) {
-    CheckPointer(ppv, E_POINTER);
-    SAY("Query interface CVCam");
+HRESULT CVCam::QueryInterface(REFIID riid, void **ppv)
+{
     //Forward request for IAMStreamConfig & IKsPropertySet to the pin
-    //if(riid == _uuidof(IAMStreamConfig) || riid == _uuidof(IKsPropertySet))
-    if(riid == IID_IAMStreamConfig || riid == IID_IKsPropertySet ||
-       riid == IID_ISpecifyPropertyPages || riid == IID_ISaturation ||
-       riid == IID_IAMVfwCaptureDialogs) {
-#ifdef SKIP_PIN
+    if(riid == _uuidof(IAMStreamConfig) || riid == _uuidof(IKsPropertySet))
+        return m_paStreams[0]->QueryInterface(riid, ppv);
+    else
         return CSource::QueryInterface(riid, ppv);
-#else
-        return m_paStreams[0]->QueryInterface(riid, ppv); //PFHIT
-#endif
-    } else {
-        return CSource::QueryInterface(riid, ppv);
-    }
-}
-*/
-
-void toString(REFIID guid, YarpOut& yarp_out) {
-    char buf[1000];
-    char buf2[1000];
-    sprintf(buf,"%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-            (unsigned int)guid.Data1,
-            guid.Data2,
-            guid.Data3,
-            guid.Data4[0],
-            guid.Data4[1],
-            guid.Data4[2],
-            guid.Data4[3],
-            guid.Data4[4],
-            guid.Data4[5],
-            guid.Data4[6],
-            guid.Data4[7]);
-    sprintf(buf2,"HKEY_CLASSES_ROOT\\Interface\\{%s};name",buf);
-    SAY(buf);
-    //std::string val = buf; //getRegistry(buf2);
-    //    SAY(val.c_str());
 }
 
-/*
-STDMETHODIMP CVCam::NonDelegatingQueryInterface(REFIID riid, void **ppv) {
-    CheckPointer(ppv, E_POINTER);
-    SAY("non-delegating Query interface CVCam!");
-    toString(riid,yarp_out);
-    toString(IID_IAMStreamConfig,yarp_out);
-    //toString(IID_IKsPropertySet,yarp_out);
-    //toString(IID_ISpecifyPropertyPages,yarp_out);
-    //toString(IID_ISaturation,yarp_out);
-    //toString(IID_IAMVfwCaptureDialogs,yarp_out);
+int CVCam::GetPinCount() { return 1; }
 
-    if(riid == IID_IAMStreamConfig) {
-        SAY("IAMStreamConfig");
-    } else if(riid == IID_IKsPropertySet) {
-        SAY("IKsPropertySet");
-    } else if(riid == IID_ISpecifyPropertyPages) {
-        SAY("ISpecifyPropertyPages");
-    } else if(riid == IID_ISaturation) {
-        SAY("ISaturation");
-    } else if(riid == IID_IAMVfwCaptureDialogs) {
-        SAY("vfwcapture");
-    } else {
-        SAY("uncaptured riid");
-    }
-    if(riid == IID_IAMStreamConfig || riid == IID_IKsPropertySet ||
-       riid == IID_ISpecifyPropertyPages || riid == IID_ISaturation) {
-#ifdef SKIP_PIN
-        HRESULT r= CSource::NonDelegatingQueryInterface(riid, ppv);
-#else
-        HRESULT r = m_paStreams[0]->NonDelegatingQueryInterface(riid, ppv);
-#endif
-        SAY("uncaptured riid done (1)");
-        return r;
-    } else {
-        HRESULT r= CSource::NonDelegatingQueryInterface(riid, ppv);
-        SAY("uncaptured riid done (2)");
-        return r;
-    }
+CBasePin *CVCam::GetPin(int n) {
+	CAutoLock cAutoLock(&m_cStateLock);
+	return m_paStreams[0];
 }
-*/
 
 //////////////////////////////////////////////////////////////////////////
 // CVCamStream is the one and only output pin of CVCam which handles 
 // all the stuff.
 //////////////////////////////////////////////////////////////////////////
 CVCamStream::CVCamStream(HRESULT *phr, CVCam *pParent, LPCWSTR pPinName) :
-    CSourceStream(NAME("ucanvcam virtual camera"),phr, pParent, pPinName), m_pParent(pParent) {
-    //ACE::init();
-    yarp_out.init("stream");
-    SAY("Starting up CVCamStream");
-    SAY3("Result",*phr,E_OUTOFMEMORY);
-    CAutoLock cAutoLockShared(&m_cSharedState);
-    bus.init();
-    ct = 0;
-    // Set the default media type as 320x240x24@15
-#ifndef SKIP_PIN
-    GetMediaType(0, &m_mt); //PFHIT
-#endif
-    //GetMediaType(4, &m_mt);
-    printf("  *** %s:%d\n", __FILE__, __LINE__); fflush(stdout);
-    running = true;
-    SAY("Started up CVCamStream");
+    CSourceStream(NAME(QUOTED_CAM_NAME),phr, pParent, pPinName), m_pParent(pParent)
+{
+	bus.init();
     lastId = 0;
     lastChange = -1000;
     haveId = false;
-#ifdef USE_YARP
-    //yarp::os::Network::init();
-#endif
-    //CoInitializeEx(NULL, COINIT_MULTITHREADED);
-
-    // only does something on Microsoft Windows
-    /*
-    TIMECAPS tm;
-    timeGetDevCaps(&tm, sizeof(TIMECAPS));
-    timeBeginPeriod(tm.wPeriodMin);
-    SAY("Configured CVCamStream");
-    */
+	ct = 0;
+    // Set the default media type as 320x240x24@15
+    GetMediaType(4, &m_mt);
 }
 
-CVCamStream::~CVCamStream() {
-    SAY("~CVCamStream");
-    yarp_out.fini();
-    CAutoLock cAutoLockShared(&m_cSharedState);
-    bus.fini();
+CVCamStream::~CVCamStream()
+{
+	bus.fini();
 } 
 
-/*
 HRESULT CVCamStream::QueryInterface(REFIID riid, void **ppv)
 {   
-    SAY("QueryInterface CVCamStream");
-
-    if(riid == IID_IAMStreamConfig) {
-        SAY("IAMStreamConfig");
-    } else if(riid == IID_IKsPropertySet) {
-        SAY("IKsPropertySet");
-    } else if(riid == IID_ISpecifyPropertyPages) {
-        SAY("ISpecifyPropertyPages");
-    } else if(riid == IID_ISaturation) {
-        SAY("ISaturation");
-    } else if(riid == IID_IAMVfwCaptureDialogs) {
-        SAY("vfwcapture");
-    } else {
-        SAY("God knows");
-    }
-
     // Standard OLE stuff
-    if(riid == IID_IAMStreamConfig)
+    if(riid == _uuidof(IAMStreamConfig))
         *ppv = (IAMStreamConfig*)this;
-    else if(riid == IID_IKsPropertySet)
+    else if(riid == _uuidof(IKsPropertySet))
         *ppv = (IKsPropertySet*)this;
-    else if(riid == IID_ISpecifyPropertyPages)
-        *ppv = (ISpecifyPropertyPages*)this;
-    else if(riid == IID_ISaturation)
-        *ppv = (ISaturation*)this;
-    else if(riid == IID_IAMVfwCaptureDialogs) 
-        *ppv = (IAMVfwCaptureDialogs*)this;
     else
         return CSourceStream::QueryInterface(riid, ppv);
 
     AddRef();
     return S_OK;
 }
-*/
-
-
- /*
-STDMETHODIMP CVCamStream::NonDelegatingQueryInterface(REFIID riid, void **ppv) {
-    SAY("non-delegating Query interface CVCamStream");
-
-    if(riid == IID_IAMStreamConfig) {
-        SAY("IAMStreamConfig");
-    } else if(riid == IID_IKsPropertySet) {
-        SAY("IKsPropertySet");
-    } else if(riid == IID_ISpecifyPropertyPages) {
-        SAY("ISpecifyPropertyPages");
-    } else if(riid == IID_ISaturation) {
-        SAY("ISaturation");
-    } else {
-        SAY("God knows");
-    }
-
-    if(riid == IID_IAMStreamConfig)
-        *ppv = (IAMStreamConfig*)this;
-    else if(riid == IID_IKsPropertySet)
-        *ppv = (IKsPropertySet*)this;
-    else if (riid == IID_ISpecifyPropertyPages)
-        *ppv = (ISpecifyPropertyPages*)this;
-    else if (riid == IID_ISaturation)
-        *ppv = (ISaturation*)this;
-    else
-        // Call the parent class.
-        return CSourceStream::NonDelegatingQueryInterface(riid, ppv);
-
-
-    AddRef();
-    return S_OK;
-}
- */
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -306,171 +94,183 @@ STDMETHODIMP CVCamStream::NonDelegatingQueryInterface(REFIID riid, void **ppv) {
 //  Camera device.
 //////////////////////////////////////////////////////////////////////////
 
+#if 1
 HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
-    SAY3("FillBuffer",0,(int)m_lSaturation);
-    //return S_FALSE;
+	CheckPointer(pms,E_POINTER);
+	HRESULT hr;
 
-    CheckPointer(pms,E_POINTER);
-    HRESULT hr;
+	int wt = 0;
+	double now = 0;
+	bool ok = false;
+	char *at = NULL;
+	int at_width = 0;
+	int at_height = 0;
 
-    {
-        CAutoLock cAutoLockShared(&m_cSharedState);
+	while (wt<5 && !ok) {
+		Sleep(5);
+		wt++;
+		bus.beginRead();
+		ShmemImageHeader header;
+		ShmemImage cp(bus);
+		cp.getHeader(header);
+		at = cp.getImage();
+		
+		FILETIME tm;
+		GetSystemTimeAsFileTime(&tm);
+		ULONGLONG ticks = (((ULONGLONG) tm.dwHighDateTime) << 32) + 
+		tm.dwLowDateTime;
+		double now = ((double)ticks)/(1000L*1000L*10L);
+		
+		at_width = header.get(IMGHDR_W);
+		at_height = header.get(IMGHDR_H);
+		int id = header.get(IMGHDR_TICK);
+		if (!haveId) {
+			lastId = id;
+			haveId = true;
+		} else {
+			if (id!=lastId) {
+				lastChange = now;
+				wt = 500;
+				ok = true;
+			}
+		}
+		lastId = id;
 
-        int wt = 0;
-        double now = 0;
-        bool ok = false;
-        char *at = NULL;
+		if (!ok) {
+			bus.endRead();
+		}
+	}
 
-        while (wt<5 && !ok) {
-            //ImageOf<PixelRgb> img;
-            //Time::delay(0.03); 
-            Sleep(5);
-            wt++;
+	if (ok) {
+		ok = (now-lastChange<2);
+	}
+	
+	BYTE *pData = NULL;
+	long lDataLen;
+	if (FAILED(hr=pms->GetPointer(&pData)))  {
+		bus.endRead();
+		return S_FALSE;
+	}
+	
+	lDataLen = pms->GetSize();
 
-            bus.beginRead();
-            ShmemImageHeader header;
-            ShmemImage cp(bus);
-            //ImageOf<PixelRgb> cp;
-            //cp.setQuantum(1);
-            //cp.setExternal(bus.buffer(),320,240);
-            cp.getHeader(header);
-            at = cp.getImage();
-            
-            FILETIME tm;
-            GetSystemTimeAsFileTime(&tm);
-            ULONGLONG ticks = (((ULONGLONG) tm.dwHighDateTime) << 32) + 
-                tm.dwLowDateTime;
-            double now = ((double)ticks)/(1000L*1000L*10L);
-            
-            int id = header.get(IMGHDR_TICK);
-            if (!haveId) {
-                lastId = id;
-                haveId = true;
-            } else {
-                if (id!=lastId) {
-                    lastChange = now;
-                    wt = 500;
-                    ok = true;
-                }
-            }
-            lastId = id;
+	AM_MEDIA_TYPE *nmt = NULL;
+	if (pms->GetMediaType(&nmt)==S_OK) {
+	    m_mt = *nmt;
+	}
 
-            if (!ok) {
-                bus.endRead();
-            }
-        }
+	ASSERT(m_mt.formattype == FORMAT_VideoInfo);
 
-        if (ok) {
-            ok = (now-lastChange<2);
-        }
-        SAY3("time is", (int)now, (int)lastChange);
-        
-        //return NOERROR;
-        
-        BYTE *pData;
-        long lDataLen;
-        if (FAILED(hr=pms->GetPointer(&pData))||!pData)  {
-            //img.copy(cp.getImage(),320,240);
-            bus.endRead();
-            return S_FALSE;
-        }
-        
-        lDataLen = pms->GetSize();
-        
-        ASSERT(m_mt.formattype == FORMAT_VideoInfo);
-        
-        REFERENCE_TIME rtNow;
-        
-        REFERENCE_TIME avgFrameTime = ((VIDEOINFOHEADER*)m_mt.pbFormat)->AvgTimePerFrame;
-        
-        rtNow = m_rtLastTime;
-        m_rtLastTime += avgFrameTime;
-        pms->SetTime(&rtNow, &m_rtLastTime);
-        
-        int ww = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biWidth;
-        int hh = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biHeight;
-        int bb = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biBitCount;
-        
-        //for(int i = 0; i < lDataLen; ++i)
-        //pData[i] = rand();
-        
-        int pp = bb/8;
-        int stride = (ww * pp + 3) & ~3;
-        if (at==NULL || !ok) {
-            // BGR order, apparently
-            ct = (ct+1)%256;
-            for (int y=0; y<hh; y++) {
-                BYTE *base = pData + y*stride;
-                for (int x=0; x<ww; x++) {
-                    base[0] = (y+ct)%256;
-                    base[1] = ct;
-                    base[2] = (x+ct)%256;
-                    base += pp;
-                }
-            }
-        } else {
-            for (int y=hh-1; y>=0; y--) {
-                BYTE *base = pData + y*stride;
-                for (int x=0; x<ww; x++) {
-                    base[2] = *at; at++;
-                    base[1] = *at; at++;
-                    base[0] = *at; at++;
-                    base += pp;
-                }
-            }
-        }
-        bus.endRead();
-    }
-            
+	REFERENCE_TIME rtNow;
+	REFERENCE_TIME avgFrameTime = ((VIDEOINFOHEADER*)m_mt.pbFormat)->AvgTimePerFrame;
+	rtNow = m_rtLastTime;
+	m_rtLastTime += avgFrameTime;
+	pms->SetTime(&rtNow, &m_rtLastTime);
+	
+	int ww = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biWidth;
+	int hh = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biHeight;
+	int bb = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biBitCount;
+	
+	YarpOut out; out.init("ziggy",true); out.say("FillBuffer #1", ww, hh);
+	out.say("FillBuffer #2", at_width, at_height);
+	out.say("FillBuffer #3", (int)at, lastId);
+
+	if (ww!=at_width || hh!=at_height) {
+		ok = false;
+	}
+
+	int pp = bb/8;
+	int stride = (ww * pp + 3) & ~3;
+	if (at==NULL || !ok) {
+		// BGR order, apparently
+		ct = (ct+1)%256;
+		for (int y=0; y<hh; y++) {
+			BYTE *base = pData + y*stride;
+			for (int x=0; x<ww; x++) {
+				base[0] = (y+ct)%256;
+				base[1] = ct;
+				base[2] = (x+ct)%256;
+				base += pp;
+			}
+		}
+	} else {
+		for (int y=hh-1; y>=0; y--) {
+			BYTE *base = pData + y*stride;
+			for (int x=0; x<ww; x++) {
+				base[2] = *at; at++;
+				base[1] = *at; at++;
+				base[0] = *at; at++;
+				base += pp;
+			}
+		}
+	}
+	bus.endRead();
+	
+	pms->SetSyncPoint(TRUE);
+
+	return NOERROR;
+} // FillBuffer
+
+#else
+
+HRESULT CVCamStream::FillBuffer(IMediaSample *pms)
+{
+    CheckPointer(pms,E_POINTER); 
+    CAutoLock cAutoLock(m_pFilter->pStateLock());
+
+    BYTE *pData;
+    long lDataLen;
+    pms->GetPointer(&pData);
+    lDataLen = pms->GetSize();
+    for(int i = 0; i < lDataLen; ++i)
+        pData[i] = rand();
+
+    REFERENCE_TIME rtNow;
+    
+    REFERENCE_TIME avgFrameTime = ((VIDEOINFOHEADER*)m_mt.pbFormat)->AvgTimePerFrame;
+
+    rtNow = m_rtLastTime;
+    m_rtLastTime += avgFrameTime;
+    pms->SetTime(&rtNow, &m_rtLastTime);
     pms->SetSyncPoint(TRUE);
 
     return NOERROR;
 } // FillBuffer
-
+#endif
 
 //
 // Notify
 // Ignore quality management messages sent from the downstream filter
 STDMETHODIMP CVCamStream::Notify(IBaseFilter * pSender, Quality q)
 {
-    SAY("Notify");
-    CheckPointer(pSender,E_POINTER);
     return E_NOTIMPL;
 } // Notify
 
 //////////////////////////////////////////////////////////////////////////
 // This is called when the output format has been negotiated
 //////////////////////////////////////////////////////////////////////////
-HRESULT CVCamStream::SetMediaType(const CMediaType *pmt) {
-    SAY("SetMediaType");
-
-    CheckPointer(pmt,E_POINTER);
+HRESULT CVCamStream::SetMediaType(const CMediaType *pmt)
+{
+    CheckPointer(pmt,E_POINTER); 
     CAutoLock cAutoLock(m_pFilter->pStateLock());
-
     DECLARE_PTR(VIDEOINFOHEADER, pvi, pmt->Format());
     HRESULT hr = CSourceStream::SetMediaType(pmt);
     return hr;
 }
 
-
 // See Directshow help topic for IAMStreamConfig for details on this method
-HRESULT CVCamStream::GetMediaType(int iPosition, CMediaType *pmt) {
-    SAY3("GetMediaType",iPosition,0);
-    CheckPointer(pmt,E_POINTER);
+HRESULT CVCamStream::GetMediaType(int iPosition, CMediaType *pmt)
+{
+    CheckPointer(pmt,E_POINTER); 
     CAutoLock cAutoLock(m_pFilter->pStateLock());
-
     if(iPosition < 0) return E_INVALIDARG;
-    if(iPosition > 0) return VFW_S_NO_MORE_ITEMS;
+    if(iPosition > 8) return VFW_S_NO_MORE_ITEMS;
 
-    /*
     if(iPosition == 0) 
-        {
-            *pmt = m_mt;
-            return S_OK;
-        }
-    */
-
-    iPosition = 4;
+    {
+        *pmt = m_mt;
+        return S_OK;
+    }
 
     DECLARE_PTR(VIDEOINFOHEADER, pvi, pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER)));
     ZeroMemory(pvi, sizeof(VIDEOINFOHEADER));
@@ -484,10 +284,7 @@ HRESULT CVCamStream::GetMediaType(int iPosition, CMediaType *pmt) {
     pvi->bmiHeader.biSizeImage  = GetBitmapSize(&pvi->bmiHeader);
     pvi->bmiHeader.biClrImportant = 0;
 
-    SAY3("media size", pvi->bmiHeader.biWidth, pvi->bmiHeader.biHeight);
-    SAY3("media full", pvi->bmiHeader.biSizeImage, 0);
-
-    pvi->AvgTimePerFrame = 1000*1000;
+    pvi->AvgTimePerFrame = 1000000;
 
     SetRectEmpty(&(pvi->rcSource)); // we want the whole image area rendered.
     SetRectEmpty(&(pvi->rcTarget)); // no particular destination rectangle
@@ -506,34 +303,19 @@ HRESULT CVCamStream::GetMediaType(int iPosition, CMediaType *pmt) {
 } // GetMediaType
 
 // This method is called to see if a given output format is supported
-HRESULT CVCamStream::CheckMediaType(const CMediaType *pMediaType) {
-    SAY("CheckMediaType");
-    CheckPointer(pMediaType,E_POINTER);
+HRESULT CVCamStream::CheckMediaType(const CMediaType *pMediaType)
+{
+    CheckPointer(pMediaType,E_POINTER); 
     CAutoLock cAutoLock(m_pFilter->pStateLock());
-
     VIDEOINFOHEADER *pvi = (VIDEOINFOHEADER *)(pMediaType->Format());
-    SAY3("Size",pvi->bmiHeader.biWidth,pvi->bmiHeader.biHeight);
-    if(
-       pvi->bmiHeader.biWidth != 320 ||
-       pvi->bmiHeader.biHeight != 240
-       ) {
-        SAY("CheckMediaType size fail");
+    if(*pMediaType != m_mt) 
         return E_INVALIDARG;
-    }
-    //if(*pMediaType != m_mt) {
-    //SAY("CheckMediaType reject");
-    //return E_INVALIDARG;
-    //}
-    SAY("CheckMediaType accept");
     return S_OK;
 } // CheckMediaType
 
 // This method is called after the pins are connected to allocate buffers to stream data
-HRESULT CVCamStream::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERTIES *pProperties) {
-    SAY("DecideBufferSize");
-    CheckPointer(pAlloc,E_POINTER);
-    CheckPointer(pProperties,E_POINTER);
-
+HRESULT CVCamStream::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERTIES *pProperties)
+{
     CAutoLock cAutoLock(m_pFilter->pStateLock());
     HRESULT hr = NOERROR;
 
@@ -551,72 +333,59 @@ HRESULT CVCamStream::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERTIE
 } // DecideBufferSize
 
 // Called when graph is run
-HRESULT CVCamStream::OnThreadCreate() {
-    //SAY("OnThreadCreate");
-    CAutoLock cAutoLockShared(&m_cSharedState);
+HRESULT CVCamStream::OnThreadCreate()
+{
     m_rtLastTime = 0;
     return NOERROR;
 } // OnThreadCreate
-
-HRESULT CVCamStream::OnThreadDestroy()
-{
-    //SAY("OnThreadDestroy");
-    CAutoLock cAutoLockShared(&m_cSharedState);
-    //running = false;
-    //SAY("OnThreadDestroy-ed");
-    m_rtLastTime = 0;
-    return NOERROR;
-} // OnThreadDestroy
 
 
 //////////////////////////////////////////////////////////////////////////
 //  IAMStreamConfig
 //////////////////////////////////////////////////////////////////////////
 
-HRESULT STDMETHODCALLTYPE CVCamStream::SetFormat(AM_MEDIA_TYPE *pmt) {
-    SAY("SetFormat");
-    CheckPointer(pmt,E_POINTER);
+HRESULT STDMETHODCALLTYPE CVCamStream::SetFormat(AM_MEDIA_TYPE *pmt)
+{
+    if(!pmt) return E_POINTER;
+    CAutoLock cAutoLock(m_pFilter->pStateLock());
     DECLARE_PTR(VIDEOINFOHEADER, pvi, m_mt.pbFormat);
     m_mt = *pmt;
     IPin* pin; 
     ConnectedTo(&pin);
     if(pin)
-        {
-            IFilterGraph *pGraph = m_pParent->GetGraph();
-            pGraph->Reconnect(this);
-        }
+    {
+        IFilterGraph *pGraph = m_pParent->GetGraph();
+        pGraph->Reconnect(this);
+    }
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE CVCamStream::GetFormat(AM_MEDIA_TYPE **ppmt) {
-    SAY("GetFormat");
-    CheckPointer(ppmt,E_POINTER);
+HRESULT STDMETHODCALLTYPE CVCamStream::GetFormat(AM_MEDIA_TYPE **ppmt)
+{
+    CheckPointer(ppmt,E_POINTER); 
     CAutoLock cAutoLock(m_pFilter->pStateLock());
     *ppmt = CreateMediaType(&m_mt);
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE CVCamStream::GetNumberOfCapabilities(int *piCount, int *piSize) {
-    SAY("GetNumberOfCapabilities");
-    CheckPointer(piCount,E_POINTER);
-    CheckPointer(piSize,E_POINTER);
-    CAutoLock cAutoLock(m_pFilter->pStateLock());
-    *piCount = 1;
+HRESULT STDMETHODCALLTYPE CVCamStream::GetNumberOfCapabilities(int *piCount, int *piSize)
+{
+    CheckPointer(piCount,E_POINTER); 
+    CheckPointer(piSize,E_POINTER); 
+    *piCount = 8;
     *piSize = sizeof(VIDEO_STREAM_CONFIG_CAPS);
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE CVCamStream::GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC) {
-    SAY3("GetStreamCaps", iIndex, 0);
-    CheckPointer(pmt,E_POINTER);
-    CheckPointer(pSCC,E_POINTER);
-
+HRESULT STDMETHODCALLTYPE CVCamStream::GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC)
+{
+    CheckPointer(pmt,E_POINTER); 
+    CheckPointer(pSCC,E_POINTER); 
     CAutoLock cAutoLock(m_pFilter->pStateLock());
     *pmt = CreateMediaType(&m_mt);
     DECLARE_PTR(VIDEOINFOHEADER, pvi, (*pmt)->pbFormat);
 
-    //if (iIndex == 0) iIndex = 4;
-    iIndex = 4;
+    if (iIndex == 0) iIndex = 4;
 
     pvi->bmiHeader.biCompression = BI_RGB;
     pvi->bmiHeader.biBitCount    = 24;
@@ -642,21 +411,21 @@ HRESULT STDMETHODCALLTYPE CVCamStream::GetStreamCaps(int iIndex, AM_MEDIA_TYPE *
     
     pvscc->guid = FORMAT_VideoInfo;
     pvscc->VideoStandard = AnalogVideo_None;
-    pvscc->InputSize.cx = 320;
-    pvscc->InputSize.cy = 240;
-    pvscc->MinCroppingSize.cx = 320;
-    pvscc->MinCroppingSize.cy = 240;
-    pvscc->MaxCroppingSize.cx = 320;
-    pvscc->MaxCroppingSize.cy = 240;
+    pvscc->InputSize.cx = 640;
+    pvscc->InputSize.cy = 480;
+    pvscc->MinCroppingSize.cx = 80;
+    pvscc->MinCroppingSize.cy = 60;
+    pvscc->MaxCroppingSize.cx = 640;
+    pvscc->MaxCroppingSize.cy = 480;
     pvscc->CropGranularityX = 80;
     pvscc->CropGranularityY = 60;
     pvscc->CropAlignX = 0;
     pvscc->CropAlignY = 0;
 
-    pvscc->MinOutputSize.cx = 320;
-    pvscc->MinOutputSize.cy = 240;
-    pvscc->MaxOutputSize.cx = 320;
-    pvscc->MaxOutputSize.cy = 240;
+    pvscc->MinOutputSize.cx = 80;
+    pvscc->MinOutputSize.cy = 60;
+    pvscc->MaxOutputSize.cx = 640;
+    pvscc->MaxOutputSize.cy = 480;
     pvscc->OutputGranularityX = 0;
     pvscc->OutputGranularityY = 0;
     pvscc->StretchTapsX = 0;
@@ -677,22 +446,22 @@ HRESULT STDMETHODCALLTYPE CVCamStream::GetStreamCaps(int iIndex, AM_MEDIA_TYPE *
 
 
 HRESULT CVCamStream::Set(REFGUID guidPropSet, DWORD dwID, void *pInstanceData, 
-                         DWORD cbInstanceData, void *pPropData, DWORD cbPropData) {
-    SAY("Set");
+                        DWORD cbInstanceData, void *pPropData, DWORD cbPropData)
+{// Set: Cannot set any properties.
     return E_NOTIMPL;
 }
 
 // Get: Return the pin category (our only property). 
 HRESULT CVCamStream::Get(
-                         REFGUID guidPropSet,   // Which property set.
-                         DWORD dwPropID,        // Which property in that set.
-                         void *pInstanceData,   // Instance data (ignore).
-                         DWORD cbInstanceData,  // Size of the instance data (ignore).
-                         void *pPropData,       // Buffer to receive the property data.
-                         DWORD cbPropData,      // Size of the buffer.
-                         DWORD *pcbReturned     // Return the size of the property.
-                         ) {
-    SAY("Get");
+    REFGUID guidPropSet,   // Which property set.
+    DWORD dwPropID,        // Which property in that set.
+    void *pInstanceData,   // Instance data (ignore).
+    DWORD cbInstanceData,  // Size of the instance data (ignore).
+    void *pPropData,       // Buffer to receive the property data.
+    DWORD cbPropData,      // Size of the buffer.
+    DWORD *pcbReturned     // Return the size of the property.
+)
+{
     if (guidPropSet != AMPROPSETID_Pin)             return E_PROP_SET_UNSUPPORTED;
     if (dwPropID != AMPROPERTY_PIN_CATEGORY)        return E_PROP_ID_UNSUPPORTED;
     if (pPropData == NULL && pcbReturned == NULL)   return E_POINTER;
@@ -706,183 +475,11 @@ HRESULT CVCamStream::Get(
 }
 
 // QuerySupported: Query whether the pin supports the specified property.
-HRESULT CVCamStream::QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWORD *pTypeSupport) {
-    SAY("QuerySupported");
+HRESULT CVCamStream::QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWORD *pTypeSupport)
+{
     if (guidPropSet != AMPROPSETID_Pin) return E_PROP_SET_UNSUPPORTED;
     if (dwPropID != AMPROPERTY_PIN_CATEGORY) return E_PROP_ID_UNSUPPORTED;
     // We support getting this property, but not setting it.
     if (pTypeSupport) *pTypeSupport = KSPROPERTY_SUPPORT_GET; 
     return S_OK;
 }
-
-
-HRESULT STDMETHODCALLTYPE CVCamStream::HasDialog(/* [in] */ int iDialog) {
-    SAY("HasDialog");
-    if (iDialog==VfwCaptureDialog_Display) {
-        return S_OK;
-    }
-    return S_FALSE;
-}
-        
-HRESULT STDMETHODCALLTYPE CVCamStream::ShowDialog(/* [in] */ int iDialog,
-                                                  /* [in] */ HWND hwnd) {
-
-    SAY("ShowDialog");
-    /*
-      HWND hdlg;
-
-      hdlg = CreateDialogParam(g_hInst,
-      MAKEINTRESOURCE(IDS_PROPPAGE),
-      hWnd, //GetDesktopWindow(),
-      pDlgProc,
-      lParam);
-    */  
-
-    CGrayProp propPage((ISaturation*)this);
-    PROPPAGEINFO pageInfo;
-    propPage.GetPageInfo(&pageInfo);
-    RECT rect;
-    rect.left = 10;
-    rect.top = 10;
-    rect.right = rect.left+320;
-    rect.bottom = rect.top+240;
-    propPage.Activate(hwnd,&rect,false);
-
-    return S_OK;
-}
-  
-HRESULT STDMETHODCALLTYPE CVCamStream::SendDriverMessage(/* [in] */int iDialog,
-                                                         /* [in] */ int uMsg,
-                                                         /* [in] */ long dw1,
-                                                         /* [in] */ long dw2) {
-    SAY("SendDriverMessage");
-    return S_OK;
-    //E_INVALIDARG;
-}
-
-
-
-
-
-
-
-
-
-
-
-HRESULT CGrayProp::OnConnect(IUnknown *pUnk) {
-    SAY("OnConnect");
-    if (pUnk == NULL)
-        {
-            return E_POINTER;
-        }
-    ASSERT(m_pGray == NULL);
-    return pUnk->QueryInterface(IID_ISaturation, 
-                                reinterpret_cast<void**>(&m_pGray));
-}
-
-
-HRESULT CGrayProp::OnActivate(void) {
-    SAY("OnActivate");
-    INITCOMMONCONTROLSEX icc;
-    icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
-    icc.dwICC = ICC_BAR_CLASSES;
-    if (InitCommonControlsEx(&icc) == FALSE)
-        {
-            return E_FAIL;
-        }
-
-    ASSERT(m_pGray != NULL);
-    HRESULT hr = m_pGray->GetSaturation(&m_lVal);
-    if (SUCCEEDED(hr))
-        {
-            SendDlgItemMessage(m_Dlg, IDC_SLIDER1, TBM_SETRANGE, 0,
-                               MAKELONG(0, 100));
-
-            SendDlgItemMessage(m_Dlg, IDC_SLIDER1, TBM_SETTICFREQ, 
-                               (100 - 0) / 10, 0);
-
-            SendDlgItemMessage(m_Dlg, IDC_SLIDER1, TBM_SETPOS, 1, m_lVal);
-
-
-            SendDlgItemMessage(m_Dlg, IDC_EFFECTS, CB_ADDSTRING, 
-                               0,(LPARAM)"hello");
-            SendDlgItemMessage(m_Dlg, IDC_EFFECTS, CB_ADDSTRING, 
-                               0,(LPARAM)"there");
-
-        }
-    return hr;
-}
-
-
-BOOL CGrayProp::OnReceiveMessage(HWND hwnd,
-                                 UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    SAY("OnReceiveMessage");
-    switch (uMsg)
-        {
-        case WM_COMMAND:
-            if (LOWORD(wParam) == IDC_DEFAULT)
-                {
-                    // User clicked the 'Revert to Default' button.
-                    m_lNewVal = 50;
-                    m_pGray->SetSaturation(m_lNewVal);
-
-                    // Update the slider control.
-                    SendDlgItemMessage(m_Dlg, IDC_SLIDER1, TBM_SETPOS, 1,
-                                       m_lNewVal);
-                    SetDirty();
-                    return (LRESULT) 1;
-                }
-            break;
-
-        case WM_HSCROLL:
-            {
-                // User moved the slider.
-                switch(LOWORD(wParam))
-                    {
-                    case TB_PAGEDOWN:
-                    case SB_THUMBTRACK:
-                    case TB_PAGEUP:
-                        m_lNewVal = SendDlgItemMessage(m_Dlg, IDC_SLIDER1,
-                                                       TBM_GETPOS, 0, 0);
-                        m_pGray->SetSaturation(m_lNewVal);
-                        SetDirty();
-                    }
-                return (LRESULT) 1;
-            }
-        } // Switch.
-    
-    // Let the parent class handle the message.
-    return CBasePropertyPage::OnReceiveMessage(hwnd,uMsg,wParam,lParam);
-} 
-
-
-HRESULT CGrayProp::OnDisconnect(void) {
-    SAY("OnDisconnect");
-    if (m_pGray)
-        {
-            // If the user clicked OK, m_lVal holds the new value.
-            // Otherwise, if the user clicked Cancel, m_lVal is the old value.
-            m_pGray->SetSaturation(m_lVal);  
-            m_pGray->Release();
-            m_pGray = NULL;
-        }
-    return S_OK;
-}
-
-
-CUnknown * WINAPI CGrayProp::CreateInstance(LPUNKNOWN pUnk, HRESULT *pHr) {
-    YarpOut yarp_out;
-    yarp_out.init("gray_static");
-    SAY("CreateInstance");
-    yarp_out.fini();
-    printf(">>>>>>>>> making a property object\n"); fflush(stdout);
-    CGrayProp *pNewObject = new CGrayProp(pUnk);
-    if (pNewObject == NULL) 
-        {
-            *pHr = E_OUTOFMEMORY;
-        }
-    return pNewObject;
-} 
-
-

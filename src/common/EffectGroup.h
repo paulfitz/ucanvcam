@@ -29,7 +29,7 @@ public:
   Effect *search(const char *str);
 
   virtual ~EffectGroup() {
-    for (int i=0; i<effects.size(); i++) {
+    for (int i=0; i<(int)effects.size(); i++) {
       if (effects[i]!=NULL) {
 	delete effects[i];
 	effects[i] = NULL;
@@ -49,7 +49,7 @@ public:
    */
   yarp::os::Bottle getList() {
     yarp::os::Bottle bot;
-    for (int i=0; i<effects.size(); i++) {
+    for (int i=0; i<(int)effects.size(); i++) {
       bot.addString(effects[i]->getName().c_str());
     }
     return bot;

@@ -4,7 +4,15 @@
 #include <yarp/os/Property.h>
 #include <yarp/sig/Image.h>
 
+#ifdef HAVE_GD
 #include <gd.h>
+#else
+typedef void *gdImagePtr;
+#endif
+
+#if _MSC_VER
+#define snprintf _snprintf
+#endif
 
 #include <vector>
 #include <string>
@@ -27,8 +35,12 @@ public:
   void clear();
   
   yarp::sig::PixelBgra pixel(int x, int y) {
+#if HAVE_GD
     int v = gdImageGetPixel(im,x,y);
     return *((yarp::sig::PixelBgra *)(&v));
+#else
+	return yarp::sig::PixelBgra();
+#endif
   }
 
   bool isValid() {
@@ -36,12 +48,16 @@ public:
   }
 
   int width() {
+#ifdef HAVE_GD
     if (im!=NULL) return im->sx;
+#endif
     return 0;
   }
 
   int height() {
+#ifdef HAVE_GD
     if (im!=NULL) return im->sy;
+#endif
     return 0;
   }
 
@@ -79,7 +95,7 @@ public:
     at = -1;
     ext = -1;
     pattern = "";
-    for (int i=0; i<store.size(); i++) {
+    for (int i=0; i<(int)store.size(); i++) {
       if (store[i]!=NULL) {
 	delete store[i];
 	store[i] = NULL;

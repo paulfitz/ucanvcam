@@ -45,7 +45,7 @@ static void ucanvcam_init() {
   static bool first = true;
   if (first) {
     //ye = effects.search("NervousTV");
-    ye = EffectGroup::get().search("TickerTV");
+    ye = EffectGroup::get().search("TestTV");
     //ye = EffectGroup::get().search("EngageTV");
     //ye = EffectGroup::get().search("BrokenTV");
   }
@@ -104,6 +104,7 @@ static bool ucanvcam_apply(ImageOf<PixelRgb>& in, ImageOf<PixelRgb>& out) {
       out.copy(*img);
     }
   }
+  return true;
 }
 
 static bool ucanvcam_apply(ImageOf<PixelBgr>& in, ImageOf<PixelBgr>& out) {
@@ -115,6 +116,7 @@ static bool ucanvcam_apply(ImageOf<PixelBgr>& in, ImageOf<PixelBgr>& out) {
       out.copy(*img);
     }
   }
+  return true;
 }
 
 static bool ucanvcam_apply(ImageOf<PixelBgra>& in, ImageOf<PixelBgra>& out) {
@@ -125,6 +127,7 @@ static bool ucanvcam_apply(ImageOf<PixelBgra>& in, ImageOf<PixelBgra>& out) {
       out.copy(*img);
     }
   }
+  return true;
 }
 
 static bool ucanvcam_apply(ImageOf<PixelRgb>& in, ImageOf<PixelBgr>& out) {
@@ -136,6 +139,7 @@ static bool ucanvcam_apply(ImageOf<PixelRgb>& in, ImageOf<PixelBgr>& out) {
       out.copy(*img);
     }
   }
+  return true;
 }
 
 static bool ucanvcam_stop() {

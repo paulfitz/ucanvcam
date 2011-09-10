@@ -1,3 +1,4 @@
+#include "screen.h"
 #include "ImageLoader.h"
 
 #include <string.h>
@@ -65,6 +66,7 @@ const char * isjpg(const char * name, int & result) {
 
 
 static gdImagePtr loadImage(const char *iname) {
+#ifdef HAVE_GD
   printf("Load image: looking at %s\n", iname);
   string local = iname;
   char *fname = (char*)local.c_str();
@@ -108,9 +110,12 @@ static gdImagePtr loadImage(const char *iname) {
   }
   fclose(fd);
   if (img!=NULL) return img;
-
   fprintf(stderr,"failed to load %s\n", fname);
   exit(1);
+#else
+  fprintf(stderr,"Need GD\n");
+  return NULL;
+#endif
 }
 
 
@@ -132,10 +137,12 @@ ImageLoader::~ImageLoader() {
 
 
 void ImageLoader::clear() {
+#if HAVE_GD
   if (im!=NULL) {
     gdImageDestroy(im);
     im = NULL;
   }
+#endif
 }
 
 

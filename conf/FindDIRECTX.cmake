@@ -3,6 +3,10 @@ if (NOT DIRECTX_FOUND)
 
 # fix this for your own path to directx
 FIND_PATH(DIRECTX_BASECLASSES_DIR NAMES amfilter.h PATHS
+				"[HKEY_CURRENT_USER\\Software\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]\\Samples\\multimedia\\directshow\\baseclasses"
+				"[HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]\\Samples\\multimedia\\directshow\\baseclasses"
+				"[HKEY_CURRENT_USER\\Software\\Microsoft\\Microsoft SDKs\\Windows\\v7.1;InstallationFolder]\\Samples\\multimedia\\directshow\\baseclasses"
+				"[HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Microsoft SDKs\\Windows\\v7.1;InstallationFolder]\\Samples\\multimedia\\directshow\\baseclasses"
 	  			$ENV{HOME}/directx 
 				$ENV{HOME}/directx/BaseClasses
 				/directx 
@@ -11,6 +15,8 @@ FIND_PATH(DIRECTX_BASECLASSES_DIR NAMES amfilter.h PATHS
 				c:/directx/BaseClasses)
 
 FIND_PATH(DIRECTX_INCLUDE_DIR NAMES dsound.h PATHS
+				"[HKEY_CURRENT_USER\\Software\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]\\Include"
+				"[HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]\\Include"
 				$ENV{HOME}/directx 
 				$ENV{HOME}/directx/Include 
 				/directx 

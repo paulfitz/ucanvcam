@@ -43,7 +43,7 @@ void EdgeMan::Decorate(YARPImageOf<YarpPixelRGB>& src,
   static int px = xxRing;
   static int py = yyRing;
   static int pct = 0;
-  if (fabs(xxRing-px)>1 || fabs(yyRing-py)>1) {
+  if (fabs((double)(xxRing-px))>1 || fabs((double)(yyRing-py))>1) {
     if (pct>2 && pct<20) {
       pct = 20;
     }
