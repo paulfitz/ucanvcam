@@ -175,6 +175,11 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
 	out.say("FillBuffer #2", at_width, at_height);
 	out.say("FillBuffer #3", (int)at, lastId);
 
+	// compatibility with current ucanvcam binaries
+	if (at_width==0&&at_height==0) {
+		at_width = 320;  at_height = 240;
+	}
+
 	if (ww!=at_width || hh!=at_height) {
 		ok = false;
 	}
