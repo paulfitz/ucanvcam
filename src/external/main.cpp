@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <windows.h>
 
+#include <string>
+
 #include "ShmemBus.h"
 
 ///////////////////////////////////////////////////////////////////////
@@ -8,13 +10,13 @@
 // Basic test of shared memory bus - read/write strings
 //
 
-void write_test_string(const char *msg) {
+int write_test_string(const char *msg) {
   ShmemBus bus;
   bus.init();
   bus.beginWrite();
   char *base = (char *)bus.buffer();
   int len = bus.size();
-  if (strlen(msg)>=len) {
+  if ((int)strlen(msg)>=len) {
     printf("Message too long\n");
   } else {
     sprintf(base,"%s",msg);
@@ -22,9 +24,10 @@ void write_test_string(const char *msg) {
   }
   bus.endWrite();
   bus.fini();
+  return 0;
 }
 
-void read_test_string() {
+int read_test_string() {
   ShmemBus bus;
   bus.init();
   for (int i=0; i<100; i++) {
@@ -35,16 +38,12 @@ void read_test_string() {
     Sleep(1000);
   }
   bus.fini();
+  return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////
 //
 // Here's the code needed to write an image. 
-// Not tested though!  (you can't even call it in this test program).
-// The code uses C-style casting that would be tricky in other
-// languages.  No problem, just make sure the same bytes get written
-// in the order given here.
-//
 
 // Use packing to make sure no gaps are inserted in structure 
 // during optimization
@@ -62,7 +61,8 @@ public:
 };
 #pragma pack(pop)
 
-void write_test_image() {
+// send 10 test images of dimension w * h
+int write_test_image(int w, int h) {
   int tck = 0;
   ShmemBus bus;
   bus.init();
@@ -72,16 +72,16 @@ void write_test_image() {
 	  ShmemImageHeader *header = (ShmemImageHeader *)base;
 	  header->tick = tck;
 	  tck++;
-	  header->w = 320;
-	  header->h = 240;
+	  header->w = w;
+	  header->h = h;
 	  for (int i=0; i<17; i++) {
 		header->blank[i] = 0;
 	  }
 	  PixelRgb *image = (PixelRgb *)(base+sizeof(ShmemImageHeader));
-	  for (int h=0; h<240; h++) {
-	    for (int w=0; w<320; w++) {
-		  image->r = (w/32)*25;
-		  image->g = (h/24)*25;
+	  for (int y=0; y<h; y++) {
+	    for (int x=0; x<w; x++) {
+		  image->r = (x/(w/10))*25;
+		  image->g = (y/(h/10))*25;
 		  image->b = k*25;
 		  image++;
 		}
@@ -97,15 +97,25 @@ void write_test_image() {
   }
 
   bus.fini();
+  return 0;
 }
 
 int main(int argc, char *argv[]) {
-  if (argc<2) {
-    read_test_string();
-  } else if (argc==2) {
-    write_test_string(argv[1]);
-  } else {
-    write_test_image();
+  if (argc>=2) {
+	std::string cmd = argv[1];
+	if (cmd=="read") {
+		return read_test_string();
+	}
+	if (cmd=="write"&&argc==3) {
+	    return write_test_string(argv[2]);
+	}
+	if (cmd=="image"&&argc==4) {
+	    return write_test_image(atoi(argv[2]),atoi(argv[3]));
+	}
   }
-  return 0;
+  printf("Call as:\n");
+  printf("testbus.exe read\n");
+  printf("testbus.exe write \"string to write\"\n");
+  printf("testbus.exe image 320 240\n");
+  return 1;
 }
