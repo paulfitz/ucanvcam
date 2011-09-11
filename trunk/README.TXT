@@ -56,7 +56,7 @@ You should now have a functioning virtual camera, sitting and waiting
 for input.  Try it out in e.g. amcap.exe.  There should also be a 
 program called "test_bus.exe" to do a basic test of the camera.
 Run:
-  test_bus.exe send grid image 
+  test_bus.exe image 320 240
 and you should see a change in the image shown by the virtual camera
 for a second or two.
 
