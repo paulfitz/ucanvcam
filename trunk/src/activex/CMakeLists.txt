@@ -41,7 +41,7 @@ FIND_PACKAGE(DIRECTX REQUIRED)
 INCLUDE_DIRECTORIES(${DIRECTX_BASECLASSES_DIR} ${DIRECTX_INCLUDE_DIR})
 FILE(GLOB_RECURSE directx_source ${DIRECTX_BASECLASSES_DIR}/*.cpp)
 
-#ADD_LIBRARY(ucanvcamx SHARED Filters.cpp Dll.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source} ${CMAKE_CURRENT_SOURCE_DIR}/../common/registry.cpp)
+#ADD_LIBRARY(ucanvcamx SHARED Filters.cpp Dll.cpp Filters.h ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source} ${CMAKE_CURRENT_SOURCE_DIR}/../common/registry.cpp)
 
 ADD_LIBRARY(ucanvcamx_directx STATIC ${directx_source})
 
