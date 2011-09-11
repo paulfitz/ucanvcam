@@ -58,7 +58,7 @@ CBasePin *CVCam::GetPin(int n) {
 // all the stuff.
 //////////////////////////////////////////////////////////////////////////
 CVCamStream::CVCamStream(HRESULT *phr, CVCam *pParent, LPCWSTR pPinName) :
-    CSourceStream(NAME(QUOTED_CAM_NAME),phr, pParent, pPinName), m_pParent(pParent)
+    CSourceStream(NAME(QUOTED_CAM_NAME),phr, pParent, pPinName), m_pParent(pParent), m_iDefaultRepeatTime(50)
 {
 	bus.init();
     lastId = 0;
@@ -96,8 +96,12 @@ HRESULT CVCamStream::QueryInterface(REFIID riid, void **ppv)
 
 #if 1
 HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
+
 	CheckPointer(pms,E_POINTER);
 	HRESULT hr;
+
+	{
+		CAutoLock cAutoLockShared(&m_cSharedState);
 
 	int wt = 0;
 	double now = 0;
@@ -106,8 +110,7 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
 	int at_width = 0;
 	int at_height = 0;
 
-	while (wt<5 && !ok) {
-		Sleep(5);
+	while (wt<10 && !ok) {
 		wt++;
 		bus.beginRead();
 		ShmemImageHeader header;
@@ -117,9 +120,14 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
 		
 		FILETIME tm;
 		GetSystemTimeAsFileTime(&tm);
+
 		ULONGLONG ticks = (((ULONGLONG) tm.dwHighDateTime) << 32) + 
-		tm.dwLowDateTime;
-		double now = ((double)ticks)/(1000L*1000L*10L);
+			tm.dwLowDateTime;
+		now = ((double)ticks)/(1000.0*1000.0*10.0);
+		if (firstTime<0) {
+			firstTime = now;
+		}
+		now -= firstTime;
 		
 		at_width = header.get(IMGHDR_W);
 		at_height = header.get(IMGHDR_H);
@@ -138,6 +146,7 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
 
 		if (!ok) {
 			bus.endRead();
+			Sleep(5);
 		}
 	}
 
@@ -161,11 +170,13 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
 
 	ASSERT(m_mt.formattype == FORMAT_VideoInfo);
 
+	/*
 	REFERENCE_TIME rtNow;
 	REFERENCE_TIME avgFrameTime = ((VIDEOINFOHEADER*)m_mt.pbFormat)->AvgTimePerFrame;
 	rtNow = m_rtLastTime;
 	m_rtLastTime += avgFrameTime;
 	pms->SetTime(&rtNow, &m_rtLastTime);
+	*/
 	
 	int ww = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biWidth;
 	int hh = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biHeight;
@@ -174,43 +185,60 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
 	YarpOut out; out.init("ziggy",true); out.say("FillBuffer #1", ww, hh);
 	out.say("FillBuffer #2", at_width, at_height);
 	out.say("FillBuffer #3", (int)at, lastId);
+	out.say("FillBuffer #4", (int)now, (int)(now*10));
 
 	// compatibility with current ucanvcam binaries
 	if (at_width==0&&at_height==0) {
 		at_width = 320;  at_height = 240;
 	}
 
-	if (ww!=at_width || hh!=at_height) {
-		ok = false;
-	}
+	//if (ww!=at_width || hh!=at_height) {
+		//ok = false;
+	//}
 
 	int pp = bb/8;
 	int stride = (ww * pp + 3) & ~3;
+	int gap = (at_width-ww)*3;
+	if (gap<0) gap = 0;
 	if (at==NULL || !ok) {
 		// BGR order, apparently
 		ct = (ct+1)%256;
 		for (int y=0; y<hh; y++) {
 			BYTE *base = pData + y*stride;
 			for (int x=0; x<ww; x++) {
-				base[0] = (y+ct)%256;
-				base[1] = ct;
-				base[2] = (x+ct)%256;
+				base[0] = 255; //(y+ct)%256;
+				base[1] = ((y+x+ct)%20==0)?128:0; //ct;
+				base[2] = 0; //(x+ct)%256;
 				base += pp;
 			}
 		}
 	} else {
-		for (int y=hh-1; y>=0; y--) {
+		for (int y=(hh<at_width)?hh:at_height-1; y>=0; y--) {
 			BYTE *base = pData + y*stride;
-			for (int x=0; x<ww; x++) {
+			for (int x=0; x<ww && x<at_width; x++) {
 				base[2] = *at; at++;
 				base[1] = *at; at++;
 				base[0] = *at; at++;
 				base += pp;
 			}
+			at += gap;
 		}
 	}
 	bus.endRead();
 	
+	//    CRefTime rtStart = m_rtSampleTime;
+    //m_rtSampleTime += (LONG)m_iRepeatTime;
+    //pms->SetTime((REFERENCE_TIME *) &rtStart,(REFERENCE_TIME *) &m_rtSampleTime);
+
+		// set PTS (presentation) timestamps...
+    REFERENCE_TIME avgFrameTime = ((VIDEOINFOHEADER*)m_mt.pbFormat)->AvgTimePerFrame;
+	CRefTime rnow;
+	m_pParent->StreamTime(rnow);
+	REFERENCE_TIME endThisFrame = rnow + avgFrameTime;
+    pms->SetTime((REFERENCE_TIME *) &rnow, &endThisFrame);
+    
+	}
+
 	pms->SetSyncPoint(TRUE);
 
 	return NOERROR;
@@ -220,6 +248,30 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms) {
 
 HRESULT CVCamStream::FillBuffer(IMediaSample *pms)
 {
+	REFERENCE_TIME rtNow;
+    
+    REFERENCE_TIME avgFrameTime = ((VIDEOINFOHEADER*)m_mt.pbFormat)->AvgTimePerFrame;
+
+    rtNow = m_rtLastTime;
+    m_rtLastTime += avgFrameTime;
+
+    
+    BYTE *pData;
+    long lDataLen;
+    pms->GetPointer(&pData);
+    lDataLen = pms->GetSize();
+    for(int i = 0; i < lDataLen; ++i)
+        pData[i] = rand();
+
+	// set PTS (presentation) timestamps...
+	CRefTime now;
+	m_pParent->StreamTime(now);
+	REFERENCE_TIME endThisFrame = now + avgFrameTime;
+    pms->SetTime((REFERENCE_TIME *) &now, &endThisFrame);
+    pms->SetSyncPoint(TRUE);
+
+	 return NOERROR;
+	/*
     CheckPointer(pms,E_POINTER); 
     CAutoLock cAutoLock(m_pFilter->pStateLock());
 
@@ -239,17 +291,36 @@ HRESULT CVCamStream::FillBuffer(IMediaSample *pms)
     pms->SetTime(&rtNow, &m_rtLastTime);
     pms->SetSyncPoint(TRUE);
 
-    return NOERROR;
+    return NOERROR;  */
 } // FillBuffer
 #endif
 
 //
 // Notify
-// Ignore quality management messages sent from the downstream filter
-STDMETHODIMP CVCamStream::Notify(IBaseFilter * pSender, Quality q)
-{
-    return E_NOTIMPL;
-} // Notify
+STDMETHODIMP CVCamStream::Notify(IBaseFilter * pSender, Quality q) {
+    if(q.Proportion<=0)
+    {
+        m_iRepeatTime = 1000;
+    }
+    else
+    {
+        m_iRepeatTime = m_iRepeatTime*1000 / q.Proportion;
+        if(m_iRepeatTime>1000)
+        {
+            m_iRepeatTime = 1000;
+        }
+        else if(m_iRepeatTime<10)
+        {
+            m_iRepeatTime = 10;
+        }
+    }
+
+    if(q.Late > 0)
+        m_rtSampleTime += q.Late;
+
+    return NOERROR;
+
+}
 
 //////////////////////////////////////////////////////////////////////////
 // This is called when the output format has been negotiated
@@ -341,6 +412,10 @@ HRESULT CVCamStream::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERTIE
 HRESULT CVCamStream::OnThreadCreate()
 {
     m_rtLastTime = 0;
+	m_rtSampleTime = 0;
+    m_iRepeatTime = m_iDefaultRepeatTime;
+	firstTime = -1;
+
     return NOERROR;
 } // OnThreadCreate
 
@@ -488,3 +563,5 @@ HRESULT CVCamStream::QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWORD *
     if (pTypeSupport) *pTypeSupport = KSPROPERTY_SUPPORT_GET; 
     return S_OK;
 }
+
+

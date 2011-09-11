@@ -82,15 +82,21 @@ public:
     HRESULT SetMediaType(const CMediaType *pmt);
     HRESULT OnThreadCreate(void);
     
+
 private:
     CVCam *m_pParent;
     REFERENCE_TIME m_rtLastTime;
+	int m_iRepeatTime;
+    const int m_iDefaultRepeatTime;
+    CRefTime m_rtSampleTime;
+
     HBITMAP m_hLogoBmp;
     CCritSec m_cSharedState;
     IReferenceClock *m_pClock;
     ShmemBus bus;
 	
     double lastChange;
+	double firstTime;
     int lastId;
     bool haveId;
 	int ct;
