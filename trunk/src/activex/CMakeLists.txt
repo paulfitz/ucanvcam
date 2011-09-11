@@ -50,19 +50,12 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/vivek)
 SET(UV_CODE 46)
 SET(LIBNAME ucanvcamx${UV_CODE})
 
-#ADD_LIBRARY(ucanvcamx SHARED vivek/Filters.cpp vivek/Dll.cpp memy.cpp prop.rc ${directx_source})
-ADD_LIBRARY(${LIBNAME}  SHARED Filters.cpp Filters.h Dll.cpp memy.cpp prop.rc memy.h YarpOut.h)
-# ADD_DEFINITIONS(-DUV_CODE=${UV_CODE})
+ADD_LIBRARY(${LIBNAME}  SHARED Filters.cpp Filters.h Dll.cpp prop.rc YarpOut.h)
 SET_PROPERTY(SOURCE Dll.cpp Filters.h APPEND PROPERTY COMPILE_DEFINITIONS UV_CODE=${UV_CODE})
 TARGET_LINK_LIBRARIES(${LIBNAME} ucanvcamx_directx)
 
-#ADD_LIBRARY(ucanvcamx SHARED vivek/Filters.cpp vivek/Dll.cpp memy.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source})
-#ADD_LIBRARY(ucanvcamx SHARED FBall.cpp Ball.cpp CBallProp.cpp memy.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source})
-#ADD_LIBRARY(ucanvcamx SHARED Filters.cpp Dll.cpp memy.cpp ${CMAKE_CURRENT_BINARY_DIR}/resources.o ${directx_source})
-
 TARGET_LINK_LIBRARIES(ucanvcamx_directx advapi32 gdi32 ole32 oleaut32 user32 winmm uuid strmiids comctl32)
 TARGET_LINK_LIBRARIES(${LIBNAME} ${YARP_LIBRARIES} ${SDL_LIBRARIES})
-
 
 INSTALL(TARGETS ${LIBNAME} DESTINATION bin)
 
