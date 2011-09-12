@@ -6,17 +6,16 @@
 #include <olectl.h>
 #include <dvdmedia.h>
 
-#include "Filters.h"
+#include "UVCam.h"
 
 // For MinGW
 #ifndef _uuidof
 #define _uuidof(x) IID_ ## x
 #endif
 
-#define SKIP_YARP
-#include "ShmemImage.h"
+#include "ShmemImageRaw.h"
 
-#include "YarpOut.h"
+#include "DllDbg.h"
 
 //////////////////////////////////////////////////////////////////////////
 //  UVCam is the source filter which masquerades as a capture device
@@ -25,8 +24,7 @@ CUnknown * WINAPI UVCam::CreateInstance(LPUNKNOWN lpunk, HRESULT *phr)
 {
 	ASSERT(phr);
 	CUnknown *punk = new UVCam(lpunk, phr);
-	DbgLog((LOG_TRACE,3,TEXT("Testing...")));
-	YarpOut out; out.init("ziggy"); out.say("hello", 51, 2);
+	DllDbg out; out.init("uvcam"); out.say("uvcam begins");
 	return punk;
 }
 
@@ -96,7 +94,6 @@ HRESULT UVCamStream::QueryInterface(REFIID riid, void **ppv)
 //  Camera device.
 //////////////////////////////////////////////////////////////////////////
 
-#if 1
 HRESULT UVCamStream::FillBuffer(IMediaSample *pms) {
 
 	CheckPointer(pms,E_POINTER);
@@ -116,7 +113,7 @@ HRESULT UVCamStream::FillBuffer(IMediaSample *pms) {
 			wt++;
 			bus.beginRead();
 			ShmemImageHeader header;
-			ShmemImage cp(bus);
+			ShmemImageRaw cp(bus);
 			cp.getHeader(header);
 			at = cp.getImage();
 
@@ -184,19 +181,14 @@ HRESULT UVCamStream::FillBuffer(IMediaSample *pms) {
 		int hh = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biHeight;
 		int bb = ((VIDEOINFOHEADER*)m_mt.pbFormat)->bmiHeader.biBitCount;
 
-		YarpOut out; out.init("ziggy",true); out.say("FillBuffer #1", ww, hh);
-		out.say("FillBuffer #2", at_width, at_height);
-		out.say("FillBuffer #3", (int)at, lastId);
-		out.say("FillBuffer #4", (int)now, (int)(now*10));
+		DllDbg out; out.init("uvcam",true); out.say("FillBuffer output dimensions", ww, hh);
+		out.say("FillBuffer input dimensions", at_width, at_height);
+		out.say("FillBuffer sequence, time", (int)at, (int)now);
 
 		// compatibility with current ucanvcam binaries
 		if (at_width==0&&at_height==0) {
 			at_width = 320;  at_height = 240;
 		}
-
-		//if (ww!=at_width || hh!=at_height) {
-		//ok = false;
-		//}
 
 		int pp = bb/8;
 		int stride = (ww * pp + 3) & ~3;
@@ -228,11 +220,6 @@ HRESULT UVCamStream::FillBuffer(IMediaSample *pms) {
 		}
 		bus.endRead();
 
-		//    CRefTime rtStart = m_rtSampleTime;
-		//m_rtSampleTime += (LONG)m_iRepeatTime;
-		//pms->SetTime((REFERENCE_TIME *) &rtStart,(REFERENCE_TIME *) &m_rtSampleTime);
-
-		// set PTS (presentation) timestamps...
 		REFERENCE_TIME avgFrameTime = ((VIDEOINFOHEADER*)m_mt.pbFormat)->AvgTimePerFrame;
 		CRefTime rnow;
 		m_pParent->StreamTime(rnow);
@@ -246,56 +233,6 @@ HRESULT UVCamStream::FillBuffer(IMediaSample *pms) {
 	return NOERROR;
 } // FillBuffer
 
-#else
-
-HRESULT UVCamStream::FillBuffer(IMediaSample *pms)
-{
-	REFERENCE_TIME rtNow;
-
-	REFERENCE_TIME avgFrameTime = ((VIDEOINFOHEADER*)m_mt.pbFormat)->AvgTimePerFrame;
-
-	rtNow = m_rtLastTime;
-	m_rtLastTime += avgFrameTime;
-
-
-	BYTE *pData;
-	long lDataLen;
-	pms->GetPointer(&pData);
-	lDataLen = pms->GetSize();
-	for(int i = 0; i < lDataLen; ++i)
-		pData[i] = rand();
-
-	// set PTS (presentation) timestamps...
-	CRefTime now;
-	m_pParent->StreamTime(now);
-	REFERENCE_TIME endThisFrame = now + avgFrameTime;
-	pms->SetTime((REFERENCE_TIME *) &now, &endThisFrame);
-	pms->SetSyncPoint(TRUE);
-
-	return NOERROR;
-	/*
-	CheckPointer(pms,E_POINTER); 
-	CAutoLock cAutoLock(m_pFilter->pStateLock());
-
-	BYTE *pData;
-	long lDataLen;
-	pms->GetPointer(&pData);
-	lDataLen = pms->GetSize();
-	for(int i = 0; i < lDataLen; ++i)
-	pData[i] = rand();
-
-	REFERENCE_TIME rtNow;
-
-	REFERENCE_TIME avgFrameTime = ((VIDEOINFOHEADER*)m_mt.pbFormat)->AvgTimePerFrame;
-
-	rtNow = m_rtLastTime;
-	m_rtLastTime += avgFrameTime;
-	pms->SetTime(&rtNow, &m_rtLastTime);
-	pms->SetSyncPoint(TRUE);
-
-	return NOERROR;  */
-} // FillBuffer
-#endif
 
 //
 // Notify
