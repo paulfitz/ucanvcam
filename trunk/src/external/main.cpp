@@ -19,7 +19,7 @@ int write_test_string(const char *msg) {
   if ((int)strlen(msg)>=len) {
     printf("Message too long\n");
   } else {
-    sprintf(base,"%s",msg);
+    sprintf_s(base,len,"%s",msg);
     printf("Writing %s\n", msg);
   }
   bus.endWrite();
@@ -87,7 +87,8 @@ int write_test_image(int w, int h) {
 		}
 	  }
 	  if (k==0) {
-		  FILE *f = fopen("target.ppm","wb");
+		  FILE *f = NULL;
+		  fopen_s(&f,"target.ppm","wb");
 		  fprintf (f, "P6\n%d %d\n255\n", header->w, header->h);
 		  fwrite (base+sizeof(ShmemImageHeader), header->w * 3 * header->h, 1, f);
 		  fclose(f);
