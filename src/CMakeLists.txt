@@ -130,6 +130,6 @@ endif ()
 
 IF (WIN32)
     INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/win32)
-	add_executable(test_bus external/main.cpp)
+	add_executable(test_bus external/test_bus.cpp)
 ENDIF ()
 

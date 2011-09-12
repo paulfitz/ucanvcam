@@ -1,9 +1,3 @@
-//////////////////////////////////////////////////////////////////////////
-//  This file contains routines to register / Unregister the 
-//  Directshow filter 'Virtual Cam'
-//  We do not use the inbuilt BaseClasses routines as we need to register as
-//  a capture source
-//////////////////////////////////////////////////////////////////////////
 #pragma comment(lib, "kernel32")
 #pragma comment(lib, "user32")
 #pragma comment(lib, "gdi32")
@@ -12,29 +6,18 @@
 #pragma comment(lib, "ole32")
 #pragma comment(lib, "oleaut32")
 
-//#ifdef _DEBUG
-//  #pragma comment(lib, "strmbasd")
-//#else
-//   #pragma comment(lib, "strmbase")
-//#endif
-
-
 #ifndef MINGW
 #pragma comment (linker, "/EXPORT:DllRegisterServer=_DllRegisterServer@0,PRIVATE")
-
 #pragma comment (linker, "/EXPORT:DllGetClassObject=_DllGetClassObject@12,PRIVATE")
-
 #pragma comment (linker, "/EXPORT:DllUnregisterServer=_DllUnregisterServer@0,PRIVATE")
-
 #pragma comment (linker, "/EXPORT:DllCanUnloadNow=_DllCanUnloadNow@0,PRIVATE")
-
 #endif
 
 #include <streams.h>
 #include <olectl.h>
 #include <initguid.h>
 #include <dllsetup.h>
-#include "Filters.h"
+#include "UVCam.h"
 
 #define CreateComObject(clsid, iid, var) CoCreateInstance( clsid, NULL, CLSCTX_INPROC_SERVER, iid, (void **)&var);
 
