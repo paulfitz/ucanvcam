@@ -64,4 +64,4 @@ To compile the ucanvcam GUI, you'll need wxwidgets (try installing
 from "wxpack") and YARP - see:
   http://eris.liralab.it/wiki/Binary_packages#Install_precompiled_versions_of_iCub_and_YARP
   
-Reconfigure, recompile.
+Reconfigure, turn on "STANDALONE", "USE_GUI", "USE_YARP", recompile.

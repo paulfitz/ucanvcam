@@ -4,8 +4,7 @@
 #include <stdio.h>
 
 // Comment out to disable debugging
-//
-#define DLL_DBG_ACTIVE
+// #define DLL_DBG_ACTIVE
 
 // Primitive log-to-file debugging.  Logs to:
 //   c:/log/ucanvcam_*.txt
