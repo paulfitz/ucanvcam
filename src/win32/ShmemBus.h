@@ -32,7 +32,7 @@ public:
 
     TCHAR buf[256];
     for (int i=0; i<SHMEM_MAX_READERS; i++) {
-      _stprintf(buf, _T("%s_%d"), readEventName, i);
+      _stprintf_s(buf, sizeof(buf), _T("%s_%d"), readEventName, i);
       readEvent[i] = CreateEvent(NULL,false,true,buf);
       if (readEvent[i]==NULL) return false;
     }

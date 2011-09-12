@@ -13,9 +13,9 @@
 #pragma comment(lib, "oleaut32")
 
 //#ifdef _DEBUG
-  //  #pragma comment(lib, "strmbasd")
+//  #pragma comment(lib, "strmbasd")
 //#else
- //   #pragma comment(lib, "strmbase")
+//   #pragma comment(lib, "strmbase")
 //#endif
 
 
@@ -46,46 +46,46 @@ STDAPI AMovieSetupUnregisterServer( CLSID clsServer );
 
 // {8E14549A-DB61-4309-AFA1-3578E927E933}
 DEFINE_GUID(CLSID_VirtualCam,
-            0x8e14549a, 0xdb61, 0x4309, 0xaf, 0xa1, 0x35, 0x78, 0xe9, 0x27, 0xe9, UV_CODE);
+	0x8e14549a, 0xdb61, 0x4309, 0xaf, 0xa1, 0x35, 0x78, 0xe9, 0x27, 0xe9, UV_CODE);
 
 
 const AMOVIESETUP_MEDIATYPE AMSMediaTypesVCam = 
 { 
-    &MEDIATYPE_Video, 
-    &MEDIASUBTYPE_NULL 
+	&MEDIATYPE_Video, 
+	&MEDIASUBTYPE_NULL 
 };
 
 const AMOVIESETUP_PIN AMSPinVCam=
 {
-    L"Output",             // Pin string name
-    FALSE,                 // Is it rendered
-    TRUE,                  // Is it an output
-    FALSE,                 // Can we have none
-    FALSE,                 // Can we have many
-    &CLSID_NULL,           // Connects to filter
-    NULL,                  // Connects to pin
-    1,                     // Number of types
-    &AMSMediaTypesVCam      // Pin Media types
+	L"Output",             // Pin string name
+	FALSE,                 // Is it rendered
+	TRUE,                  // Is it an output
+	FALSE,                 // Can we have none
+	FALSE,                 // Can we have many
+	&CLSID_NULL,           // Connects to filter
+	NULL,                  // Connects to pin
+	1,                     // Number of types
+	&AMSMediaTypesVCam      // Pin Media types
 };
 
 const AMOVIESETUP_FILTER AMSFilterVCam =
 {
-    &CLSID_VirtualCam,  // Filter CLSID
-    LQUOTED_CAM_NAME,     // String name
-    MERIT_DO_NOT_USE,      // Filter merit
-    1,                     // Number pins
-    &AMSPinVCam             // Pin details
+	&CLSID_VirtualCam,  // Filter CLSID
+	LQUOTED_CAM_NAME,     // String name
+	MERIT_DO_NOT_USE,      // Filter merit
+	1,                     // Number pins
+	&AMSPinVCam             // Pin details
 };
 
 CFactoryTemplate g_Templates[] = 
 {
-    {
-        LQUOTED_CAM_NAME,
-        &CLSID_VirtualCam,
-        CVCam::CreateInstance,
-        NULL,
-        &AMSFilterVCam
-    },
+	{
+		LQUOTED_CAM_NAME,
+			&CLSID_VirtualCam,
+			UVCam::CreateInstance,
+			NULL,
+			&AMSFilterVCam
+	},
 
 };
 
@@ -93,67 +93,67 @@ int g_cTemplates = sizeof(g_Templates) / sizeof(g_Templates[0]);
 
 STDAPI RegisterFilters( BOOL bRegister )
 {
-    HRESULT hr = NOERROR;
-    WCHAR achFileName[MAX_PATH];
-    char achTemp[MAX_PATH];
-    ASSERT(g_hInst != 0);
+	HRESULT hr = NOERROR;
+	WCHAR achFileName[MAX_PATH];
+	char achTemp[MAX_PATH];
+	ASSERT(g_hInst != 0);
 
-    if( 0 == GetModuleFileNameA(g_hInst, achTemp, sizeof(achTemp))) 
-        return AmHresultFromWin32(GetLastError());
+	if( 0 == GetModuleFileNameA(g_hInst, achTemp, sizeof(achTemp))) 
+		return AmHresultFromWin32(GetLastError());
 
-    MultiByteToWideChar(CP_ACP, 0L, achTemp, lstrlenA(achTemp) + 1, 
-                       achFileName, NUMELMS(achFileName));
-  
-    hr = CoInitialize(0);
-    if(bRegister)
-    {
-        hr = AMovieSetupRegisterServer(CLSID_VirtualCam, LQUOTED_CAM_NAME, achFileName, L"Both", L"InprocServer32");
-    }
+	MultiByteToWideChar(CP_ACP, 0L, achTemp, lstrlenA(achTemp) + 1, 
+		achFileName, NUMELMS(achFileName));
 
-    if( SUCCEEDED(hr) )
-    {
-        IFilterMapper2 *fm = 0;
-        hr = CreateComObject( CLSID_FilterMapper2, IID_IFilterMapper2, fm );
-        if( SUCCEEDED(hr) )
-        {
-            if(bRegister)
-            {
-                IMoniker *pMoniker = 0;
-                REGFILTER2 rf2;
-                rf2.dwVersion = 1;
-                rf2.dwMerit = MERIT_DO_NOT_USE;
-                rf2.cPins = 1;
-                rf2.rgPins = &AMSPinVCam;
-                hr = fm->RegisterFilter(CLSID_VirtualCam, LQUOTED_CAM_NAME, &pMoniker, &CLSID_VideoInputDeviceCategory, NULL, &rf2);
-            }
-            else
-            {
-                hr = fm->UnregisterFilter(&CLSID_VideoInputDeviceCategory, 0, CLSID_VirtualCam);
-            }
-        }
+	hr = CoInitialize(0);
+	if(bRegister)
+	{
+		hr = AMovieSetupRegisterServer(CLSID_VirtualCam, LQUOTED_CAM_NAME, achFileName, L"Both", L"InprocServer32");
+	}
 
-      // release interface
-      //
-      if(fm)
-          fm->Release();
-    }
+	if( SUCCEEDED(hr) )
+	{
+		IFilterMapper2 *fm = 0;
+		hr = CreateComObject( CLSID_FilterMapper2, IID_IFilterMapper2, fm );
+		if( SUCCEEDED(hr) )
+		{
+			if(bRegister)
+			{
+				IMoniker *pMoniker = 0;
+				REGFILTER2 rf2;
+				rf2.dwVersion = 1;
+				rf2.dwMerit = MERIT_DO_NOT_USE;
+				rf2.cPins = 1;
+				rf2.rgPins = &AMSPinVCam;
+				hr = fm->RegisterFilter(CLSID_VirtualCam, LQUOTED_CAM_NAME, &pMoniker, &CLSID_VideoInputDeviceCategory, NULL, &rf2);
+			}
+			else
+			{
+				hr = fm->UnregisterFilter(&CLSID_VideoInputDeviceCategory, 0, CLSID_VirtualCam);
+			}
+		}
 
-    if( SUCCEEDED(hr) && !bRegister )
-        hr = AMovieSetupUnregisterServer( CLSID_VirtualCam );
+		// release interface
+		//
+		if(fm)
+			fm->Release();
+	}
 
-    CoFreeUnusedLibraries();
-    CoUninitialize();
-    return hr;
+	if( SUCCEEDED(hr) && !bRegister )
+		hr = AMovieSetupUnregisterServer( CLSID_VirtualCam );
+
+	CoFreeUnusedLibraries();
+	CoUninitialize();
+	return hr;
 }
 
 STDAPI DllRegisterServer()
 {
-    return RegisterFilters(TRUE);
+	return RegisterFilters(TRUE);
 }
 
 STDAPI DllUnregisterServer()
 {
-    return RegisterFilters(FALSE);
+	return RegisterFilters(FALSE);
 }
 
 extern "C" BOOL WINAPI DllEntryPoint(HINSTANCE, ULONG, LPVOID);

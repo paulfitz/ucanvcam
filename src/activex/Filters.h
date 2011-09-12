@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UCANVCAM_FILTERS_INC
+#define UCANVCAM_FILTERS_INC
 
 #define DECLARE_PTR(type, ptr, expr) type* ptr = (type*)(expr);
 
@@ -19,87 +20,89 @@
 
 EXTERN_C const GUID CLSID_VirtualCam;
 
-class CVCamStream;
-class CVCam : public CSource
+class UVCamStream;
+class UVCam : public CSource
 {
 public:
-    //////////////////////////////////////////////////////////////////////////
-    //  IUnknown
-    //////////////////////////////////////////////////////////////////////////
-    static CUnknown * WINAPI CreateInstance(LPUNKNOWN lpunk, HRESULT *phr);
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
+	//////////////////////////////////////////////////////////////////////////
+	//  IUnknown
+	//////////////////////////////////////////////////////////////////////////
+	static CUnknown * WINAPI CreateInstance(LPUNKNOWN lpunk, HRESULT *phr);
+	STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
 
-    IFilterGraph *GetGraph() {return m_pGraph;}
+	IFilterGraph *GetGraph() {return m_pGraph;}
 
 private:
-    CVCam(LPUNKNOWN lpunk, HRESULT *phr);
+	UVCam(LPUNKNOWN lpunk, HRESULT *phr);
 
 	int GetPinCount();
 	CBasePin *GetPin(int n);
 };
 
-class CVCamStream : public CSourceStream, public IAMStreamConfig, public IKsPropertySet
+class UVCamStream : public CSourceStream, public IAMStreamConfig, public IKsPropertySet
 {
 public:
 
-    //////////////////////////////////////////////////////////////////////////
-    //  IUnknown
-    //////////////////////////////////////////////////////////////////////////
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
-    STDMETHODIMP_(ULONG) AddRef() { return GetOwner()->AddRef(); }                                                          \
-    STDMETHODIMP_(ULONG) Release() { return GetOwner()->Release(); }
+	//////////////////////////////////////////////////////////////////////////
+	//  IUnknown
+	//////////////////////////////////////////////////////////////////////////
+	STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
+	STDMETHODIMP_(ULONG) AddRef() { return GetOwner()->AddRef(); }                                                          \
+		STDMETHODIMP_(ULONG) Release() { return GetOwner()->Release(); }
 
-    //////////////////////////////////////////////////////////////////////////
-    //  IQualityControl
-    //////////////////////////////////////////////////////////////////////////
-    STDMETHODIMP Notify(IBaseFilter * pSender, Quality q);
+	//////////////////////////////////////////////////////////////////////////
+	//  IQualityControl
+	//////////////////////////////////////////////////////////////////////////
+	STDMETHODIMP Notify(IBaseFilter * pSender, Quality q);
 
-    //////////////////////////////////////////////////////////////////////////
-    //  IAMStreamConfig
-    //////////////////////////////////////////////////////////////////////////
-    HRESULT STDMETHODCALLTYPE SetFormat(AM_MEDIA_TYPE *pmt);
-    HRESULT STDMETHODCALLTYPE GetFormat(AM_MEDIA_TYPE **ppmt);
-    HRESULT STDMETHODCALLTYPE GetNumberOfCapabilities(int *piCount, int *piSize);
-    HRESULT STDMETHODCALLTYPE GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC);
+	//////////////////////////////////////////////////////////////////////////
+	//  IAMStreamConfig
+	//////////////////////////////////////////////////////////////////////////
+	HRESULT STDMETHODCALLTYPE SetFormat(AM_MEDIA_TYPE *pmt);
+	HRESULT STDMETHODCALLTYPE GetFormat(AM_MEDIA_TYPE **ppmt);
+	HRESULT STDMETHODCALLTYPE GetNumberOfCapabilities(int *piCount, int *piSize);
+	HRESULT STDMETHODCALLTYPE GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC);
 
-    //////////////////////////////////////////////////////////////////////////
-    //  IKsPropertySet
-    //////////////////////////////////////////////////////////////////////////
-    HRESULT STDMETHODCALLTYPE Set(REFGUID guidPropSet, DWORD dwID, void *pInstanceData, DWORD cbInstanceData, void *pPropData, DWORD cbPropData);
-    HRESULT STDMETHODCALLTYPE Get(REFGUID guidPropSet, DWORD dwPropID, void *pInstanceData,DWORD cbInstanceData, void *pPropData, DWORD cbPropData, DWORD *pcbReturned);
-    HRESULT STDMETHODCALLTYPE QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWORD *pTypeSupport);
-    
-    //////////////////////////////////////////////////////////////////////////
-    //  CSourceStream
-    //////////////////////////////////////////////////////////////////////////
-    CVCamStream(HRESULT *phr, CVCam *pParent, LPCWSTR pPinName);
-    ~CVCamStream();
+	//////////////////////////////////////////////////////////////////////////
+	//  IKsPropertySet
+	//////////////////////////////////////////////////////////////////////////
+	HRESULT STDMETHODCALLTYPE Set(REFGUID guidPropSet, DWORD dwID, void *pInstanceData, DWORD cbInstanceData, void *pPropData, DWORD cbPropData);
+	HRESULT STDMETHODCALLTYPE Get(REFGUID guidPropSet, DWORD dwPropID, void *pInstanceData,DWORD cbInstanceData, void *pPropData, DWORD cbPropData, DWORD *pcbReturned);
+	HRESULT STDMETHODCALLTYPE QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWORD *pTypeSupport);
 
-    HRESULT FillBuffer(IMediaSample *pms);
-    HRESULT DecideBufferSize(IMemAllocator *pIMemAlloc, ALLOCATOR_PROPERTIES *pProperties);
-    HRESULT CheckMediaType(const CMediaType *pMediaType);
-    HRESULT GetMediaType(int iPosition, CMediaType *pmt);
-    HRESULT SetMediaType(const CMediaType *pmt);
-    HRESULT OnThreadCreate(void);
-    
+	//////////////////////////////////////////////////////////////////////////
+	//  CSourceStream
+	//////////////////////////////////////////////////////////////////////////
+	UVCamStream(HRESULT *phr, UVCam *pParent, LPCWSTR pPinName);
+	~UVCamStream();
+
+	HRESULT FillBuffer(IMediaSample *pms);
+	HRESULT DecideBufferSize(IMemAllocator *pIMemAlloc, ALLOCATOR_PROPERTIES *pProperties);
+	HRESULT CheckMediaType(const CMediaType *pMediaType);
+	HRESULT GetMediaType(int iPosition, CMediaType *pmt);
+	HRESULT SetMediaType(const CMediaType *pmt);
+	HRESULT OnThreadCreate(void);
+
 
 private:
-    CVCam *m_pParent;
-    REFERENCE_TIME m_rtLastTime;
+	UVCam *m_pParent;
+	REFERENCE_TIME m_rtLastTime;
 	int m_iRepeatTime;
-    const int m_iDefaultRepeatTime;
-    CRefTime m_rtSampleTime;
+	const int m_iDefaultRepeatTime;
+	CRefTime m_rtSampleTime;
 
-    HBITMAP m_hLogoBmp;
-    CCritSec m_cSharedState;
-    IReferenceClock *m_pClock;
-    ShmemBus bus;
-	
-    double lastChange;
+	HBITMAP m_hLogoBmp;
+	CCritSec m_cSharedState;
+	IReferenceClock *m_pClock;
+	ShmemBus bus;
+
+	double lastChange;
 	double firstTime;
-    int lastId;
-    bool haveId;
+	int lastId;
+	bool haveId;
 	int ct;
 };
 
+
+#endif
 
