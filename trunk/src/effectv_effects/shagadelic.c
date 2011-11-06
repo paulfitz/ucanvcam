@@ -13,6 +13,7 @@
 #include <math.h>
 #include "EffecTV.h"
 #include "utils.h"
+#include <SDL/SDL.h>
 
 static int start(void);
 static int stop(void);

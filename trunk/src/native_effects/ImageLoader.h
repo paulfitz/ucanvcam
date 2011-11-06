@@ -4,7 +4,7 @@
 #include <yarp/os/Property.h>
 #include <yarp/sig/Image.h>
 
-#ifdef HAVE_GD
+#ifdef GD_IS_AVAILABLE
 #include <gd.h>
 #else
 typedef void *gdImagePtr;
@@ -35,7 +35,7 @@ public:
   void clear();
   
   yarp::sig::PixelBgra pixel(int x, int y) {
-#if HAVE_GD
+#if GD_IS_AVAILABLE
     int v = gdImageGetPixel(im,x,y);
     return *((yarp::sig::PixelBgra *)(&v));
 #else
@@ -48,14 +48,14 @@ public:
   }
 
   int width() {
-#ifdef HAVE_GD
+#ifdef GD_IS_AVAILABLE
     if (im!=NULL) return im->sx;
 #endif
     return 0;
   }
 
   int height() {
-#ifdef HAVE_GD
+#ifdef GD_IS_AVAILABLE
     if (im!=NULL) return im->sy;
 #endif
     return 0;

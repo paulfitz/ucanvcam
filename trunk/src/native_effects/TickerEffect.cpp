@@ -1,4 +1,4 @@
-#ifdef HAVE_GD
+#ifdef GD_IS_AVAILABLE
 
 #include <stdlib.h>
 #include <string.h>

@@ -66,7 +66,7 @@ const char * isjpg(const char * name, int & result) {
 
 
 static gdImagePtr loadImage(const char *iname) {
-#ifdef HAVE_GD
+#ifdef GD_IS_AVAILABLE
   printf("Load image: looking at %s\n", iname);
   string local = iname;
   char *fname = (char*)local.c_str();
