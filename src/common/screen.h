@@ -9,8 +9,11 @@
 #ifndef __SCREEN_H__
 #define __SCREEN_H__
 
-//#include <SDL/SDL.h>
+#ifdef SDL_IS_AVAILABLE
+#  include <SDL/SDL.h>
+#else 
 typedef void *SDL_Event;
+#endif
 
 #if defined(WIN32) || defined(WIN64)
 #define strncasecmp _strnicmp

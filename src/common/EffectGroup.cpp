@@ -1,4 +1,7 @@
 
+#include <stdlib.h>
+#include <string.h>
+
 extern "C" {
 #include "EffecTV.h"
   //#include "utils.h"
@@ -13,7 +16,7 @@ using namespace yarp::dev;
 
 // -> not present
 //// -> floating point exception
-#ifdef USE_GD
+#ifdef GD_IS_AVAILABLE
 static effectRegisterFunc *effects_register_list[] =
 {
 	dumbRegister,
@@ -173,7 +176,7 @@ int EffectGroup::init()
 	effect *entry;
 
 	effectMax = 0;
-#ifdef USE_GD
+#ifdef GD_IS_AVAILABLE
 	n = sizeof(effects_register_list)/sizeof(effectRegisterFunc *);
 	for(i=0;i<n;i++) {
 		entry = (*effects_register_list[i])();
@@ -185,7 +188,7 @@ int EffectGroup::init()
 	}
 #endif
 	add(testRegister());
-#ifdef USE_SDL
+#ifdef SDL_IS_AVAILABLE
 	add(tickerRegister());
 	add(engageRegister());
 	add(paramRegister());

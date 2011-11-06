@@ -18,7 +18,7 @@ echo -e "\tcd build; make install"
 cd build
 # we have a bug: we need to run cmake twice at the moment.
 cmake .. > /dev/null 2> /dev/null
-cmake -DENABLE_vcammod_ffmpeg_grabber:BOOL=TRUE . || (
+cmake -DSTANDALONE:BOOL=TRUE -DUSE_GUI:BOOL=TRUE -DUSE_GD:BOOL=TRUE -DUSE_SDL:BOOL=TRUE -DENABLE_vcammod_ffmpeg_grabber:BOOL=TRUE -DENABLE_vcammod_ffmpeg_writer:BOOL=TRUE . || (
     cd $base
     rm -f Makefile
     exit 1
