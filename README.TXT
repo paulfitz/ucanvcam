@@ -22,24 +22,20 @@ See DEPENDENCIES.TXT for details
 To use with the skype beta current at the time of writing(version 2.0.0.43),
 you'll need the "gstfakevideo" workaround (do a web search).
 
-== Compiling on Windows with Visual Studio (Linux is easy) ==
+== Compiling on Windows with Visual Studio (Linux is easier) ==
 
-Compile using CMake:
-  http://www.cmake.org
-  
 You'll need DirectX installed.  These days, it is bundled with
 the Windows Platform SDK.  Install that.
 
+Compile using CMake: http://www.cmake.org
+  cmake.exe CMakeLists.txt  
+
 Chose any build directory you want, and configure.  Hopefully, DirectX
 will be found automatically.  Otherwise, edit the two variables
-DIRECTX_BASECLASSES_DIR and DIRECTX_INCLUDE_DIR by hand.  They should
-look something like this (at the time of writing):
-
-DIRECTX_BASECLASSES_DIR:
-  C:/Program Files/Microsoft SDKs/Windows/v7.1/Samples/multimedia/directshow/baseclasses
-
-DIRECTX_INCLUDE_DIR:
-  C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Include
+DIRECTX_BASECLASSES_DIR and DIRECTX_INCLUDE_DIR by hand in CMakeLists.txt.  They should
+look something like this:
+  SET(DIRECTX_BASECLASSES_DIR "C:/Program Files/Microsoft SDKs/Windows/v7.1/Samples/multimedia/directshow/baseclasses")
+  SET(DIRECTX_INCLUDE_DIR "C:/Program Files/Microsoft SDKs/Windows/v7.1/Include")
 
 Configure again if you need to, then Generate.  All going well, you
 should now have a "ucanvcam.sln" in your build directory.  Open
